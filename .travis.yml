@@ -1,0 +1,10 @@
+sudo: required
+
+services:
+  - docker
+
+script:
+  - make all latest
+
+after_success:
+  - .travis/maybe-deploy.sh
