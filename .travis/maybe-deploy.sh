@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 if [ "x$TRAVIS_BRANCH" = "xrelease" ]; then
     VERSION=$(make version)
     docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
