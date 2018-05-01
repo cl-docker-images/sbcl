@@ -1,10 +1,8 @@
-FROM alpine:edge as builder
+FROM debian:stretch as builder
 
 # Install build requirements
-RUN apk add --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ sbcl \
-    && apk add make gcc linux-headers musl-dev zlib-dev
-
-COPY patches/ /build/patches/
+RUN apt-get update \
+    && apt-get install -y sbcl build-essential zlib1g-dev
 
 ARG SBCL_VERSION
 
@@ -14,12 +12,10 @@ ADD https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${S
 WORKDIR /build
 RUN tar xf sbcl-${SBCL_VERSION}.tar.bz2 \
     && cd sbcl-${SBCL_VERSION}/ \
-    && cat /build/patches/netdb-addition.h >> /usr/include/netdb.h \
-    && patch -i /build/patches/*.patch -p1 \
     && ./make.sh --fancy --prefix=/usr/local/ \
     && ./install.sh
 
-FROM alpine:3.7
+FROM debian:stretch
 
 LABEL maintainer="etimmons@mit.edu"
 

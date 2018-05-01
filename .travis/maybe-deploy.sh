@@ -6,4 +6,8 @@ if [ "x$TRAVIS_BRANCH" = "xrelease" ]; then
     docker push daewok/sbcl:${VERSION}-alpine-3.7
     docker push daewok/sbcl:alpine-3.7
     docker push daewok/sbcl:alpine
+
+    docker push daewok/sbcl:${VERSION}-debian-stretch
+    docker push daewok/sbcl:debian-stretch
+    docker push daewok/sbcl:debian-stretch
 fi
