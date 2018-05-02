@@ -5,6 +5,7 @@ if [ "x$TRAVIS_BRANCH" = "xrelease" ]; then
 
     TAGS=$(docker images daewok/sbcl | tail -n +2 | tr -s ' ' | cut -d ' ' -f 2)
     for tag in ${TAGS}; do
+        echo "pushing daewok/sbcl:${tag}"
         docker push daewok/sbcl:${tag}
     done
 
