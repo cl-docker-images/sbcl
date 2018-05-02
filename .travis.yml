@@ -7,7 +7,7 @@ before_install:
   - docker pull docker:stable-dind
 
 script:
-  - docker run --privileged -it --rm -v `pwd`:/build -v /var/run/docker.sock:/var/run/docker.sock -w /build docker:stable-dind sh -c "apk add --no-cache make; make alpine-latest"
+  - docker run --privileged -it --rm -v `pwd`:/build -v /var/run/docker.sock:/var/run/docker.sock -w /build docker:stable-dind sh -c "apk add --no-cache make; make all"
 
 after_success:
   - .travis/maybe-deploy.sh
