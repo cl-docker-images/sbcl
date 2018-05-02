@@ -23,13 +23,13 @@ RUN set -x \
     && bunzip2 /build/sbcl-${SBCL_VERSION}-source.tar.bz2 \
     && grep sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION}-crhodes.asc > sum-file.txt \
     && sha256sum -c sum-file.txt \
-    && rm -r "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sum-file.txt \
+    && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sum-file.txt \
     && tar xf sbcl-${SBCL_VERSION}-source.tar \
     && cd sbcl-${SBCL_VERSION}/ \
     && ./make.sh --fancy --prefix=/usr/local/ \
     && ./install.sh \
     && cd / \
-    && rm -r /build \
+    && rm -rf /build \
     && apt-get remove -y sbcl build-essential zlib1g-dev wget ca-certificates \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
