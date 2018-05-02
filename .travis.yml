@@ -4,7 +4,7 @@ services:
   - docker
 
 script:
-  - make all latest
+  - make alpine
 
 after_success:
   - .travis/maybe-deploy.sh

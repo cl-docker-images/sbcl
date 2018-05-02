@@ -1,32 +1,81 @@
-SBCL_VERSION := 1.4.7
+LATEST_VERSION = 1.4.7
+VERSIONS = $(notdir $(shell find versions -mindepth 1 -maxdepth 1 -type d))
 
-all: alpine
+LATEST_ALPINE = alpine3.7
+LATEST_DEBIAN = debian-stretch
+LATEST_UBUNTU = ubuntu-bionic
+OSES = alpine3.7 debian-stretch ubuntu-xenial ubuntu-bionic
 
-alpine-3.7:
-	docker build -t daewok/sbcl:$(SBCL_VERSION)-alpine-3.7 \
-		--build-arg SBCL_VERSION=$(SBCL_VERSION) \
-		versions/alpine-3.7
+ALL_TARGETS =
 
-alpine: alpine-3.7
+ALL_TAGS =
 
-latest-alpine: alpine-3.7
-	docker tag daewok/sbcl:$(SBCL_VERSION)-alpine-3.7 daewok/sbcl:alpine
-	docker tag daewok/sbcl:$(SBCL_VERSION)-alpine-3.7 daewok/sbcl:alpine-3.7
+all:
 
-debian-stretch:
-	docker build -t daewok/sbcl:$(SBCL_VERSION)-debian-stretch \
-		--build-arg SBCL_VERSION=$(SBCL_VERSION) \
-		versions/debian-stretch
+define DOCKER_TEMPLATE =
+v$(1)-$(2):: versions/$(1)/$(2)/Dockerfile
+	docker build -t daewok/sbcl:$(1)-$(2) versions/$(1)/$(2)
 
-debian: debian-stretch
+ALL_TARGETS += v$(1)-$(2)
+ALL_TAGS += $(1)-$(2)
+.PHONY: v$(1)-$(2)
+endef
 
-latest-debian: debian-stretch
-	docker tag daewok/sbcl:$(SBCL_VERSION)-debian-stretch daewok/sbcl:debian
-	docker tag daewok/sbcl:$(SBCL_VERSION)-debian-stretch daewok/sbcl:debian-stretch
+define LATEST_ALPINE_TEMPLATE =
+v$(1)-alpine: v$(1)-$(LATEST_ALPINE)
+	docker tag daewok/sbcl:$(1)-$(LATEST_ALPINE) daewok/sbcl:$(1)-alpine
 
-latest: latest-alpine latest-debian
+ALL_TARGETS += v$(1)-alpine
+ALL_TAGS += $(1)-alpine
+.PHONY: v$(1)-alpine
+endef
 
-version:
-	@echo $(SBCL_VERSION)
+define LATEST_DEBIAN_TEMPLATE =
+v$(1)-debian: v$(1)-$(LATEST_DEBIAN)
+	docker tag daewok/sbcl:$(1)-$(LATEST_DEBIAN) daewok/sbcl:$(1)-debian
 
-.PHONY: all alpine alpine-3.7 latest-alpine debian debian-stretch latest-debian latest version
+ALL_TARGETS += v$(1)-debian
+ALL_TAGS += $(1)-debian
+.PHONY: v$(1)-debian
+endef
+
+define LATEST_UBUNTU_TEMPLATE =
+v$(1)-ubuntu: v$(1)-$(LATEST_UBUNTU)
+	docker tag daewok/sbcl:$(1)-$(LATEST_UBUNTU) daewok/sbcl:$(1)-ubuntu
+
+ALL_TARGETS += v$(1)-ubuntu
+ALL_TAGS += $(1)-ubuntu
+.PHONY: v$(1)-ubuntu
+endef
+
+define EXPAND_VERSION =
+$(foreach os,$(OSES),$(eval $(call DOCKER_TEMPLATE,$(1),$(os))))
+
+$(eval $(call LATEST_ALPINE_TEMPLATE,$(1)))
+$(eval $(call LATEST_DEBIAN_TEMPLATE,$(1)))
+$(eval $(call LATEST_UBUNTU_TEMPLATE,$(1)))
+
+endef
+
+$(foreach v,$(VERSIONS),$(call EXPAND_VERSION,$(v)))
+
+alpine-latest: v$(LATEST_VERSION)-$(LATEST_ALPINE)
+	docker tag daewok/sbcl:$(LATEST_VERSION)-$(LATEST_ALPINE) daewok/sbcl:alpine
+
+debian-latest: v$(LATEST_VERSION)-$(LATEST_DEBIAN)
+	docker tag daewok/sbcl:$(LATEST_VERSION)-$(LATEST_DEBIAN) daewok/sbcl:debian
+
+ubuntu-latest: v$(LATEST_VERSION)-$(LATEST_UBUNTU)
+	docker tag daewok/sbcl:$(LATEST_VERSION)-$(LATEST_UBUNTU) daewok/sbcl:ubuntu
+
+ALL_TAGS += alpine debian ubuntu
+
+all: alpine-latest debian-latest ubuntu-latest $(ALL_TARGETS)
+
+all_tags:
+	@echo $(ALL_TAGS)
+
+alpine_tags:
+	@echo alpine alpine3.7
+
+.PHONY: all all_tags
