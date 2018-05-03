@@ -1,4 +1,4 @@
-SBCL Docker Images [![Build Status](https://travis-ci.org/daewok/docker-sbcl.svg?branch=master)](https://travis-ci.org/daewok/docker-sbcl)
+# SBCL Docker Images [![Build Status](https://travis-ci.org/daewok/docker-sbcl.svg?branch=master)](https://travis-ci.org/daewok/docker-sbcl)
 
 This repo contains Dockerfiles for SBCL builds on a variety of base images.
 
