@@ -5,8 +5,8 @@ LABEL maintainer="etimmons@mit.edu"
 ENV SBCL_VERSION=1.4.7
 
 RUN set -x \
-    && mkdir /build \
-    && cd /build \
+    && mkdir -p /usr/local/src/ \
+    && cd /usr/local/src/ \
     && apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y sbcl build-essential zlib1g-dev gnupg wget ca-certificates\
@@ -20,16 +20,16 @@ RUN set -x \
        || gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ${CRHODES_KEY} \
        || gpg --keyserver pgp.mit.edu --recv-keys ${CRHODES_KEY}) \
     && gpg --batch --verify sbcl-${SBCL_VERSION}-crhodes.asc \
-    && bunzip2 /build/sbcl-${SBCL_VERSION}-source.tar.bz2 \
+    && bunzip2 sbcl-${SBCL_VERSION}-source.tar.bz2 \
     && grep sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION}-crhodes.asc > sum-file.txt \
     && sha256sum -c sum-file.txt \
     && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sum-file.txt \
     && tar xf sbcl-${SBCL_VERSION}-source.tar \
     && cd sbcl-${SBCL_VERSION}/ \
-    && ./make.sh --fancy --prefix=/usr/local/ \
+    && ./make.sh --with-sb-core-compression --with-sb-thread --prefix=/usr/local/ \
     && ./install.sh \
-    && cd / \
-    && rm -rf /build \
+    && cd /usr/local/src \
+    && rm -rf sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION} \
     && apt-get remove -y sbcl build-essential zlib1g-dev gnupg wget ca-certificates \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*

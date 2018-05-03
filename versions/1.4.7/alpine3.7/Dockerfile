@@ -2,11 +2,12 @@ FROM alpine:3.7
 
 LABEL maintainer="etimmons@mit.edu"
 
-COPY patches/musl-libc.patch /build/patches/musl-libc.patch
+COPY patches/musl-libc.patch /usr/local/src/sbcl-patches/musl-libc.patch
 
 ENV SBCL_VERSION=1.4.7
 
-RUN set -x && cd /build \
+RUN set -x \
+    && cd /usr/local/src/ \
     && apk upgrade --no-cache \
     && apk add --no-cache ca-certificates openssl make gcc linux-headers musl-dev zlib-dev gnupg \
     && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ sbcl \
@@ -20,17 +21,17 @@ RUN set -x && cd /build \
        || gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ${CRHODES_KEY} \
        || gpg --keyserver pgp.mit.edu --recv-keys ${CRHODES_KEY}) \
     && gpg --batch --verify sbcl-${SBCL_VERSION}-crhodes.asc \
-    && bunzip2 /build/sbcl-${SBCL_VERSION}-source.tar.bz2 \
+    && bunzip2 sbcl-${SBCL_VERSION}-source.tar.bz2 \
     && grep sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION}-crhodes.asc > sum-file.txt \
     && sha256sum -c sum-file.txt \
     && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sum-file.txt \
     && tar xf sbcl-${SBCL_VERSION}-source.tar \
     && cd sbcl-${SBCL_VERSION}/ \
-    && patch -i /build/patches/musl-libc.patch -p1 \
-    && ./make.sh --fancy --prefix=/usr/local/ \
+    && patch -i /usr/local/src/sbcl-patches/musl-libc.patch -p1 \
+    && ./make.sh --with-sb-core-compression --with-sb-thread --prefix=/usr/local/ \
     && ./install.sh \
-    && cd / \
-    && rm -rf /build \
+    && cd /usr/local/src/ \
+    && rm -rf sbcl-patches sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION} \
     && apk del --no-cache sbcl gcc make linux-headers musl-dev zlib-dev gnupg openssl
 
 CMD ["sbcl"]
