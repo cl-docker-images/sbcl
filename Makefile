@@ -57,7 +57,19 @@ $(eval $(call LATEST_UBUNTU_TEMPLATE,$(1)))
 
 endef
 
+
+define EXPAND_OS =
+$(1): v$(LATEST_VERSION)-$(1)
+	docker tag daewok/sbcl:$(LATEST_VERSION)-$(1) daewok/sbcl:$(1)
+
+.PHONY: $(1)
+
+ALL_TARGETS += $(1)
+ALL_TAGS += $(1)
+endef
+
 $(foreach v,$(VERSIONS),$(call EXPAND_VERSION,$(v)))
+$(foreach o,$(OSES),$(eval $(call EXPAND_OS,$(o))))
 
 alpine-latest: v$(LATEST_VERSION)-$(LATEST_ALPINE)
 	docker tag daewok/sbcl:$(LATEST_VERSION)-$(LATEST_ALPINE) daewok/sbcl:alpine
