@@ -1,16 +1,15 @@
-FROM alpine:3.7
+FROM debian:stretch
 
 LABEL maintainer="etimmons@mit.edu"
 
-COPY patches/musl-libc.patch /usr/local/src/sbcl-patches/musl-libc.patch
-
-ENV SBCL_VERSION=1.4.8
+ENV SBCL_VERSION=1.4.10
 
 RUN set -x \
+    && mkdir -p /usr/local/src/ \
     && cd /usr/local/src/ \
-    && apk upgrade --no-cache \
-    && apk add --no-cache ca-certificates openssl make gcc linux-headers musl-dev zlib-dev gnupg \
-    && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ sbcl \
+    && apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y sbcl build-essential zlib1g-dev gnupg wget ca-certificates\
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-source.tar.bz2 \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-crhodes.asc \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -27,11 +26,12 @@ RUN set -x \
     && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sum-file.txt \
     && tar xf sbcl-${SBCL_VERSION}-source.tar \
     && cd sbcl-${SBCL_VERSION}/ \
-    && patch -i /usr/local/src/sbcl-patches/musl-libc.patch -p1 \
     && ./make.sh --with-sb-core-compression --with-sb-thread --prefix=/usr/local/ \
     && ./install.sh \
-    && cd /usr/local/src/ \
-    && rm -rf sbcl-patches sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION} \
-    && apk del --no-cache sbcl gcc make linux-headers musl-dev zlib-dev gnupg openssl
+    && cd /usr/local/src \
+    && rm -rf sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION} \
+    && apt-get remove -y sbcl build-essential zlib1g-dev gnupg wget ca-certificates \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
 
 CMD ["sbcl"]
