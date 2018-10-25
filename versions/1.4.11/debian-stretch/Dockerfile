@@ -1,15 +1,15 @@
-FROM ubuntu:xenial
+FROM debian:stretch
 
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_VERSION=1.4.9
+ENV SBCL_VERSION=1.4.11
 
 RUN set -x \
     && mkdir -p /usr/local/src/ \
     && cd /usr/local/src/ \
     && apt-get update \
     && apt-get upgrade -y \
-    && apt-get install -y sbcl build-essential zlib1g-dev wget ca-certificates\
+    && apt-get install -y sbcl build-essential zlib1g-dev gnupg wget ca-certificates\
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-source.tar.bz2 \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-crhodes.asc \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -30,7 +30,7 @@ RUN set -x \
     && ./install.sh \
     && cd /usr/local/src \
     && rm -rf sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION} \
-    && apt-get remove -y sbcl build-essential zlib1g-dev wget ca-certificates \
+    && apt-get remove -y sbcl build-essential zlib1g-dev gnupg wget ca-certificates \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
