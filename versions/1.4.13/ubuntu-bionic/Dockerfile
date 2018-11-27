@@ -1,8 +1,8 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_VERSION=1.4.11
+ENV SBCL_VERSION=1.4.13
 
 RUN set -x \
     && mkdir -p /usr/local/src/ \
