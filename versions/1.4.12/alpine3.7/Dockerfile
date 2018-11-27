@@ -15,11 +15,11 @@ RUN set -x \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-crhodes.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && export CRHODES_KEY=D6839CA0A67F74D9DFB70922EBD595A9100D63CD \
-    && (gpg --keyserver ha.pool.sks-keyservers.net --recv-keys ${CRHODES_KEY} \
-       || gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys ${CRHODES_KEY} \
-       || gpg --keyserver keyserver.ubuntu.com --recv-keys ${CRHODES_KEY} \
-       || gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ${CRHODES_KEY} \
-       || gpg --keyserver pgp.mit.edu --recv-keys ${CRHODES_KEY}) \
+    && (gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys ${CRHODES_KEY} \
+       || gpg --batch --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys ${CRHODES_KEY} \
+       || gpg --batch --keyserver keyserver.ubuntu.com --recv-keys ${CRHODES_KEY} \
+       || gpg --batch --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ${CRHODES_KEY} \
+       || gpg --batch --keyserver pgp.mit.edu --recv-keys ${CRHODES_KEY}) \
     && gpg --batch --verify sbcl-${SBCL_VERSION}-crhodes.asc \
     && bunzip2 sbcl-${SBCL_VERSION}-source.tar.bz2 \
     && grep sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION}-crhodes.asc > sum-file.txt \
