@@ -1,0 +1,55 @@
+#+TITLE: SBCL Docker Images
+#+AUTHOR: Eric Timmons
+
+https://travis-ci.org/daewok/docker-sbcl.svg?branch=master
+
+This repo contains Dockerfiles for SBCL on a variety of base images.
+
+The SBCL versions build are:
+
++ 1.4.14
++ 1.4.13
+
+The OSes and versions SBCL is built on are:
+
++ alpine
+  + 3.8
++ debian
+  + stretch
++ ubuntu
+  + cosmic
+  + bionic
+
+Besides necessary patches for alpine, SBCL is built as close to vanilla as
+possible. Additionally, where possible, the pre-built version from SBCL upstream
+is used.
+
+* =-build= images
+
+  In addition to the standard images, a set of "build" images are
+  provided. These images have SBCL already installed in them and include the
+  SBCL source code and any packages needed to build SBCL from scratch. This
+  allows a customized SBCL to be easily built. However, this comes with the cost
+  of the images being much larger than the base images. These images are ideal
+  for use in a multi-stage build where you require some features of SBCL to be
+  enabled (such as ~:sb-core-compression~ or ~:sb-linkable-runtime~) and you
+  will copy the resulting executable out into another image.
+
+  To customize the SBCL feature set, place a file at
+  =/usr/local/src/sbcl-${SBCL_VERSION}/customize-target-features.lisp=. See the
+  SBCL build instructions for more details on what this file should contain.
+
+  To patch SBCL, place any number of patch files (ending in ".patch") in
+  =/usr/local/src/sbcl-${SBCL_VERSION}/patches/=
+
+  To build and install SBCL, execute ~rebuild-sbcl~. This script will apply the
+  patches, build, install, and remove the previous copy of SBCL.
+
+* Building
+
+  To build all images, just run:
+
+  #+begin_src shell
+    make
+  #+end_src
+  The release branch is used to automatically push images to Docker hub.

@@ -1,18 +1,15 @@
-FROM ubuntu:xenial
+FROM daewok/sbcl:1.4.13-alpine3.8
 
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_VERSION=1.4.13
+WORKDIR /usr/local/src/
 
 RUN set -x \
-    && mkdir -p /usr/local/src/ \
-    && cd /usr/local/src/ \
-    && apt-get update \
-    && apt-get upgrade -y \
-    && apt-get install -y sbcl build-essential zlib1g-dev wget ca-certificates\
+    && apk add --no-cache ca-certificates openssl make gcc linux-headers musl-dev zlib-dev gnupg \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-source.tar.bz2 \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-crhodes.asc \
-    && export GNUPGHOME="$(mktemp -d)" \
+    && GNUPGHOME="$(mktemp -d)" \
+    && export GNUPGHOME \
     && export CRHODES_KEY=D6839CA0A67F74D9DFB70922EBD595A9100D63CD \
     && (gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys ${CRHODES_KEY} \
        || gpg --batch --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys ${CRHODES_KEY} \
@@ -26,12 +23,11 @@ RUN set -x \
     && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sum-file.txt \
     && tar xf sbcl-${SBCL_VERSION}-source.tar \
     && cd sbcl-${SBCL_VERSION}/ \
-    && ./make.sh --with-sb-core-compression --with-sb-thread --prefix=/usr/local/ \
-    && ./install.sh \
-    && cd /usr/local/src \
-    && rm -rf sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION} \
-    && apt-get remove -y sbcl build-essential zlib1g-dev wget ca-certificates \
-    && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/*
+    && for p in /usr/local/src/sbcl-patches/*.patch; do patch -p1 < "$p"; done \
+    && cd /usr/local/src/ \
+    && rm -rf sbcl-${SBCL_VERSION}-source.tar \
+    && apk del --no-cache gnupg openssl
 
-CMD ["sbcl"]
+WORKDIR /
+
+COPY rebuild-sbcl /usr/local/bin/rebuild-sbcl
