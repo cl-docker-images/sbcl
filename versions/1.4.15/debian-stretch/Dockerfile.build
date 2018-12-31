@@ -1,11 +1,11 @@
-FROM daewok/sbcl:1.4.13-alpine3.8
-
-LABEL maintainer="etimmons@mit.edu"
+FROM daewok/sbcl:1.4.15-debian-stretch
 
 WORKDIR /usr/local/src/
 
+# hadolint ignore=DL3003,DL3008,SC2086
 RUN set -x \
-    && apk add --no-cache ca-certificates openssl make gcc linux-headers musl-dev zlib-dev gnupg \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends make zlib1g-dev gcc patch wget ca-certificates gnupg dirmngr bzip2 \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-source.tar.bz2 \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-crhodes.asc \
     && GNUPGHOME="$(mktemp -d)" \
@@ -20,13 +20,11 @@ RUN set -x \
     && bunzip2 sbcl-${SBCL_VERSION}-source.tar.bz2 \
     && grep sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION}-crhodes.asc > sum-file.txt \
     && sha256sum -c sum-file.txt \
-    && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sum-file.txt \
     && tar xf sbcl-${SBCL_VERSION}-source.tar \
-    && cd sbcl-${SBCL_VERSION}/ \
-    && for p in /usr/local/src/sbcl-patches/*.patch; do patch -p1 < "$p"; done \
-    && cd /usr/local/src/ \
-    && rm -rf sbcl-${SBCL_VERSION}-source.tar \
-    && apk del --no-cache gnupg openssl
+    && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sum-file.txt sbcl-${SBCL_VERSION}-source.tar \
+    && apt-get remove -y wget ca-certificates gnupg dirmngr bzip2 \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /
 

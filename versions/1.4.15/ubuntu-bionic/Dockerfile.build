@@ -1,4 +1,4 @@
-FROM daewok/sbcl:1.4.13-ubuntu-cosmic
+FROM daewok/sbcl:1.4.15-ubuntu-bionic
 
 WORKDIR /usr/local/src/
 

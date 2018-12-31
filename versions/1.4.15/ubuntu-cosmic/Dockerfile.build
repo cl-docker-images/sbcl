@@ -1,11 +1,11 @@
-FROM daewok/sbcl:1.4.13-debian-stretch
+FROM daewok/sbcl:1.4.15-ubuntu-cosmic
 
 WORKDIR /usr/local/src/
 
 # hadolint ignore=DL3003,DL3008,SC2086
 RUN set -x \
     && apt-get update \
-    && apt-get install -y --no-install-recommends make zlib1g-dev gcc patch wget ca-certificates gnupg dirmngr bzip2 \
+    && apt-get install -y --no-install-recommends make zlib1g-dev gcc patch wget ca-certificates gnupg \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-source.tar.bz2 \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-crhodes.asc \
     && GNUPGHOME="$(mktemp -d)" \
@@ -22,7 +22,7 @@ RUN set -x \
     && sha256sum -c sum-file.txt \
     && tar xf sbcl-${SBCL_VERSION}-source.tar \
     && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sum-file.txt sbcl-${SBCL_VERSION}-source.tar \
-    && apt-get remove -y wget ca-certificates gnupg dirmngr bzip2 \
+    && apt-get remove -y wget ca-certificates gnupg \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
