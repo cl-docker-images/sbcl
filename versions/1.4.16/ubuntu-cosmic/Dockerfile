@@ -2,7 +2,7 @@ FROM ubuntu:cosmic
 
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_VERSION=1.4.14
+ENV SBCL_VERSION=1.4.16
 
 WORKDIR /usr/local/src/
 
@@ -22,9 +22,10 @@ RUN set -x \
        || gpg --batch --keyserver pgp.mit.edu --recv-keys ${CRHODES_KEY}) \
     && gpg --batch --verify sbcl-${SBCL_VERSION}-crhodes.asc \
     && bunzip2 sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar.bz2 \
-    && grep sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar sbcl-${SBCL_VERSION}-crhodes.asc > sum-file.txt \
+    && gpg --batch --decrypt sbcl-${SBCL_VERSION}-crhodes.asc > sbcl-${SBCL_VERSION}-crhodes.txt \
+    && grep sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar sbcl-${SBCL_VERSION}-crhodes.txt > sum-file.txt \
     && sha256sum -c sum-file.txt \
-    && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sum-file.txt \
+    && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sbcl-${SBCL_VERSION}-crhodes.txt sum-file.txt \
     && tar xf sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar \
     && (cd sbcl-${SBCL_VERSION}-x86-64-linux/ && sh install.sh) \
     && rm -rf sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar sbcl-${SBCL_VERSION}-x86-64-linux/ \
