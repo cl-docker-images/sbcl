@@ -1,4 +1,4 @@
-FROM daewok/sbcl:1.4.15-ubuntu-bionic
+FROM daewok/sbcl:1.5.0-ubuntu-cosmic
 
 WORKDIR /usr/local/src/
 
@@ -18,10 +18,11 @@ RUN set -x \
        || gpg --batch --keyserver pgp.mit.edu --recv-keys ${CRHODES_KEY}) \
     && gpg --batch --verify sbcl-${SBCL_VERSION}-crhodes.asc \
     && bunzip2 sbcl-${SBCL_VERSION}-source.tar.bz2 \
-    && grep sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION}-crhodes.asc > sum-file.txt \
+    && gpg --batch --decrypt sbcl-${SBCL_VERSION}-crhodes.asc > sbcl-${SBCL_VERSION}-crhodes.txt \
+    && grep sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION}-crhodes.txt > sum-file.txt \
     && sha256sum -c sum-file.txt \
     && tar xf sbcl-${SBCL_VERSION}-source.tar \
-    && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sum-file.txt sbcl-${SBCL_VERSION}-source.tar \
+    && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sum-file.txt sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION}-crhodes.txt \
     && apt-get remove -y wget ca-certificates gnupg \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
