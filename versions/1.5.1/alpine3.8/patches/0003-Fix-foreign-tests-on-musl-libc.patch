@@ -1,7 +1,7 @@
-From dbd7e03c4af5ee4b462bcc238f49c35bbf43e8b8 Mon Sep 17 00:00:00 2001
+From 91f822a3bbbb8d1e1007cb60cc2563be10d8bed2 Mon Sep 17 00:00:00 2001
 From: Eric Timmons <etimmons@mit.edu>
 Date: Sun, 2 Dec 2018 14:20:24 -0500
-Subject: [PATCH 3/3] Fix foreign tests on musl libc
+Subject: [PATCH 3/5] Fix foreign tests on musl libc
 
 Musl libc's implementation of dlclose(3) is (intentionally) a noop (see:
 https://wiki.musl-libc.org/functional-differences-from-glibc.html). Add a build
@@ -78,18 +78,18 @@ index 7fb757813..78f0517a0 100755
  
    (sb-ext:exit :code $EXIT_LISP_WIN) ; success convention for Lisp program
 diff --git a/tools-for-build/Makefile b/tools-for-build/Makefile
-index 3f6e4ecf9..731ae6640 100644
+index 1be91e9df..434e03081 100644
 --- a/tools-for-build/Makefile
 +++ b/tools-for-build/Makefile
 @@ -16,6 +16,9 @@ LDLIBS:=$(OS_LIBS)
  
- all: grovel-headers determine-endianness where-is-mcontext
+ all: grovel-headers determine-endianness where-is-mcontext mmap-rwx
  
 +os-dlclose-is-noop-test-helper.so: os-dlclose-is-noop-test-helper.c
 +	@$(CC) $(LDFLAGS) -shared $< -o $@ $(LOADLIBES) $(LDLIBS)
 +
  clean:
- 	rm -f *.o grovel-headers determine-endianness where-is-mcontext
+ 	rm -f *.o grovel-headers determine-endianness where-is-mcontext mmap-rwx
  	rm -f *.exe
 diff --git a/tools-for-build/grovel-features.sh b/tools-for-build/grovel-features.sh
 index 9992b46ad..4e2546878 100644
@@ -139,5 +139,5 @@ index 000000000..3678870d5
 +   }
 +}
 -- 
-2.19.2
+2.21.0
 

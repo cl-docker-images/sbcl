@@ -2,7 +2,7 @@ FROM ubuntu:cosmic
 
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_VERSION=1.4.16
+ENV SBCL_VERSION=1.5.1
 
 WORKDIR /usr/local/src/
 

@@ -1,0 +1,25 @@
+From 08fa62b689a9cd2a3f7353fd5ff7b96d9d19861e Mon Sep 17 00:00:00 2001
+From: Eric Timmons <etimmons@mit.edu>
+Date: Mon, 1 Apr 2019 17:47:29 -0400
+Subject: [PATCH 5/5] musl has a different implementation of exp than glibc
+
+---
+ float-math.lisp-expr | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/float-math.lisp-expr b/float-math.lisp-expr
+index 67f2cd69d..b2717d3ac 100644
+--- a/float-math.lisp-expr
++++ b/float-math.lisp-expr
+@@ -532,7 +532,7 @@
+ (COERCE (#.(MAKE-DOUBLE-FLOAT #x400921FB #x54442D18) SINGLE-FLOAT) #.(MAKE-SINGLE-FLOAT #x40490FDB))
+ (COERCE (#.(MAKE-DOUBLE-FLOAT #x401C0000 #x0) SINGLE-FLOAT) #.(MAKE-SINGLE-FLOAT #x40E00000))
+ (COERCE (#.(MAKE-DOUBLE-FLOAT #x4310624D #xD2F1A9F8) SINGLE-FLOAT) #.(MAKE-SINGLE-FLOAT #x5883126F))
+-(EXP #.(MAKE-DOUBLE-FLOAT #x3FF00000 #x0) #.(MAKE-DOUBLE-FLOAT #x4005BF0A #x8B145769))
++(EXP #.(MAKE-DOUBLE-FLOAT #x3FF00000 #x0) #.(MAKE-DOUBLE-FLOAT #x4005BF0A #x8B14576A))
+ (EXPT (#.(MAKE-SINGLE-FLOAT #x40000000) #x3F) #.(MAKE-SINGLE-FLOAT #x5F000000))
+ (EXPT (#.(MAKE-DOUBLE-FLOAT #x40000000 #x0) #x3F) #.(MAKE-DOUBLE-FLOAT #x43E00000 #x0))
+ (FLOAT (#x0) #.(MAKE-SINGLE-FLOAT #x0))
+-- 
+2.21.0
+
