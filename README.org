@@ -1,8 +1,6 @@
 #+TITLE: SBCL Docker Images
 #+AUTHOR: Eric Timmons
 
-https://travis-ci.org/daewok/docker-sbcl.svg?branch=master
-
 This repo contains Dockerfiles for SBCL on a variety of base images.
 
 The SBCL versions build are:
@@ -50,6 +48,9 @@ is used.
   To build all images, just run:
 
   #+begin_src shell
-    make
+    export DOCKER_CONTENT_TRUST=1
+    make all-non-build
+    make push_non_build_tags
+    make all-build
+    make push_build_tags
   #+end_src
-  The release branch is used to automatically push images to Docker hub.
