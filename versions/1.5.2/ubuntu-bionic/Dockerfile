@@ -1,18 +1,16 @@
-FROM alpine:3.8
+FROM ubuntu:bionic
 
 LABEL maintainer="etimmons@mit.edu"
 
-COPY patches/ /usr/local/src/sbcl-patches/
-
-ENV SBCL_VERSION=1.5.1
+ENV SBCL_VERSION=1.5.2
 
 WORKDIR /usr/local/src/
 
-# hadolint ignore=DL3003,DL3018
+# hadolint ignore=DL3003,DL3008
 RUN set -x \
-    && apk add --no-cache ca-certificates openssl make gcc linux-headers musl-dev gnupg \
-    && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ sbcl \
-    && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-source.tar.bz2 \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends wget gnupg ca-certificates make \
+    && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar.bz2 \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-crhodes.asc \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
@@ -23,19 +21,17 @@ RUN set -x \
        || gpg --batch --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ${CRHODES_KEY} \
        || gpg --batch --keyserver pgp.mit.edu --recv-keys ${CRHODES_KEY}) \
     && gpg --batch --verify sbcl-${SBCL_VERSION}-crhodes.asc \
-    && bunzip2 sbcl-${SBCL_VERSION}-source.tar.bz2 \
+    && bunzip2 sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar.bz2 \
     && gpg --batch --decrypt sbcl-${SBCL_VERSION}-crhodes.asc > sbcl-${SBCL_VERSION}-crhodes.txt \
-    && grep sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION}-crhodes.txt > sum-file.txt \
+    && grep sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar sbcl-${SBCL_VERSION}-crhodes.txt > sum-file.txt \
     && sha256sum -c sum-file.txt \
     && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sbcl-${SBCL_VERSION}-crhodes.txt sum-file.txt \
-    && tar xf sbcl-${SBCL_VERSION}-source.tar \
-    && cd sbcl-${SBCL_VERSION}/ \
-    && for p in /usr/local/src/sbcl-patches/*.patch; do patch -p1 < "$p"; done \
-    && sh make.sh \
-    && sh install.sh \
-    && cd /usr/local/src/ \
-    && rm -rf sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION} \
-    && apk del --no-cache sbcl gcc make linux-headers musl-dev gnupg openssl
+    && tar xf sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar \
+    && (cd sbcl-${SBCL_VERSION}-x86-64-linux/ && sh install.sh) \
+    && rm -rf sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar sbcl-${SBCL_VERSION}-x86-64-linux/ \
+    && apt-get remove -y wget gnupg ca-certificates make \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /
 

@@ -1,10 +1,10 @@
-LATEST_VERSION = 1.5.1
+LATEST_VERSION = 1.5.2
 VERSIONS = $(notdir $(shell find versions -mindepth 1 -maxdepth 1 -type d))
 
-LATEST_ALPINE = alpine3.8
+LATEST_ALPINE = alpine3.9
 LATEST_DEBIAN = debian-stretch
 LATEST_UBUNTU = ubuntu-cosmic
-OSES = alpine3.8 debian-stretch ubuntu-bionic ubuntu-cosmic
+OSES = alpine3.9 debian-stretch ubuntu-bionic ubuntu-cosmic
 
 ALL_TARGETS =
 
@@ -154,6 +154,6 @@ push_build_tags:
 	done
 
 alpine_tags:
-	@echo alpine alpine3.8
+	@echo alpine alpine3.9
 
 .PHONY: all all_tags

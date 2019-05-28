@@ -2,7 +2,7 @@ FROM debian:stretch
 
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_VERSION=1.5.0
+ENV SBCL_VERSION=1.5.2
 
 WORKDIR /usr/local/src/
 

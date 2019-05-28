@@ -1,7 +1,7 @@
-From d969f7ffaf6d91deb223a27f2b8670f03519979b Mon Sep 17 00:00:00 2001
+From 85e778913e2ee4ff16fe54bdfd9ed9d3eb987114 Mon Sep 17 00:00:00 2001
 From: Eric Timmons <etimmons@mit.edu>
 Date: Sun, 2 Dec 2018 14:10:23 -0500
-Subject: [PATCH 2/3] Fix threads on musl libc
+Subject: [PATCH 2/4] Fix threads on musl libc
 
 Musl libc does not add any content to _CS_GNU_LIBPTHREAD_VERSION, causing the
 runtime check to make sure the thread implementation is NPTL to fail. There
@@ -12,7 +12,7 @@ value is empty, just assume the thread implementation is good enough.
  1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/src/runtime/linux-os.c b/src/runtime/linux-os.c
-index b9058bdff..6103d79f7 100644
+index a033d69ee..1214ddd28 100644
 --- a/src/runtime/linux-os.c
 +++ b/src/runtime/linux-os.c
 @@ -187,8 +187,15 @@ isnptl (void)
@@ -33,5 +33,5 @@ index b9058bdff..6103d79f7 100644
  #endif
  
 -- 
-2.19.2
+2.21.0
 

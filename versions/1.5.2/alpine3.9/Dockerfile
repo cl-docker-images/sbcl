@@ -1,11 +1,17 @@
-FROM daewok/sbcl:1.5.0-ubuntu-bionic
+FROM alpine:3.9
+
+LABEL maintainer="etimmons@mit.edu"
+
+COPY patches/ /usr/local/src/sbcl-patches/
+
+ENV SBCL_VERSION=1.5.2
 
 WORKDIR /usr/local/src/
 
-# hadolint ignore=DL3003,DL3008,SC2086
+# hadolint ignore=DL3003,DL3018
 RUN set -x \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends make zlib1g-dev gcc patch wget ca-certificates gnupg \
+    && apk add --no-cache ca-certificates openssl make gcc linux-headers musl-dev gnupg \
+    && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ sbcl \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-source.tar.bz2 \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-crhodes.asc \
     && GNUPGHOME="$(mktemp -d)" \
@@ -21,12 +27,16 @@ RUN set -x \
     && gpg --batch --decrypt sbcl-${SBCL_VERSION}-crhodes.asc > sbcl-${SBCL_VERSION}-crhodes.txt \
     && grep sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION}-crhodes.txt > sum-file.txt \
     && sha256sum -c sum-file.txt \
+    && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sbcl-${SBCL_VERSION}-crhodes.txt sum-file.txt \
     && tar xf sbcl-${SBCL_VERSION}-source.tar \
-    && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sum-file.txt sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION}-crhodes.txt \
-    && apt-get remove -y wget ca-certificates gnupg \
-    && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/*
+    && cd sbcl-${SBCL_VERSION}/ \
+    && for p in /usr/local/src/sbcl-patches/*.patch; do patch -p1 < "$p" || exit 1; done \
+    && sh make.sh \
+    && sh install.sh \
+    && cd /usr/local/src/ \
+    && rm -rf sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION} \
+    && apk del --no-cache sbcl gcc make linux-headers musl-dev gnupg openssl
 
 WORKDIR /
 
-COPY rebuild-sbcl /usr/local/bin/rebuild-sbcl
+ENTRYPOINT ["sbcl"]

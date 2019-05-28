@@ -1,4 +1,4 @@
-FROM daewok/sbcl:1.5.1-alpine3.8
+FROM daewok/sbcl:1.5.1-alpine3.9
 
 LABEL maintainer="etimmons@mit.edu"
 
@@ -24,7 +24,7 @@ RUN set -x \
     && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sbcl-${SBCL_VERSION}-crhodes.txt sum-file.txt \
     && tar xf sbcl-${SBCL_VERSION}-source.tar \
     && cd sbcl-${SBCL_VERSION}/ \
-    && for p in /usr/local/src/sbcl-patches/*.patch; do patch -p1 < "$p"; done \
+    && for p in /usr/local/src/sbcl-patches/*.patch; do patch -p1 < "$p" || exit 1; done \
     && cd /usr/local/src/ \
     && rm -rf sbcl-${SBCL_VERSION}-source.tar \
     && apk del --no-cache gnupg openssl
