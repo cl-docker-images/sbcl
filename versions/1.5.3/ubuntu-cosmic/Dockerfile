@@ -1,8 +1,8 @@
-FROM ubuntu:bionic
+FROM ubuntu:cosmic
 
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_VERSION=1.5.1
+ENV SBCL_VERSION=1.5.3
 
 WORKDIR /usr/local/src/
 

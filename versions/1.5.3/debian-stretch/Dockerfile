@@ -1,15 +1,15 @@
-FROM ubuntu:cosmic
+FROM debian:stretch
 
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_VERSION=1.5.1
+ENV SBCL_VERSION=1.5.3
 
 WORKDIR /usr/local/src/
 
 # hadolint ignore=DL3003,DL3008
 RUN set -x \
     && apt-get update \
-    && apt-get install -y --no-install-recommends wget gnupg ca-certificates make \
+    && apt-get install -y --no-install-recommends wget gnupg ca-certificates make dirmngr bzip2 \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar.bz2 \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-crhodes.asc \
     && GNUPGHOME="$(mktemp -d)" \
@@ -29,7 +29,7 @@ RUN set -x \
     && tar xf sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar \
     && (cd sbcl-${SBCL_VERSION}-x86-64-linux/ && sh install.sh) \
     && rm -rf sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar sbcl-${SBCL_VERSION}-x86-64-linux/ \
-    && apt-get remove -y wget gnupg ca-certificates make \
+    && apt-get remove -y wget gnupg ca-certificates make dirmngr bzip2 \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 

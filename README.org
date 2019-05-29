@@ -5,8 +5,8 @@ This repo contains Dockerfiles for SBCL on a variety of base images.
 
 The SBCL versions build are:
 
++ 1.5.3
 + 1.5.2
-+ 1.5.1
 
 The OSes and versions SBCL is built on are:
 

@@ -8,10 +8,17 @@ ENV SBCL_VERSION=1.5.2
 
 WORKDIR /usr/local/src/
 
-# hadolint ignore=DL3003,DL3018
+# hadolint ignore=DL3003,DL3018,DL4006
 RUN set -x \
-    && apk add --no-cache ca-certificates openssl make gcc linux-headers musl-dev gnupg \
-    && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ sbcl \
+    && export ECL_VERSION=16.1.3 \
+    && apk add --no-cache ca-certificates openssl make gcc gmp-dev \
+                          libffi-dev musl-dev gc gc-dev linux-headers gnupg \
+    && wget https://common-lisp.net/project/ecl/static/files/release/ecl-${ECL_VERSION}.tgz \
+    && echo "5d743f422f6bc24671abf4c739cde8273d08f056906a1ef8aed5145c703b6d52c7fa4b5e0be8c125f32240c20ce053007786bb3ae81cc34d47791f6fae0819c1  ecl-16.1.3.tgz" | sha512sum -c \
+    && gunzip ecl-${ECL_VERSION}.tgz \
+    && tar xf ecl-${ECL_VERSION}.tar \
+    && (cd ecl-${ECL_VERSION} && ./configure --enable-boehm=system --prefix=/usr/local/ecl/ && make && make install) \
+    && rm -rf ecl-${ECL_VERSION}.tar ecl-${ECL_VERSION} \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-source.tar.bz2 \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-crhodes.asc \
     && GNUPGHOME="$(mktemp -d)" \
@@ -31,11 +38,11 @@ RUN set -x \
     && tar xf sbcl-${SBCL_VERSION}-source.tar \
     && cd sbcl-${SBCL_VERSION}/ \
     && for p in /usr/local/src/sbcl-patches/*.patch; do patch -p1 < "$p" || exit 1; done \
-    && sh make.sh \
+    && sh make.sh --xc-host=/usr/local/ecl/bin/ecl \
     && sh install.sh \
     && cd /usr/local/src/ \
-    && rm -rf sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION} \
-    && apk del --no-cache sbcl gcc make linux-headers musl-dev gnupg openssl
+    && rm -rf sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION} /usr/local/ecl/ \
+    && apk del --no-cache ca-certificates gcc make linux-headers musl-dev gnupg openssl gc gc-dev libffi-dev gmp-dev
 
 WORKDIR /
 
