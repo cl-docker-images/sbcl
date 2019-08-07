@@ -1,10 +1,10 @@
-LATEST_VERSION = 1.5.3
+LATEST_VERSION = 1.5.5
 VERSIONS = $(notdir $(shell find versions -mindepth 1 -maxdepth 1 -type d))
 
-LATEST_ALPINE = alpine3.9
+LATEST_ALPINE = alpine3.10
 LATEST_DEBIAN = debian-stretch
 LATEST_UBUNTU = ubuntu-cosmic
-OSES = alpine3.9 debian-stretch ubuntu-bionic ubuntu-cosmic
+OSES = alpine3.10 alpine3.9 debian-stretch ubuntu-bionic ubuntu-cosmic
 
 ALL_TARGETS =
 
