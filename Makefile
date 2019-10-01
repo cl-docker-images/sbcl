@@ -1,4 +1,4 @@
-LATEST_VERSION = 1.5.5
+LATEST_VERSION = 1.5.7
 VERSIONS = $(notdir $(shell find versions -mindepth 1 -maxdepth 1 -type d))
 
 LATEST_ALPINE = alpine3.10
