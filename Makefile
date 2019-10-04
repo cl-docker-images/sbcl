@@ -114,8 +114,8 @@ ubuntu/disco:
 ubuntu/disco-build:
 	docker build -t daewok/sbcl:$(VERSION)-ubuntu-disco-build -f ubuntu/disco/Dockerfile.build ubuntu/disco
 
-UBUNTU_NONBUILD_TARGETS = ubuntu ubuntu/bionc ubuntu/disco
-UBUNTU_BUILD_TARGETS = ubuntu-build ubuntu/bionc-build ubuntu/disco-build
+UBUNTU_NONBUILD_TARGETS = ubuntu ubuntu/bionic ubuntu/disco
+UBUNTU_BUILD_TARGETS = ubuntu-build ubuntu/bionic-build ubuntu/disco-build
 
 NONBUILD_TARGETS += $(UBUNTU_NONBUILD_TARGETS)
 BUILD_TARGETS += $(UBUNTU_BUILD_TARGETS)
