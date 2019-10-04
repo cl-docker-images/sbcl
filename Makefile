@@ -1,147 +1,135 @@
-LATEST_VERSION = 1.5.7
-VERSIONS = $(notdir $(shell find versions -mindepth 1 -maxdepth 1 -type d))
+VERSION = 1.5.7
 
-LATEST_ALPINE = alpine3.10
-LATEST_DEBIAN = debian-stretch
-LATEST_UBUNTU = ubuntu-cosmic
-OSES = alpine3.10 alpine3.9 debian-stretch ubuntu-bionic ubuntu-cosmic
+LATEST_ALPINE = 3.10
+LATEST_DEBIAN = stretch
+LATEST_UBUNTU = cosmic
+OSES = alpine/3.10 alpine/3.9 debian/stretch ubuntu/bionic ubuntu/cosmic
 
 ALL_TARGETS =
+BUILD_TARGETS =
+NONBUILD_TARGETS =
 
 ALL_TAGS =
+BUILD_TAGS =
+NONBUILD_TAGS =
 
 all:
 
-define DOCKER_TEMPLATE =
-v$(1)-$(2):: versions/$(1)/$(2)/Dockerfile
-	docker build -t daewok/sbcl:$(1)-$(2) versions/$(1)/$(2)
+##############################################################################
+# Alpine
+##############################################################################
 
-v$(1)-$(2)-build:: v$(1)-$(2) versions/$(1)/$(2)/Dockerfile.build
-	docker build -t daewok/sbcl:$(1)-$(2)-build -f versions/$(1)/$(2)/Dockerfile.build versions/$(1)/$(2)
+alpine: alpine/$(LATEST_ALPINE)
+	docker tag daewok/sbcl:$(VERSION)-alpine$(LATEST_ALPINE) daewok/sbcl:$(VERSION)-alpine
+	docker tag daewok/sbcl:$(VERSION)-alpine$(LATEST_ALPINE) daewok/sbcl:alpine
 
-ALL_TARGETS += v$(1)-$(2) v$(1)-$(2)-build
-NON_BUILD_TARGETS += v$(1)-$(2)
-BUILD_TARGETS += v$(1)-$(2)-build
-ALL_TAGS += $(1)-$(2) $(1)-$(2)-build
-NON_BUILD_TAGS += $(1)-$(2)
-BUILD_TAGS += $(1)-$(2)-build
-.PHONY: v$(1)-$(2) v$(1)-$(2)-build
-endef
+alpine-build: alpine/$(LATEST_ALPINE)-build
+	docker tag daewok/sbcl:$(VERSION)-alpine$(LATEST_ALPINE)-build daewok/sbcl:$(VERSION)-alpine-build
+	docker tag daewok/sbcl:$(VERSION)-alpine$(LATEST_ALPINE)-build daewok/sbcl:alpine-build
 
-define LATEST_ALPINE_TEMPLATE =
-v$(1)-alpine: v$(1)-$(LATEST_ALPINE)
-	docker tag daewok/sbcl:$(1)-$(LATEST_ALPINE) daewok/sbcl:$(1)-alpine
+alpine/3.10:
+	docker build -t daewok/sbcl:$(VERSION)-alpine3.10 alpine/3.10
 
-v$(1)-alpine-build: v$(1)-$(LATEST_ALPINE)-build
-	docker tag daewok/sbcl:$(1)-$(LATEST_ALPINE)-build daewok/sbcl:$(1)-alpine-build
+alpine/3.10-build:
+	docker build -t daewok/sbcl:$(VERSION)-alpine3.10-build -f alpine/3.10/Dockerfile.build alpine/3.10
 
-ALL_TARGETS += v$(1)-alpine v$(1)-alpine-build
-NON_BUILD_TARGETS += v$(1)-alpine
-BUILD_TARGETS += v$(1)-alpine-build
-ALL_TAGS += $(1)-alpine $(1)-alpine-build
-NON_BUILD_TAGS += $(1)-alpine
-BUILD_TAGS += $(1)-alpine-build
-.PHONY: v$(1)-alpine v$(1)-alpine-build
-endef
+alpine/3.9:
+	docker build -t daewok/sbcl:$(VERSION)-alpine3.9 alpine/3.9
 
-define LATEST_DEBIAN_TEMPLATE =
-v$(1)-debian: v$(1)-$(LATEST_DEBIAN)
-	docker tag daewok/sbcl:$(1)-$(LATEST_DEBIAN) daewok/sbcl:$(1)-debian
+alpine/3.9-build:
+	docker build -t daewok/sbcl:$(VERSION)-alpine3.9-build -f alpine/3.9/Dockerfile.build alpine/3.9
 
-v$(1)-debian-build: v$(1)-$(LATEST_DEBIAN)-build
-	docker tag daewok/sbcl:$(1)-$(LATEST_DEBIAN)-build daewok/sbcl:$(1)-debian-build
+ALPINE_NONBUILD_TARGETS = alpine alpine/3.10 alpine/3.9
+ALPINE_BUILD_TARGETS = alpine-build alpine/3.10-build alpine/3.9-build
 
-ALL_TARGETS += v$(1)-debian v$(1)-debian-build
-NON_BUILD_TARGETS += v$(1)-debian
-BUILD_TARGETS += v$(1)-debian-build
-ALL_TAGS += $(1)-debian $(1)-debian-build
-NON_BUILD_TAGS += $(1)-debian
-BUILD_TAGS += $(1)-debian-build
-.PHONY: v$(1)-debian v$(1)-debian-build
-endef
+NONBUILD_TARGETS += $(ALPINE_NONBUILD_TARGETS)
+BUILD_TARGETS += $(ALPINE_BUILD_TARGETS)
 
-define LATEST_UBUNTU_TEMPLATE =
-v$(1)-ubuntu: v$(1)-$(LATEST_UBUNTU)
-	docker tag daewok/sbcl:$(1)-$(LATEST_UBUNTU) daewok/sbcl:$(1)-ubuntu
+ALPINE_TARGETS = $(ALPINE_NONBUILD_TARGETS) $(ALPINE_BUILD_TARGETS)
+ALL_TARGETS += $(ALPINE_TARGETS)
 
-v$(1)-ubuntu-build: v$(1)-$(LATEST_UBUNTU)-build
-	docker tag daewok/sbcl:$(1)-$(LATEST_UBUNTU)-build daewok/sbcl:$(1)-ubuntu-build
+BUILD_TAGS += $(VERSION)-alpine3.9-build $(VERSION)-alpine3.10-build $(VERSION)-alpine-build alpine-build
+NONBUILD_TAGS += $(VERSION)-alpine3.9 $(VERSION)-alpine3.10 $(VERSION)-alpine alpine
 
-ALL_TARGETS += v$(1)-ubuntu v$(1)-ubuntu-build
-NON_BUILD_TARGETS += v$(1)-ubuntu
-BUILD_TARGETS += v$(1)-ubuntu-build
-ALL_TAGS += $(1)-ubuntu $(1)-ubuntu-build
-NON_BUILD_TAGS += $(1)-ubuntu
-BUILD_TAGS += $(1)-ubuntu-build
-.PHONY: v$(1)-ubuntu v$(1)-ubuntu-build
-endef
+.PHONY: $(ALPINE_TARGETS)
 
-define EXPAND_VERSION =
-$(foreach os,$(OSES),$(eval $(call DOCKER_TEMPLATE,$(1),$(os))))
+##############################################################################
+# Debian
+##############################################################################
 
-$(eval $(call LATEST_ALPINE_TEMPLATE,$(1)))
-$(eval $(call LATEST_DEBIAN_TEMPLATE,$(1)))
-$(eval $(call LATEST_UBUNTU_TEMPLATE,$(1)))
+debian: debian/$(LATEST_DEBIAN)
+	docker tag daewok/sbcl:$(VERSION)-debian-$(LATEST_DEBIAN) daewok/sbcl:$(VERSION)-debian
+	docker tag daewok/sbcl:$(VERSION)-debian-$(LATEST_DEBIAN) daewok/sbcl:debian
 
-endef
+debian-build: debian/$(LATEST_DEBIAN)-build
+	docker tag daewok/sbcl:$(VERSION)-debian-$(LATEST_DEBIAN)-build daewok/sbcl:$(VERSION)-debian-build
+	docker tag daewok/sbcl:$(VERSION)-debian-$(LATEST_DEBIAN)-build daewok/sbcl:debian-build
 
+debian/stretch:
+	docker build -t daewok/sbcl:$(VERSION)-debian-stretch debian/stretch
 
-define EXPAND_OS =
-$(1): v$(LATEST_VERSION)-$(1)
-	docker tag daewok/sbcl:$(LATEST_VERSION)-$(1) daewok/sbcl:$(1)
+debian/stretch-build:
+	docker build -t daewok/sbcl:$(VERSION)-debian-stretch-build -f debian/stretch/Dockerfile.build debian/stretch
 
-$(1)-build: v$(LATEST_VERSION)-$(1)-build
-	docker tag daewok/sbcl:$(LATEST_VERSION)-$(1)-build daewok/sbcl:$(1)-build
+DEBIAN_NONBUILD_TARGETS = debian debian/stretch
+DEBIAN_BUILD_TARGETS = debian-build debian/stretch-build
 
-.PHONY: $(1)
+NONBUILD_TARGETS += $(DEBIAN_NONBUILD_TARGETS)
+BUILD_TARGETS += $(DEBIAN_BUILD_TARGETS)
 
-ALL_TARGETS += $(1) $(1)-build
-NON_BUILD_TARGETS += $(1)
-BUILD_TARGETS += $(1)-build
-ALL_TAGS += $(1) $(1)-build
-NON_BUILD_TAGS += $(1)
-BUILD_TAGS += $(1)-build
-endef
+DEBIAN_TARGETS = $(DEBIAN_NONBUILD_TARGETS) $(DEBIAN_BUILD_TARGETS)
+ALL_TARGETS += $(DEBIAN_TARGETS)
 
-$(foreach v,$(VERSIONS),$(call EXPAND_VERSION,$(v)))
-$(foreach o,$(OSES),$(eval $(call EXPAND_OS,$(o))))
+BUILD_TAGS += $(VERSION)-debian-stretch-build $(VERSION)-debian-build debian-build
+NONBUILD_TAGS += $(VERSION)-debian-stretch $(VERSION)-debian debian
 
-alpine-latest: v$(LATEST_VERSION)-$(LATEST_ALPINE)
-	docker tag daewok/sbcl:$(LATEST_VERSION)-$(LATEST_ALPINE) daewok/sbcl:alpine
+.PHONY: $(DEBIAN_TARGETS)
 
-alpine-latest-build: v$(LATEST_VERSION)-$(LATEST_ALPINE)-build
-	docker tag daewok/sbcl:$(LATEST_VERSION)-$(LATEST_ALPINE)-build daewok/sbcl:alpine-build
+##############################################################################
+# Ubuntu
+##############################################################################
 
-debian-latest: v$(LATEST_VERSION)-$(LATEST_DEBIAN)
-	docker tag daewok/sbcl:$(LATEST_VERSION)-$(LATEST_DEBIAN) daewok/sbcl:debian
+ubuntu: ubuntu/$(LATEST_UBUNTU)
+	docker tag daewok/sbcl:$(VERSION)-ubuntu-$(LATEST_UBUNTU) daewok/sbcl:$(VERSION)-ubuntu
+	docker tag daewok/sbcl:$(VERSION)-ubuntu-$(LATEST_UBUNTU) daewok/sbcl:ubuntu
 
-debian-latest-build: v$(LATEST_VERSION)-$(LATEST_DEBIAN)-build
-	docker tag daewok/sbcl:$(LATEST_VERSION)-$(LATEST_DEBIAN)-build daewok/sbcl:debian-build
+ubuntu-build: ubuntu/$(LATEST_UBUNTU)-build
+	docker tag daewok/sbcl:$(VERSION)-ubuntu-$(LATEST_UBUNTU)-build daewok/sbcl:$(VERSION)-ubuntu-build
+	docker tag daewok/sbcl:$(VERSION)-ubuntu-$(LATEST_UBUNTU)-build daewok/sbcl:ubuntu-build
 
-ubuntu-latest: v$(LATEST_VERSION)-$(LATEST_UBUNTU)
-	docker tag daewok/sbcl:$(LATEST_VERSION)-$(LATEST_UBUNTU) daewok/sbcl:ubuntu
+ubuntu/bionic:
+	docker build -t daewok/sbcl:$(VERSION)-ubuntu-bionic ubuntu/bionic
 
-ubuntu-latest-build: v$(LATEST_VERSION)-$(LATEST_UBUNTU)-build
-	docker tag daewok/sbcl:$(LATEST_VERSION)-$(LATEST_UBUNTU)-build daewok/sbcl:ubuntu-build
+ubuntu/bionic-build:
+	docker build -t daewok/sbcl:$(VERSION)-ubuntu-bionic-build -f ubuntu/bionic/Dockerfile.build ubuntu/bionic
 
-ALL_TAGS += alpine alpine-build debian debian-build ubuntu ubuntu-build
-NON_BUILD_TAGS += alpine debian ubuntu
-BUILD_TAGS += alpine-build debian-build ubuntu-build
+ubuntu/cosmic:
+	docker build -t daewok/sbcl:$(VERSION)-ubuntu-cosmic ubuntu/cosmic
 
-all: alpine-latest alpine-latest-build debian-latest debian-latest-build ubuntu-latest ubuntu-latest-build $(ALL_TARGETS)
+ubuntu/cosmic-build:
+	docker build -t daewok/sbcl:$(VERSION)-ubuntu-cosmic-build -f ubuntu/cosmic/Dockerfile.build ubuntu/cosmic
 
-all-non-build: alpine-latest debian-latest ubuntu-latest $(NON_BUILD_TARGETS)
+UBUNTU_NONBUILD_TARGETS = ubuntu ubuntu/bionc ubuntu/cosmic
+UBUNTU_BUILD_TARGETS = ubuntu-build ubuntu/bionc-build ubuntu/cosmic-build
 
-all-build: alpine-latest-build debian-latest-build ubuntu-latest-build $(BUILD_TARGETS)
+NONBUILD_TARGETS += $(UBUNTU_NONBUILD_TARGETS)
+BUILD_TARGETS += $(UBUNTU_BUILD_TARGETS)
 
-all_tags:
-	@echo $(ALL_TAGS)
+UBUNTU_TARGETS = $(UBUNTU_NONBUILD_TARGETS) $(UBUNTU_BUILD_TARGETS)
+ALL_TARGETS += $(UBUNTU_TARGETS)
 
-build_tags:
-	@echo $(BUILD_TAGS)
+BUILD_TAGS += $(VERSION)-ubuntu-bionic-build $(VERSION)-ubuntu-cosmic-build $(VERSION)-ubuntu-build ubuntu-build
+NONBUILD_TAGS += $(VERSION)-ubuntu-bionic $(VERSION)-ubuntu-cosmic $(VERSION)-ubuntu ubuntu
 
-non_build_tags:
-	@echo $(NON_BUILD_TAGS)
+.PHONY: $(UBUNTU_TARGETS)
+
+##############################################################################
+# Primary entry points
+##############################################################################
+
+all: $(ALL_TARGETS)
+all-non-build: $(NONBUILD_TARGETS)
+all-build: $(BUILD_TARGETS)
 
 push_non_build_tags:
 	for tag in $(NON_BUILD_TAGS); do \
@@ -152,8 +140,3 @@ push_build_tags:
 	for tag in $(BUILD_TAGS); do \
 		docker push daewok/sbcl:$$tag ; \
 	done
-
-alpine_tags:
-	@echo alpine alpine3.9
-
-.PHONY: all all_tags
