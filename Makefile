@@ -1,9 +1,8 @@
 VERSION = 1.5.7
 
 LATEST_ALPINE = 3.10
-LATEST_DEBIAN = stretch
+LATEST_DEBIAN = buster
 LATEST_UBUNTU = cosmic
-OSES = alpine/3.10 alpine/3.9 debian/stretch ubuntu/bionic ubuntu/cosmic
 
 ALL_TARGETS =
 BUILD_TARGETS =
@@ -65,14 +64,20 @@ debian-build: debian/$(LATEST_DEBIAN)-build
 	docker tag daewok/sbcl:$(VERSION)-debian-$(LATEST_DEBIAN)-build daewok/sbcl:$(VERSION)-debian-build
 	docker tag daewok/sbcl:$(VERSION)-debian-$(LATEST_DEBIAN)-build daewok/sbcl:debian-build
 
+debian/buster:
+	docker build -t daewok/sbcl:$(VERSION)-debian-buster debian/buster
+
+debian/buster-build:
+	docker build -t daewok/sbcl:$(VERSION)-debian-buster-build -f debian/buster/Dockerfile.build debian/buster
+
 debian/stretch:
 	docker build -t daewok/sbcl:$(VERSION)-debian-stretch debian/stretch
 
 debian/stretch-build:
 	docker build -t daewok/sbcl:$(VERSION)-debian-stretch-build -f debian/stretch/Dockerfile.build debian/stretch
 
-DEBIAN_NONBUILD_TARGETS = debian debian/stretch
-DEBIAN_BUILD_TARGETS = debian-build debian/stretch-build
+DEBIAN_NONBUILD_TARGETS = debian debian/stretch debian/buster
+DEBIAN_BUILD_TARGETS = debian-build debian/stretch-build debian/buster-build
 
 NONBUILD_TARGETS += $(DEBIAN_NONBUILD_TARGETS)
 BUILD_TARGETS += $(DEBIAN_BUILD_TARGETS)
@@ -80,8 +85,8 @@ BUILD_TARGETS += $(DEBIAN_BUILD_TARGETS)
 DEBIAN_TARGETS = $(DEBIAN_NONBUILD_TARGETS) $(DEBIAN_BUILD_TARGETS)
 ALL_TARGETS += $(DEBIAN_TARGETS)
 
-BUILD_TAGS += $(VERSION)-debian-stretch-build $(VERSION)-debian-build debian-build
-NONBUILD_TAGS += $(VERSION)-debian-stretch $(VERSION)-debian debian
+BUILD_TAGS += $(VERSION)-debian-buster-build $(VERSION)-debian-stretch-build $(VERSION)-debian-build debian-build
+NONBUILD_TAGS += $(VERSION)-debian-buster $(VERSION)-debian-stretch $(VERSION)-debian debian
 
 .PHONY: $(DEBIAN_TARGETS)
 
