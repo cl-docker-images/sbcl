@@ -12,7 +12,7 @@ The OSes and versions SBCL is built on are:
   + stretch
   + buster
 + ubuntu
-  + cosmic
+  + disco
   + bionic
 
 Besides necessary patches for alpine, SBCL is built as close to vanilla as

@@ -1,12 +1,16 @@
-FROM daewok/sbcl:1.5.7-ubuntu-cosmic
+FROM ubuntu:disco
+
+LABEL maintainer="etimmons@mit.edu"
+
+ENV SBCL_VERSION=1.5.7
 
 WORKDIR /usr/local/src/
 
-# hadolint ignore=DL3003,DL3008,SC2086
+# hadolint ignore=DL3003,DL3008
 RUN set -x \
     && apt-get update \
-    && apt-get install -y --no-install-recommends make zlib1g-dev gcc patch wget ca-certificates gnupg \
-    && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-source.tar.bz2 \
+    && apt-get install -y --no-install-recommends wget gnupg ca-certificates make \
+    && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar.bz2 \
     && wget https://downloads.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-crhodes.asc \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
@@ -17,16 +21,18 @@ RUN set -x \
        || gpg --batch --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ${CRHODES_KEY} \
        || gpg --batch --keyserver pgp.mit.edu --recv-keys ${CRHODES_KEY}) \
     && gpg --batch --verify sbcl-${SBCL_VERSION}-crhodes.asc \
-    && bunzip2 sbcl-${SBCL_VERSION}-source.tar.bz2 \
+    && bunzip2 sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar.bz2 \
     && gpg --batch --decrypt sbcl-${SBCL_VERSION}-crhodes.asc > sbcl-${SBCL_VERSION}-crhodes.txt \
-    && grep sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION}-crhodes.txt > sum-file.txt \
+    && grep sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar sbcl-${SBCL_VERSION}-crhodes.txt > sum-file.txt \
     && sha256sum -c sum-file.txt \
-    && tar xf sbcl-${SBCL_VERSION}-source.tar \
-    && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sum-file.txt sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION}-crhodes.txt \
-    && apt-get remove -y wget ca-certificates gnupg \
+    && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sbcl-${SBCL_VERSION}-crhodes.txt sum-file.txt \
+    && tar xf sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar \
+    && (cd sbcl-${SBCL_VERSION}-x86-64-linux/ && sh install.sh) \
+    && rm -rf sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar sbcl-${SBCL_VERSION}-x86-64-linux/ \
+    && apt-get remove -y wget gnupg ca-certificates make \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /
 
-COPY rebuild-sbcl /usr/local/bin/rebuild-sbcl
+ENTRYPOINT ["sbcl"]

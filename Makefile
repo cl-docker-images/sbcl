@@ -2,7 +2,7 @@ VERSION = 1.5.7
 
 LATEST_ALPINE = 3.10
 LATEST_DEBIAN = buster
-LATEST_UBUNTU = cosmic
+LATEST_UBUNTU = disco
 
 ALL_TARGETS =
 BUILD_TARGETS =
@@ -108,14 +108,14 @@ ubuntu/bionic:
 ubuntu/bionic-build:
 	docker build -t daewok/sbcl:$(VERSION)-ubuntu-bionic-build -f ubuntu/bionic/Dockerfile.build ubuntu/bionic
 
-ubuntu/cosmic:
-	docker build -t daewok/sbcl:$(VERSION)-ubuntu-cosmic ubuntu/cosmic
+ubuntu/disco:
+	docker build -t daewok/sbcl:$(VERSION)-ubuntu-disco ubuntu/disco
 
-ubuntu/cosmic-build:
-	docker build -t daewok/sbcl:$(VERSION)-ubuntu-cosmic-build -f ubuntu/cosmic/Dockerfile.build ubuntu/cosmic
+ubuntu/disco-build:
+	docker build -t daewok/sbcl:$(VERSION)-ubuntu-disco-build -f ubuntu/disco/Dockerfile.build ubuntu/disco
 
-UBUNTU_NONBUILD_TARGETS = ubuntu ubuntu/bionc ubuntu/cosmic
-UBUNTU_BUILD_TARGETS = ubuntu-build ubuntu/bionc-build ubuntu/cosmic-build
+UBUNTU_NONBUILD_TARGETS = ubuntu ubuntu/bionc ubuntu/disco
+UBUNTU_BUILD_TARGETS = ubuntu-build ubuntu/bionc-build ubuntu/disco-build
 
 NONBUILD_TARGETS += $(UBUNTU_NONBUILD_TARGETS)
 BUILD_TARGETS += $(UBUNTU_BUILD_TARGETS)
@@ -123,8 +123,8 @@ BUILD_TARGETS += $(UBUNTU_BUILD_TARGETS)
 UBUNTU_TARGETS = $(UBUNTU_NONBUILD_TARGETS) $(UBUNTU_BUILD_TARGETS)
 ALL_TARGETS += $(UBUNTU_TARGETS)
 
-BUILD_TAGS += $(VERSION)-ubuntu-bionic-build $(VERSION)-ubuntu-cosmic-build $(VERSION)-ubuntu-build ubuntu-build
-NONBUILD_TAGS += $(VERSION)-ubuntu-bionic $(VERSION)-ubuntu-cosmic $(VERSION)-ubuntu ubuntu
+BUILD_TAGS += $(VERSION)-ubuntu-bionic-build $(VERSION)-ubuntu-disco-build $(VERSION)-ubuntu-build ubuntu-build
+NONBUILD_TAGS += $(VERSION)-ubuntu-bionic $(VERSION)-ubuntu-disco $(VERSION)-ubuntu ubuntu
 
 .PHONY: $(UBUNTU_TARGETS)
 
