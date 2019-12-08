@@ -1,6 +1,16 @@
-VERSION = 1.5.7
+VERSION = 1.5.9
 
-ARCHES := linux/amd64,linux/arm/v7
+PLATFORM := linux/amd64
+
+ifeq ($(PLATFORM),linux/amd64)
+ARCH = amd64
+else ifeq ($(PLATFORM),linux/arm64)
+ARCH = arm64
+else ifeq ($(PLATFORM),linux/arm/v7)
+ARCH = armhf
+else
+$(error Unknown ARCH)
+endif
 
 LATEST_ALPINE = 3.10
 LATEST_DEBIAN = buster
@@ -16,7 +26,8 @@ NONBUILD_TAGS =
 
 all:
 
-DOCKER_BUILD = docker build --pull --platform $$ARCH --load
+DOCKER_BUILD = docker build --pull --platform $(PLATFORM) --progress plain
+DOCKER_PUSH = docker push
 
 REPO = daewok/sbcl
 VERSIONED_REPO = $(REPO):$(VERSION)
@@ -28,290 +39,219 @@ VERSIONED_REPO = $(REPO):$(VERSION)
 # Debian Base Images
 ##############################################################################
 
-debian: debian/buster debian/stretch
-	docker manifest create --amend $(REPO):debian $(VERSIONED_REPO)-debian-buster-amd64 $(VERSIONED_REPO)-debian-buster-arm32v7
-	docker manifest create --amend $(VERSIONED_REPO)-debian $(VERSIONED_REPO)-debian-buster-amd64 $(VERSIONED_REPO)-debian-buster-arm32v7
+debian/buster:
+	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-debian-buster-$(ARCH) debian/buster
 
+debian/stretch:
+	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-debian-stretch-$(ARCH) debian/stretch
+
+debian: debian/buster debian/stretch
+
+debian-manifests/buster:
+	docker manifest create $(REPO):debian-buster $(VERSIONED_REPO)-debian-buster-amd64 $(VERSIONED_REPO)-debian-buster-arm64 $(VERSIONED_REPO)-debian-buster-armhf
+	docker manifest create $(VERSIONED_REPO)-debian-buster $(VERSIONED_REPO)-debian-buster-amd64 $(VERSIONED_REPO)-debian-buster-arm64 $(VERSIONED_REPO)-debian-buster-armhf
+
+debian-manifests/stretch:
+	docker manifest create $(REPO):debian-stretch $(VERSIONED_REPO)-debian-stretch-amd64 $(VERSIONED_REPO)-debian-stretch-arm64 $(VERSIONED_REPO)-debian-stretch-armhf
+	docker manifest create $(VERSIONED_REPO)-debian-stretch $(VERSIONED_REPO)-debian-stretch-amd64 $(VERSIONED_REPO)-debian-stretch-arm64 $(VERSIONED_REPO)-debian-stretch-armhf
+
+debian-manifests: debian-manifests/buster debian-manifests/stretch
+	docker manifest create $(REPO):debian $(VERSIONED_REPO)-debian-$(LATEST_DEBIAN)-amd64 $(VERSIONED_REPO)-debian-$(LATEST_DEBIAN)-arm64 $(VERSIONED_REPO)-debian-$(LATEST_DEBIAN)-armhf
+	docker manifest create $(VERSIONED_REPO)-debian $(VERSIONED_REPO)-debian-$(LATEST_DEBIAN)-amd64 $(VERSIONED_REPO)-debian-$(LATEST_DEBIAN)-arm64 $(VERSIONED_REPO)-debian-$(LATEST_DEBIAN)-armhf
+
+push-manifests-debian: debian-manifests
+	docker manifest push $(REPO):debian-buster
+	docker manifest push $(VERSIONED_REPO)-debian-buster
+	docker manifest push $(REPO):debian-stretch
+	docker manifest push $(VERSIONED_REPO)-debian-stretch
 	docker manifest push $(REPO):debian
 	docker manifest push $(VERSIONED_REPO)-debian
 
-debian/buster: debian/buster-amd64 debian/buster-arm32v7
-	docker manifest create --amend $(VERSIONED_REPO)-debian-buster $(VERSIONED_REPO)-debian-buster-amd64 $(VERSIONED_REPO)-debian-buster-arm32v7
-	docker manifest push $(VERSIONED_REPO)-debian-buster
+.PHONY: debian debian/buster debian/stretch debian-manifests debian-manifests/buster debian-manifests/stretch push-debian-manifests
 
-debian/buster-amd64: export ARCH = linux/amd64
-debian/buster-amd64:
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-debian-buster-amd64 debian/buster
-	docker push $(VERSIONED_REPO)-debian-buster-amd64
-
-debian/buster-arm32v7: export ARCH = linux/arm/v7
-debian/buster-arm32v7:
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-debian-buster-arm32v7 debian/buster
-	docker push $(VERSIONED_REPO)-debian-buster-arm32v7
-
-
-debian/stretch: debian/stretch-amd64 debian/stretch-arm32v7
-	docker manifest create --amend $(VERSIONED_REPO)-debian-stretch $(VERSIONED_REPO)-debian-stretch-amd64 $(VERSIONED_REPO)-debian-stretch-arm32v7
-	docker manifest push $(VERSIONED_REPO)-debian-stretch
-
-debian/stretch-amd64: export ARCH = linux/amd64
-debian/stretch-amd64:
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-debian-stretch-amd64 debian/stretch
-	docker push $(VERSIONED_REPO)-debian-stretch-amd64
-
-debian/stretch-arm32v7: export ARCH = linux/arm/v7
-debian/stretch-arm32v7:
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-debian-stretch-arm32v7 debian/stretch
-	docker push $(VERSIONED_REPO)-debian-stretch-arm32v7
 
 ##############################################################################
 # Debian Build Images
 ##############################################################################
 
-debian-build: debian/buster-build debian/stretch-build
-	docker manifest create --amend $(REPO):debian-build $(VERSIONED_REPO)-debian-buster-build-amd64 $(VERSIONED_REPO)-debian-buster-build-arm32v7
-	docker manifest create --amend $(VERSIONED_REPO)-debian-build $(VERSIONED_REPO)-debian-buster-build-amd64 $(VERSIONED_REPO)-debian-buster-build-arm32v7
+debian-build/buster:
+	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-debian-buster-build-$(ARCH) -f debian/buster/Dockerfile.build debian/buster
 
+debian-build/stretch:
+	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-debian-stretch-build-$(ARCH) -f debian/stretch/Dockerfile.build debian/stretch
+
+debian-build: debian-build/buster debian-build/stretch
+
+debian-build-manifests/buster:
+	docker manifest create $(REPO):debian-buster-build $(VERSIONED_REPO)-debian-buster-build-amd64 $(VERSIONED_REPO)-debian-buster-build-arm64 $(VERSIONED_REPO)-debian-buster-build-armhf
+	docker manifest create $(VERSIONED_REPO)-debian-buster-build $(VERSIONED_REPO)-debian-buster-build-amd64 $(VERSIONED_REPO)-debian-buster-build-arm64 $(VERSIONED_REPO)-debian-buster-build-armhf
+
+debian-build-manifests/stretch:
+	docker manifest create $(REPO):debian-stretch-build $(VERSIONED_REPO)-debian-stretch-build-amd64 $(VERSIONED_REPO)-debian-stretch-build-arm64 $(VERSIONED_REPO)-debian-stretch-build-armhf
+	docker manifest create $(VERSIONED_REPO)-debian-stretch-build $(VERSIONED_REPO)-debian-stretch-build-amd64 $(VERSIONED_REPO)-debian-stretch-build-arm64 $(VERSIONED_REPO)-debian-stretch-build-armhf
+
+debian-build-manifests: debian-build-manifests/buster debian-build-manifests/stretch
+	docker manifest create $(REPO):debian-build $(VERSIONED_REPO)-debian-$(LATEST_DEBIAN)-build-amd64 $(VERSIONED_REPO)-debian-$(LATEST_DEBIAN)-build-arm64 $(VERSIONED_REPO)-debian-$(LATEST_DEBIAN)-build-armhf
+	docker manifest create $(VERSIONED_REPO)-debian-build $(VERSIONED_REPO)-debian-$(LATEST_DEBIAN)-build-amd64 $(VERSIONED_REPO)-debian-$(LATEST_DEBIAN)-build-arm64 $(VERSIONED_REPO)-debian-$(LATEST_DEBIAN)-build-armhf
+
+push-manifests-debian-build: debian-build-manifests
+	docker manifest push $(REPO):debian-buster-build
+	docker manifest push $(VERSIONED_REPO)-debian-buster-build
+	docker manifest push $(REPO):debian-stretch-build
+	docker manifest push $(VERSIONED_REPO)-debian-stretch-build
 	docker manifest push $(REPO):debian-build
 	docker manifest push $(VERSIONED_REPO)-debian-build
 
-debian/buster-build: debian/buster-build-amd64 debian/buster-build-arm32v7
-	docker manifest create --amend $(VERSIONED_REPO)-debian-buster-build $(VERSIONED_REPO)-debian-buster-build-amd64 $(VERSIONED_REPO)-debian-buster-build-arm32v7
-	docker manifest push $(VERSIONED_REPO)-debian-buster-build
-
-debian/buster-build-amd64: export ARCH = linux/amd64
-debian/buster-build-amd64: debian/buster
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-debian-buster-build-amd64 -f debian/buster/Dockerfile.build debian/buster
-	docker push $(VERSIONED_REPO)-debian-buster-build-amd64
-
-debian/buster-build-arm32v7: export ARCH = linux/arm/v7
-debian/buster-build-arm32v7: debian/buster
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-debian-buster-build-arm32v7 -f debian/buster/Dockerfile.build debian/buster
-	docker push $(VERSIONED_REPO)-debian-buster-build-arm32v7
-
-
-
-debian/stretch-build: debian/stretch-build-amd64 debian/stretch-build-arm32v7
-	docker manifest create --amend $(VERSIONED_REPO)-debian-stretch-build $(VERSIONED_REPO)-debian-stretch-build-amd64 $(VERSIONED_REPO)-debian-stretch-build-arm32v7
-	docker manifest push $(VERSIONED_REPO)-debian-stretch-build
-
-debian/stretch-build-amd64: export ARCH = linux/amd64
-debian/stretch-build-amd64: debian/stretch
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-debian-stretch-build-amd64 -f debian/stretch/Dockerfile.build debian/stretch
-	docker push $(VERSIONED_REPO)-debian-stretch-build-amd64
-
-debian/stretch-build-arm32v7: export ARCH = linux/arm/v7
-debian/stretch-build-arm32v7: debian/stretch
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-debian-stretch-build-arm32v7 -f debian/stretch/Dockerfile.build debian/stretch
-	docker push $(VERSIONED_REPO)-debian-stretch-build-arm32v7
+.PHONY: debian-build debian-build/buster debian-build/stretch debian-build-manifests debian-build-manifests/buster debian-build-manifests/stretch push-debian-build-manifests
 
 
 ##############################################################################
 # Ubuntu Base Images
 ##############################################################################
 
-ubuntu: ubuntu/disco ubuntu/bionic
-	docker manifest create --amend $(REPO):ubuntu $(VERSIONED_REPO)-ubuntu-disco-amd64 $(VERSIONED_REPO)-ubuntu-disco-arm32v7
-	docker manifest create --amend $(VERSIONED_REPO)-ubuntu $(VERSIONED_REPO)-ubuntu-disco-amd64 $(VERSIONED_REPO)-ubuntu-disco-arm32v7
+ubuntu/disco:
+	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-ubuntu-disco-$(ARCH) ubuntu/disco
 
+ubuntu/bionic:
+	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-ubuntu-bionic-$(ARCH) ubuntu/bionic
+
+ubuntu: ubuntu/disco ubuntu/bionic
+
+ubuntu-manifests/disco:
+	docker manifest create $(REPO):ubuntu-disco $(VERSIONED_REPO)-ubuntu-disco-amd64 $(VERSIONED_REPO)-ubuntu-disco-arm64 $(VERSIONED_REPO)-ubuntu-disco-armhf
+	docker manifest create $(VERSIONED_REPO)-ubuntu-disco $(VERSIONED_REPO)-ubuntu-disco-amd64 $(VERSIONED_REPO)-ubuntu-disco-arm64 $(VERSIONED_REPO)-ubuntu-disco-armhf
+
+ubuntu-manifests/bionic:
+	docker manifest create $(REPO):ubuntu-bionic $(VERSIONED_REPO)-ubuntu-bionic-amd64 $(VERSIONED_REPO)-ubuntu-bionic-arm64 $(VERSIONED_REPO)-ubuntu-bionic-armhf
+	docker manifest create $(VERSIONED_REPO)-ubuntu-bionic $(VERSIONED_REPO)-ubuntu-bionic-amd64 $(VERSIONED_REPO)-ubuntu-bionic-arm64 $(VERSIONED_REPO)-ubuntu-bionic-armhf
+
+ubuntu-manifests: ubuntu-manifests/disco ubuntu-manifests/bionic
+	docker manifest create $(REPO):ubuntu $(VERSIONED_REPO)-ubuntu-$(LATEST_UBUNTU)-amd64 $(VERSIONED_REPO)-ubuntu-$(LATEST_UBUNTU)-arm64 $(VERSIONED_REPO)-ubuntu-$(LATEST_UBUNTU)-armhf
+	docker manifest create $(VERSIONED_REPO)-ubuntu $(VERSIONED_REPO)-ubuntu-$(LATEST_UBUNTU)-amd64 $(VERSIONED_REPO)-ubuntu-$(LATEST_UBUNTU)-arm64 $(VERSIONED_REPO)-ubuntu-$(LATEST_UBUNTU)-armhf
+
+push-manifests-ubuntu: ubuntu-manifests
+	docker manifest push $(REPO):ubuntu-disco
+	docker manifest push $(VERSIONED_REPO)-ubuntu-disco
+	docker manifest push $(REPO):ubuntu-bionic
+	docker manifest push $(VERSIONED_REPO)-ubuntu-bionic
 	docker manifest push $(REPO):ubuntu
 	docker manifest push $(VERSIONED_REPO)-ubuntu
 
-ubuntu/disco: ubuntu/disco-amd64 ubuntu/disco-arm32v7
-	docker manifest create --amend $(VERSIONED_REPO)-ubuntu-disco $(VERSIONED_REPO)-ubuntu-disco-amd64 $(VERSIONED_REPO)-ubuntu-disco-arm32v7
-	docker manifest push $(VERSIONED_REPO)-ubuntu-disco
+.PHONY: ubuntu ubuntu/disco ubuntu/bionic ubuntu-manifests ubuntu-manifests/disco ubuntu-manifests/bionic push-ubuntu-manifests
 
-ubuntu/disco-amd64: export ARCH = linux/amd64
-ubuntu/disco-amd64:
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-ubuntu-disco-amd64 ubuntu/disco
-	docker push $(VERSIONED_REPO)-ubuntu-disco-amd64
-
-ubuntu/disco-arm32v7: export ARCH = linux/arm/v7
-ubuntu/disco-arm32v7:
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-ubuntu-disco-arm32v7 ubuntu/disco
-	docker push $(VERSIONED_REPO)-ubuntu-disco-arm32v7
-
-
-ubuntu/bionic: ubuntu/bionic-amd64 ubuntu/bionic-arm32v7
-	docker manifest create --amend $(VERSIONED_REPO)-ubuntu-bionic $(VERSIONED_REPO)-ubuntu-bionic-amd64 $(VERSIONED_REPO)-ubuntu-bionic-arm32v7
-	docker manifest push $(VERSIONED_REPO)-ubuntu-bionic
-
-ubuntu/bionic-amd64: export ARCH = linux/amd64
-ubuntu/bionic-amd64:
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-ubuntu-bionic-amd64 ubuntu/bionic
-	docker push $(VERSIONED_REPO)-ubuntu-bionic-amd64
-
-ubuntu/bionic-arm32v7: export ARCH = linux/arm/v7
-ubuntu/bionic-arm32v7:
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-ubuntu-bionic-arm32v7 ubuntu/bionic
-	docker push $(VERSIONED_REPO)-ubuntu-bionic-arm32v7
 
 ##############################################################################
 # Ubuntu Build Images
 ##############################################################################
 
-ubuntu-build: ubuntu/disco-build ubuntu/bionic-build
-	docker manifest create --amend $(REPO):ubuntu-build $(VERSIONED_REPO)-ubuntu-disco-build-amd64 $(VERSIONED_REPO)-ubuntu-disco-build-arm32v7
-	docker manifest create --amend $(VERSIONED_REPO)-ubuntu-build $(VERSIONED_REPO)-ubuntu-disco-build-amd64 $(VERSIONED_REPO)-ubuntu-disco-build-arm32v7
+ubuntu-build/disco:
+	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-ubuntu-disco-build-$(ARCH) -f ubuntu/disco/Dockerfile.build ubuntu/disco
 
+ubuntu-build/bionic:
+	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-ubuntu-bionic-build-$(ARCH) -f ubuntu/bionic/Dockerfile.build ubuntu/bionic
+
+ubuntu-build: ubuntu-build/disco ubuntu-build/bionic
+
+ubuntu-build-manifests/disco:
+	docker manifest create $(REPO):ubuntu-disco-build $(VERSIONED_REPO)-ubuntu-disco-build-amd64 $(VERSIONED_REPO)-ubuntu-disco-build-arm64 $(VERSIONED_REPO)-ubuntu-disco-build-armhf
+	docker manifest create $(VERSIONED_REPO)-ubuntu-disco-build $(VERSIONED_REPO)-ubuntu-disco-build-amd64 $(VERSIONED_REPO)-ubuntu-disco-build-arm64 $(VERSIONED_REPO)-ubuntu-disco-build-armhf
+
+ubuntu-build-manifests/bionic:
+	docker manifest create $(REPO):ubuntu-bionic-build $(VERSIONED_REPO)-ubuntu-bionic-build-amd64 $(VERSIONED_REPO)-ubuntu-bionic-build-arm64 $(VERSIONED_REPO)-ubuntu-bionic-build-armhf
+	docker manifest create $(VERSIONED_REPO)-ubuntu-bionic-build $(VERSIONED_REPO)-ubuntu-bionic-build-amd64 $(VERSIONED_REPO)-ubuntu-bionic-build-arm64 $(VERSIONED_REPO)-ubuntu-bionic-build-armhf
+
+ubuntu-build-manifests: ubuntu-build-manifests/disco ubuntu-build-manifests/bionic
+	docker manifest create $(REPO):ubuntu-build $(VERSIONED_REPO)-ubuntu-$(LATEST_UBUNTU)-build-amd64 $(VERSIONED_REPO)-ubuntu-$(LATEST_UBUNTU)-build-arm64 $(VERSIONED_REPO)-ubuntu-$(LATEST_UBUNTU)-build-armhf
+	docker manifest create $(VERSIONED_REPO)-ubuntu-build $(VERSIONED_REPO)-ubuntu-$(LATEST_UBUNTU)-build-amd64 $(VERSIONED_REPO)-ubuntu-$(LATEST_UBUNTU)-build-arm64 $(VERSIONED_REPO)-ubuntu-$(LATEST_UBUNTU)-build-armhf
+
+push-manifests-ubuntu-build: ubuntu-build-manifests
+	docker manifest push $(REPO):ubuntu-disco-build
+	docker manifest push $(VERSIONED_REPO)-ubuntu-disco-build
+	docker manifest push $(REPO):ubuntu-bionic-build
+	docker manifest push $(VERSIONED_REPO)-ubuntu-bionic-build
 	docker manifest push $(REPO):ubuntu-build
 	docker manifest push $(VERSIONED_REPO)-ubuntu-build
 
-ubuntu/disco-build: ubuntu/disco-build-amd64 ubuntu/disco-build-arm32v7
-	docker manifest create --amend $(VERSIONED_REPO)-ubuntu-disco-build $(VERSIONED_REPO)-ubuntu-disco-build-amd64 $(VERSIONED_REPO)-ubuntu-disco-build-arm32v7
-	docker manifest push $(VERSIONED_REPO)-ubuntu-disco-build
-
-ubuntu/disco-build-amd64: export ARCH = linux/amd64
-ubuntu/disco-build-amd64: ubuntu/disco
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-ubuntu-disco-build-amd64 -f ubuntu/disco/Dockerfile.build ubuntu/disco
-	docker push $(VERSIONED_REPO)-ubuntu-disco-build-amd64
-
-ubuntu/disco-build-arm32v7: export ARCH = linux/arm/v7
-ubuntu/disco-build-arm32v7: ubuntu/disco
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-ubuntu-disco-build-arm32v7 -f ubuntu/disco/Dockerfile.build ubuntu/disco
-	docker push $(VERSIONED_REPO)-ubuntu-disco-build-arm32v7
+.PHONY: ubuntu-build ubuntu-build/disco ubuntu-build/bionic ubuntu-build-manifests ubuntu-build-manifests/disco ubuntu-build-manifests/bionic push-ubuntu-build-manifests
 
 
+##############################################################################
+# Alpine Base Images
+##############################################################################
 
-ubuntu/bionic-build: ubuntu/bionic-build-amd64 ubuntu/bionic-build-arm32v7
-	docker manifest create --amend $(VERSIONED_REPO)-ubuntu-bionic-build $(VERSIONED_REPO)-ubuntu-bionic-build-amd64 $(VERSIONED_REPO)-ubuntu-bionic-build-arm32v7
-	docker manifest push $(VERSIONED_REPO)-ubuntu-bionic-build
+alpine/3.10:
+	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-alpine3.10-$(ARCH) alpine/3.10
 
-ubuntu/bionic-build-amd64: export ARCH = linux/amd64
-ubuntu/bionic-build-amd64: ubuntu/bionic
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-ubuntu-bionic-build-amd64 -f ubuntu/bionic/Dockerfile.build ubuntu/bionic
-	docker push $(VERSIONED_REPO)-ubuntu-bionic-build-amd64
+alpine/3.9:
+	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-alpine3.9-$(ARCH) alpine/3.9
 
-ubuntu/bionic-build-arm32v7: export ARCH = linux/arm/v7
-ubuntu/bionic-build-arm32v7: ubuntu/bionic
-	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-ubuntu-bionic-build-arm32v7 -f ubuntu/bionic/Dockerfile.build ubuntu/bionic
-	docker push $(VERSIONED_REPO)-ubuntu-bionic-build-arm32v7
+alpine: alpine/3.10 alpine/3.9
+
+alpine-manifests/3.10:
+	docker manifest create $(REPO):alpine3.10 $(VERSIONED_REPO)-alpine3.10-amd64 $(VERSIONED_REPO)-alpine3.10-arm64 $(VERSIONED_REPO)-alpine3.10-armhf
+	docker manifest create $(VERSIONED_REPO)-alpine3.10 $(VERSIONED_REPO)-alpine3.10-amd64 $(VERSIONED_REPO)-alpine3.10-arm64 $(VERSIONED_REPO)-alpine3.10-armhf
+
+alpine-manifests/3.9:
+	docker manifest create $(REPO):alpine3.9 $(VERSIONED_REPO)-alpine3.9-amd64 $(VERSIONED_REPO)-alpine3.9-arm64 $(VERSIONED_REPO)-alpine3.9-armhf
+	docker manifest create $(VERSIONED_REPO)-alpine3.9 $(VERSIONED_REPO)-alpine3.9-amd64 $(VERSIONED_REPO)-alpine3.9-arm64 $(VERSIONED_REPO)-alpine3.9-armhf
+
+alpine-manifests: alpine-manifests/3.10 alpine-manifests/3.9
+	docker manifest create $(REPO):alpine $(VERSIONED_REPO)-alpine-$(LATEST_ALPINE)-amd64 $(VERSIONED_REPO)-alpine-$(LATEST_ALPINE)-arm64 $(VERSIONED_REPO)-alpine-$(LATEST_ALPINE)-armhf
+	docker manifest create $(VERSIONED_REPO)-alpine $(VERSIONED_REPO)-alpine-$(LATEST_ALPINE)-amd64 $(VERSIONED_REPO)-alpine-$(LATEST_ALPINE)-arm64 $(VERSIONED_REPO)-alpine-$(LATEST_ALPINE)-armhf
+
+push-manifests-alpine: alpine-manifests
+	docker manifest push $(REPO):alpine3.10
+	docker manifest push $(VERSIONED_REPO)-alpine3.10
+	docker manifest push $(REPO):alpine3.9
+	docker manifest push $(VERSIONED_REPO)-alpine3.9
+	docker manifest push $(REPO):alpine
+	docker manifest push $(VERSIONED_REPO)-alpine
+
+.PHONY: alpine alpine/3.10 alpine/3.9 alpine-manifests alpine-manifests/3.10 alpine-manifests/3.9 push-alpine-manifests
 
 
-# ##############################################################################
-# # Alpine
-# ##############################################################################
+##############################################################################
+# Alpine Build Images
+##############################################################################
 
-# alpine: alpine/$(LATEST_ALPINE)
-# 	docker tag daewok/sbcl:$(VERSION)-alpine$(LATEST_ALPINE) daewok/sbcl:$(VERSION)-alpine
-# 	docker tag daewok/sbcl:$(VERSION)-alpine$(LATEST_ALPINE) daewok/sbcl:alpine
+alpine-build/3.10:
+	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-alpine3.10-build-$(ARCH) -f alpine/3.10/Dockerfile.build alpine/3.10
 
-# alpine-build: alpine/$(LATEST_ALPINE)-build
-# 	docker tag daewok/sbcl:$(VERSION)-alpine$(LATEST_ALPINE)-build daewok/sbcl:$(VERSION)-alpine-build
-# 	docker tag daewok/sbcl:$(VERSION)-alpine$(LATEST_ALPINE)-build daewok/sbcl:alpine-build
+alpine-build/3.9:
+	$(DOCKER_BUILD) -t $(VERSIONED_REPO)-alpine3.9-build-$(ARCH) -f alpine/3.9/Dockerfile.build alpine/3.9
 
-# alpine/3.10:
-# 	$(DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-alpine3.10-amd64 alpine/3.10
+alpine-build: alpine-build/3.10 alpine-build/3.9
 
-# alpine/3.10-build:
-# 	$(DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-alpine3.10-build -f alpine/3.10/Dockerfile.build alpine/3.10
+alpine-build-manifests/3.10:
+	docker manifest create $(REPO):alpine3.10-build $(VERSIONED_REPO)-alpine3.10-build-amd64 $(VERSIONED_REPO)-alpine3.10-build-arm64 $(VERSIONED_REPO)-alpine3.10-build-armhf
+	docker manifest create $(VERSIONED_REPO)-alpine3.10-build $(VERSIONED_REPO)-alpine3.10-build-amd64 $(VERSIONED_REPO)-alpine3.10-build-arm64 $(VERSIONED_REPO)-alpine3.10-build-armhf
 
-# alpine/3.9:
-# 	$(DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-alpine3.9-amd64 alpine/3.9
+alpine-build-manifests/3.9:
+	docker manifest create $(REPO):alpine3.9-build $(VERSIONED_REPO)-alpine3.9-build-amd64 $(VERSIONED_REPO)-alpine3.9-build-arm64 $(VERSIONED_REPO)-alpine3.9-build-armhf
+	docker manifest create $(VERSIONED_REPO)-alpine3.9-build $(VERSIONED_REPO)-alpine3.9-build-amd64 $(VERSIONED_REPO)-alpine3.9-build-arm64 $(VERSIONED_REPO)-alpine3.9-build-armhf
 
-# alpine/3.9-build:
-# 	$(DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-alpine3.9-build -f alpine/3.9/Dockerfile.build alpine/3.9
+alpine-build-manifests: alpine-build-manifests/3.10 alpine-build-manifests/3.9
+	docker manifest create $(REPO):alpine-build $(VERSIONED_REPO)-alpine-$(LATEST_ALPINE)-build-amd64 $(VERSIONED_REPO)-alpine-$(LATEST_ALPINE)-build-arm64 $(VERSIONED_REPO)-alpine-$(LATEST_ALPINE)-build-armhf
+	docker manifest create $(VERSIONED_REPO)-alpine-build $(VERSIONED_REPO)-alpine-$(LATEST_ALPINE)-build-amd64 $(VERSIONED_REPO)-alpine-$(LATEST_ALPINE)-build-arm64 $(VERSIONED_REPO)-alpine-$(LATEST_ALPINE)-build-armhf
 
-# ALPINE_NONBUILD_TARGETS = alpine alpine/3.10 alpine/3.9
-# ALPINE_BUILD_TARGETS = alpine-build alpine/3.10-build alpine/3.9-build
+push-manifests-alpine-build: alpine-build-manifests
+	docker manifest push $(REPO):alpine3.10-build
+	docker manifest push $(VERSIONED_REPO)-alpine3.10-build
+	docker manifest push $(REPO):alpine3.9-build
+	docker manifest push $(VERSIONED_REPO)-alpine3.9-build
+	docker manifest push $(REPO):alpine-build
+	docker manifest push $(VERSIONED_REPO)-alpine-build
 
-# NONBUILD_TARGETS += $(ALPINE_NONBUILD_TARGETS)
-# BUILD_TARGETS += $(ALPINE_BUILD_TARGETS)
+.PHONY: alpine-build alpine-build/3.10 alpine-build/3.9 alpine-build-manifests alpine-build-manifests/3.10 alpine-build-manifests/3.9 push-alpine-build-manifests
 
-# ALPINE_TARGETS = $(ALPINE_NONBUILD_TARGETS) $(ALPINE_BUILD_TARGETS)
-# ALL_TARGETS += $(ALPINE_TARGETS)
-
-# BUILD_TAGS += $(VERSION)-alpine3.9-build $(VERSION)-alpine3.10-build $(VERSION)-alpine-build alpine-build
-# NONBUILD_TAGS += $(VERSION)-alpine3.9 $(VERSION)-alpine3.10 $(VERSION)-alpine alpine
-
-# .PHONY: $(ALPINE_TARGETS)
-
-# ##############################################################################
-# # Debian
-# ##############################################################################
-
-# debian: debian/$(LATEST_DEBIAN)
-# 	docker tag daewok/sbcl:$(VERSION)-debian-$(LATEST_DEBIAN) daewok/sbcl:$(VERSION)-debian
-# 	docker tag daewok/sbcl:$(VERSION)-debian-$(LATEST_DEBIAN) daewok/sbcl:debian
-
-# debian-build: debian/$(LATEST_DEBIAN)-build
-# 	docker tag daewok/sbcl:$(VERSION)-debian-$(LATEST_DEBIAN)-build daewok/sbcl:$(VERSION)-debian-build
-# 	docker tag daewok/sbcl:$(VERSION)-debian-$(LATEST_DEBIAN)-build daewok/sbcl:debian-build
-
-# debian/buster:
-# 	$(DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-debian-buster-amd64 debian/buster
-# 	$(ARM_DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-debian-buster-arm32v7 debian/buster
-
-# debian/buster-build:
-# 	$(DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-debian-buster-build -f debian/buster/Dockerfile.build debian/buster
-
-# debian/stretch:
-# 	$(DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-debian-stretch-amd64 debian/stretch
-# 	$(ARM_DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-debian-stretch-arm32v7 debian/stretch
-
-# debian/stretch-build:
-# 	$(DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-debian-stretch-build -f debian/stretch/Dockerfile.build debian/stretch
-
-# DEBIAN_NONBUILD_TARGETS = debian debian/stretch debian/buster
-# DEBIAN_BUILD_TARGETS = debian-build debian/stretch-build debian/buster-build
-
-# NONBUILD_TARGETS += $(DEBIAN_NONBUILD_TARGETS)
-# BUILD_TARGETS += $(DEBIAN_BUILD_TARGETS)
-
-# DEBIAN_TARGETS = $(DEBIAN_NONBUILD_TARGETS) $(DEBIAN_BUILD_TARGETS)
-# ALL_TARGETS += $(DEBIAN_TARGETS)
-
-# BUILD_TAGS += $(VERSION)-debian-buster-build $(VERSION)-debian-stretch-build $(VERSION)-debian-build debian-build
-# NONBUILD_TAGS += $(VERSION)-debian-buster $(VERSION)-debian-stretch $(VERSION)-debian debian
-
-# .PHONY: $(DEBIAN_TARGETS)
-
-# ##############################################################################
-# # Ubuntu
-# ##############################################################################
-
-# ubuntu: ubuntu/$(LATEST_UBUNTU)
-# 	docker tag daewok/sbcl:$(VERSION)-ubuntu-$(LATEST_UBUNTU) daewok/sbcl:$(VERSION)-ubuntu
-# 	docker tag daewok/sbcl:$(VERSION)-ubuntu-$(LATEST_UBUNTU) daewok/sbcl:ubuntu
-
-# ubuntu-build: ubuntu/$(LATEST_UBUNTU)-build
-# 	docker tag daewok/sbcl:$(VERSION)-ubuntu-$(LATEST_UBUNTU)-build daewok/sbcl:$(VERSION)-ubuntu-build
-# 	docker tag daewok/sbcl:$(VERSION)-ubuntu-$(LATEST_UBUNTU)-build daewok/sbcl:ubuntu-build
-
-# ubuntu/bionic:
-# 	$(DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-ubuntu-bionic-amd64 ubuntu/bionic
-# 	$(ARM_DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-ubuntu-bionic-arm32v7 ubuntu/bionic
-
-# ubuntu/bionic-build:
-# 	$(DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-ubuntu-bionic-build -f ubuntu/bionic/Dockerfile.build ubuntu/bionic
-
-# ubuntu/disco:
-# 	$(DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-ubuntu-disco-amd64 ubuntu/disco
-# 	$(ARM_DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-ubuntu-disco-arm32v7 ubuntu/disco
-
-# ubuntu/disco-build:
-# 	$(DOCKER_BUILD) -t daewok/sbcl:$(VERSION)-ubuntu-disco-build -f ubuntu/disco/Dockerfile.build ubuntu/disco
-
-# UBUNTU_NONBUILD_TARGETS = ubuntu ubuntu/bionic ubuntu/disco
-# UBUNTU_BUILD_TARGETS = ubuntu-build ubuntu/bionic-build ubuntu/disco-build
-
-# NONBUILD_TARGETS += $(UBUNTU_NONBUILD_TARGETS)
-# BUILD_TARGETS += $(UBUNTU_BUILD_TARGETS)
-
-# UBUNTU_TARGETS = $(UBUNTU_NONBUILD_TARGETS) $(UBUNTU_BUILD_TARGETS)
-# ALL_TARGETS += $(UBUNTU_TARGETS)
-
-# BUILD_TAGS += $(VERSION)-ubuntu-bionic-build $(VERSION)-ubuntu-disco-build $(VERSION)-ubuntu-build ubuntu-build
-# NONBUILD_TAGS += $(VERSION)-ubuntu-bionic $(VERSION)-ubuntu-disco $(VERSION)-ubuntu ubuntu
-
-# .PHONY: $(UBUNTU_TARGETS)
-
-# ##############################################################################
-# # Primary entry points
-# ##############################################################################
+##############################################################################
+# Primary entry points
+##############################################################################
 
 # all: $(ALL_TARGETS)
-# all-non-build: $(NONBUILD_TARGETS)
+all-non-build: alpine debian ubuntu
+all-build: alpine-build debian-build ubuntu-build
+
 # all-build: $(BUILD_TARGETS)
 
 # push_non_build_tags:
