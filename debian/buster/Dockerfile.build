@@ -1,4 +1,4 @@
-FROM daewok/sbcl:1.5.7-debian-buster
+FROM daewok/sbcl:1.5.9-debian-buster
 
 WORKDIR /usr/local/src/
 

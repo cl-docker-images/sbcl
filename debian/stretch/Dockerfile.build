@@ -1,4 +1,4 @@
-FROM daewok/sbcl:1.5.7-debian-stretch
+FROM daewok/sbcl:1.5.9-debian-stretch
 
 WORKDIR /usr/local/src/
 

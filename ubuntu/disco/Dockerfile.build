@@ -1,4 +1,4 @@
-FROM daewok/sbcl:1.5.7-ubuntu-disco
+FROM daewok/sbcl:1.5.9-ubuntu-disco
 
 WORKDIR /usr/local/src/
 

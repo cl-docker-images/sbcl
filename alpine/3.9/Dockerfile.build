@@ -1,4 +1,4 @@
-FROM daewok/sbcl:1.5.7-alpine3.9
+FROM daewok/sbcl:1.5.9-alpine3.9
 
 LABEL maintainer="etimmons@mit.edu"
 

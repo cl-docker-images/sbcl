@@ -1,28 +1,42 @@
 FROM ubuntu:disco
 
+ARG TARGETARCH
+
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_VERSION=1.5.7
+COPY patches/ /usr/local/src/sbcl-patches/
+
+ENV SBCL_VERSION=1.5.9
 
 WORKDIR /usr/local/src/
 
 # hadolint ignore=DL3003,DL3008
 RUN set -x \
     && get_arch_code() { \
-         case "$(uname -m)" in \
-           x86_64) echo "x86-64";; \
-           armv7l) echo "armhf";; \
-           aarch64) echo "arm64";; \
+         case "$TARGETARCH" in \
+           amd64) echo "x86-64";; \
+           arm64) echo "arm64";; \
+           arm) echo "armhf";; \
            *) exit 1;; \
          esac \
-       } \
-    && get_sbcl_binary_version() { \
-         case "$(get_arch_code)" in \
-           x86-64) echo "1.5.7";; \
-           armhf) echo "1.4.11";; \
-           arm64) echo "1.4.2";; \
+      } \
+    && get_sbcl_arch() { \
+         case "$TARGETARCH" in \
+           amd64) echo "x86-64";; \
+           arm64) echo "arm64";; \
+           arm) echo "arm";; \
+           *) exit 1;; \
          esac \
-       } \
+      } \
+    # Helper that determines which version of SBCL we use to build our final
+    # image. Needed because dependencies (such as libc) have evolved over time.
+    && get_sbcl_binary_version() { \
+         case "$TARGETARCH" in \
+           amd64) echo "1.5.9";; \
+           arm64) echo "1.4.2";; \
+           arm) echo "1.4.11";; \
+         esac \
+      } \
     && download_and_validate_hashes() { \
          curl -L "https://downloads.sourceforge.net/project/sbcl/sbcl/${1}/sbcl-${1}-crhodes.asc" > "sbcl-${1}-crhodes.asc" \
          && gpg --batch --verify "sbcl-${1}-crhodes.asc" \
@@ -44,12 +58,15 @@ RUN set -x \
          && sha256sum -c "${1}-sum-file.txt" \
          && tar xf "sbcl-${1}-source.tar" \
          && cd "sbcl-${1}/" \
+         && for p in /usr/local/src/sbcl-patches/*.patch; do patch -p1 < "$p" || exit 1; done \
          && sh make.sh "--xc-host=${2}" \
          && sh install.sh \
          && cd /usr/local/src; \
        } \
     && SBCL_BINARY_VERSION="$(get_sbcl_binary_version)" \
     && export SBCL_BINARY_VERSION \
+    && SBCL_ARCH="$(get_sbcl_arch)" \
+    && export SBCL_ARCH \
     && apt-get update \
     && apt-get install -y --no-install-recommends curl gnupg ca-certificates make build-essential \
     && GNUPGHOME="$(mktemp -d)" \
@@ -64,7 +81,9 @@ RUN set -x \
     && download_and_validate_hashes "$SBCL_VERSION" \
     && download_and_unpack_binary "$SBCL_BINARY_VERSION" \
     && download_and_build_source "$SBCL_VERSION" "/usr/local/src/sbcl-${SBCL_BINARY_VERSION}-$(get_arch_code)-linux/run-sbcl.sh" \
+    && mv sbcl-patches /tmp \
     && rm -rf "$GNUPGHOME" ./* \
+    && mv /tmp/sbcl-patches . \
     && apt-get remove -y curl gnupg ca-certificates make build-essential \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
