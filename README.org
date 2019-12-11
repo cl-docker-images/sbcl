@@ -1,23 +1,44 @@
 #+TITLE: SBCL Docker Images
 #+AUTHOR: Eric Timmons
 
-This repo contains Dockerfiles for SBCL on a variety of base images.
+This repo contains Dockerfiles for SBCL on a variety of architectures and base
+images.
 
-The OSes and versions SBCL is built on are:
+The OSes, versions, and architectures SBCL is built on are:
+
 
 + alpine
   + 3.10
+    + amd64
+    + arm64
+    + armhf
   + 3.9
+    + amd64
+    + arm64
+    + armhf
 + debian
-  + stretch
   + buster
+    + amd64
+    + arm64
+    + armhf
+  + stretch
+    + amd64
+    + arm64
+    + armhf
 + ubuntu
   + disco
+    + amd64
+    + arm64
+    + armhf
   + bionic
+    + amd64
+    + arm64
+    + armhf
 
-Besides necessary patches for alpine, SBCL is built as close to vanilla as
-possible. Additionally, where possible, the pre-built version from SBCL upstream
-is used.
+Besides necessary patches for building with musl libc (on alpine), SBCL is
+built as close to vanilla as possible. The only additional patches are changes
+to test timeouts (as the stock timeouts can frequently be too short when
+cross-building images with QEMU).
 
 * =-build= images
 

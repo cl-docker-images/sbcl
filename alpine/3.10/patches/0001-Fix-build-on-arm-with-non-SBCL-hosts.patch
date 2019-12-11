@@ -1,0 +1,48 @@
+From 5491e88d2dc2130aaba5162096bf81cbd9fbef3e Mon Sep 17 00:00:00 2001
+From: Eric Timmons <etimmons@mit.edu>
+Date: Tue, 10 Dec 2019 10:28:08 -0800
+Subject: [PATCH] Fix build on arm with non-SBCL hosts
+
+There are issues inlining the various barriers
+---
+ src/code/barrier.lisp | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/src/code/barrier.lisp b/src/code/barrier.lisp
+index 48ddcf39d..4db2872df 100644
+--- a/src/code/barrier.lisp
++++ b/src/code/barrier.lisp
+@@ -18,9 +18,11 @@
+ (progn
+ ;;; Assert correctness of build order. (Need not be exhaustive)
+ (eval-when (:compile-toplevel) #+x86-64 (error "Expected %memory-barrier vop"))
+-(declaim (inline sb-vm:%compiler-barrier sb-vm:%memory-barrier
+-                 sb-vm:%read-barrier sb-vm:%write-barrier
+-                 sb-vm:%data-dependency-barrier)))
++;; (declaim (inline sb-vm:%compiler-barrier sb-vm:%memory-barrier
++;;                  sb-vm:%read-barrier sb-vm:%write-barrier
++;;                  sb-vm:%data-dependency-barrier))
++)
++
+ (macrolet ((def (name)
+              `(defun ,name ()
+                 #+(vop-named sb-vm:%memory-barrier) (,name)
+@@ -63,10 +65,10 @@ (defmacro barrier ((kind) &body forms)
+ highly recommended reading for anyone programming at this level."
+   `(multiple-value-prog1
+     (progn ,@forms)
+-    (,(or (getf '(:compiler        sb-vm:%compiler-barrier
+-                  :memory          sb-vm:%memory-barrier
+-                  :read            sb-vm:%read-barrier
+-                  :write           sb-vm:%write-barrier
+-                  :data-dependency sb-vm:%data-dependency-barrier)
++    (,(or (getf '(:compiler        #+arm values #-arm sb-vm:%compiler-barrier
++                  :memory          #+arm values #-arm sb-vm:%memory-barrier
++                  :read            #+arm values #-arm sb-vm:%read-barrier
++                  :write           #+arm values #-arm sb-vm:%write-barrier
++                  :data-dependency #+arm values #-arm sb-vm:%data-dependency-barrier)
+                 kind)
+           (error "Unknown barrier kind ~S" kind)))))
+-- 
+2.24.0
+
