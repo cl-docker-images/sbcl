@@ -1,0 +1,21 @@
+commit c9bca547087892d9bbb7671e86952fc3d468ba57
+Author: Stas Boukarev <stassats@users.sourceforge.net>
+Date:   Sat Dec 7 06:14:28 2019 +0300
+
+    Fix non-sbcl host builds.
+    
+    make-array is not necessarily initialized to zero.
+
+diff --git a/src/compiler/assem.lisp b/src/compiler/assem.lisp
+index c8c006fe0..201f10031 100644
+--- a/src/compiler/assem.lisp
++++ b/src/compiler/assem.lisp
+@@ -1895,7 +1895,7 @@ (defmacro defpattern (name (opcodes1 opcodes2) lambda-list &body body)
+ 
+ (defparameter *show-peephole-transforms-p* nil)
+ (defglobal *asm-pattern-matchers* nil)
+-(defglobal *asm-pattern-matchers-invoked* (make-array 20))
++(defglobal *asm-pattern-matchers-invoked* (make-array 20 :initial-element 0))
+ (defun %defpattern (name opcodes1 opcodes2 applicator)
+   (let ((index (length *asm-pattern-matchers*)))
+     (push (list opcodes1 opcodes2  applicator index name)
