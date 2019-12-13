@@ -11,6 +11,16 @@ if [ -z "$NOTARY_DELEGATION_PASSPHRASE" ]; then
   exit 1
 fi
 
+if [ -z "$DOCKER_USERNAME" ]; then
+  echo "You must set DOCKER_USERNAME"
+  exit 1
+fi
+
+if [ -z "$DOCKER_PASSWORD" ]; then
+  echo "You must set DOCKER_PASSWORD"
+  exit 1
+fi
+
 sign_manifest() {
   tagged_name="$(yq r "$1" image)"
   tag="${tagged_name#*:}"
@@ -20,12 +30,44 @@ sign_manifest() {
   sha256=$(echo "$2" | cut -d' ' -f2 | cut -d':' -f2)
   size=$(echo "$2" | cut -d' ' -f3)
 
-  notary -s https://notary.docker.io \
-         -d ~/.docker/trust \
-         addhash "$gun" "$tag" \
-         "$size" \
-         --sha256 "$sha256" \
-         -r targets/etimmons-rocinante
+  notary_command="notary -s https://notary.docker.io -d $HOME/.docker/trust addhash -p $gun $tag $size --sha256 $sha256 -r targets/releases"
+  echo '
+  spawn '"$notary_command"'
+  set pid [exp_pid]
+  set timeout 60
+  expect {
+    timeout {
+      puts "Expected username prompt"
+      exec kill -9 $pid
+      exit 1
+    }
+    "username: " {
+      send "'"$DOCKER_USERNAME"'\n"
+    }
+  }
+  expect {
+    timeout {
+      puts "Expected password prompt"
+      exec kill -9 $pid
+      exit 1
+    }
+    "password: " {
+      send "'"$DOCKER_PASSWORD"'\n"
+    }
+  }
+  expect {
+    timeout {
+      puts "Expected eof"
+      exec kill -9 $pid
+      exit 1
+    }
+    eof {
+    }
+  }
+  set waitval [wait -i $spawn_id]
+  set exval [lindex $waitval 3]
+  exit $exval
+  ' | expect -f -
 }
 
 for i in manifests/* ; do
@@ -33,4 +75,4 @@ for i in manifests/* ; do
   sign_manifest "$i" "$OUT"
 done
 
-notary publish -s https://notary.docker.io -d ~/.docker/trust docker.io/daewok/sbcl
+# notary publish -s https://notary.docker.io -d ~/.docker/trust docker.io/daewok/sbcl
