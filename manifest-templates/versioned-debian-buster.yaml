@@ -1,0 +1,15 @@
+image: daewok/sbcl:VERSION-debian-buster
+manifests:
+  - image: daewok/sbcl:VERSION-debian-buster-amd64
+    platform:
+      architecture: amd64
+      os: linux
+  - image: daewok/sbcl:VERSION-debian-buster-arm64
+    platform:
+      architecture: arm64
+      os: linux
+  - image: daewok/sbcl:VERSION-debian-buster-arm32v7
+    platform:
+      architecture: arm
+      variant: v7
+      os: linux
