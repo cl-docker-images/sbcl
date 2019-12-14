@@ -1,14 +1,14 @@
-image: daewok/sbcl:VERSION-alpine
+image: daewok/sbcl:$SBCL_VERSION-alpine
 manifests:
-  - image: daewok/sbcl:VERSION-alpine3.10-amd64
+  - image: $ALPINE_3_10_AMD64_NONBUILD_DIGEST
     platform:
       architecture: amd64
       os: linux
-  - image: daewok/sbcl:VERSION-alpine3.10-arm64
+  - image: $ALPINE_3_10_ARM64_NONBUILD_DIGEST
     platform:
       architecture: arm64
       os: linux
-  - image: daewok/sbcl:VERSION-alpine3.10-arm32v7
+  - image: $ALPINE_3_10_ARM32V7_NONBUILD_DIGEST
     platform:
       architecture: arm
       variant: v7

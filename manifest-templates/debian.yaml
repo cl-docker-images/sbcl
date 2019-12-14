@@ -1,14 +1,14 @@
 image: daewok/sbcl:debian
 manifests:
-  - image: daewok/sbcl:VERSION-debian-buster-amd64
+  - image: $DEBIAN_BUSTER_AMD64_NONBUILD_DIGEST
     platform:
       architecture: amd64
       os: linux
-  - image: daewok/sbcl:VERSION-debian-buster-arm64
+  - image: $DEBIAN_BUSTER_ARM64_NONBUILD_DIGEST
     platform:
       architecture: arm64
       os: linux
-  - image: daewok/sbcl:VERSION-debian-buster-arm32v7
+  - image: $DEBIAN_BUSTER_ARM32V7_NONBUILD_DIGEST
     platform:
       architecture: arm
       variant: v7

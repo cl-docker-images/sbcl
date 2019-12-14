@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 #-*- sh-basic-offset: 2; -*-
 
 # This was inspired heavily by

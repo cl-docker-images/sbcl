@@ -1,14 +1,14 @@
-image: daewok/sbcl:debian-stretch
+image: daewok/sbcl:ubuntu-disco-build
 manifests:
-  - image: $DEBIAN_STRETCH_AMD64_NONBUILD_DIGEST
+  - image: $UBUNTU_DISCO_AMD64_BUILD_DIGEST
     platform:
       architecture: amd64
       os: linux
-  - image: $DEBIAN_STRETCH_ARM64_NONBUILD_DIGEST
+  - image: $UBUNTU_DISCO_ARM64_BUILD_DIGEST
     platform:
       architecture: arm64
       os: linux
-  - image: $DEBIAN_STRETCH_ARM32V7_NONBUILD_DIGEST
+  - image: $UBUNTU_DISCO_ARM32V7_BUILD_DIGEST
     platform:
       architecture: arm
       variant: v7

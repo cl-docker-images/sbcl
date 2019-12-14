@@ -1,14 +1,14 @@
-image: daewok/sbcl:VERSION-ubuntu-bionic
+image: daewok/sbcl:$SBCL_VERSION-ubuntu-bionic
 manifests:
-  - image: daewok/sbcl:VERSION-ubuntu-bionic-amd64
+  - image: $UBUNTU_BIONIC_AMD64_NONBUILD_DIGEST
     platform:
       architecture: amd64
       os: linux
-  - image: daewok/sbcl:VERSION-ubuntu-bionic-arm64
+  - image: $UBUNTU_BIONIC_ARM64_NONBUILD_DIGEST
     platform:
       architecture: arm64
       os: linux
-  - image: daewok/sbcl:VERSION-ubuntu-bionic-arm32v7
+  - image: $UBUNTU_BIONIC_ARM32V7_NONBUILD_DIGEST
     platform:
       architecture: arm
       variant: v7
