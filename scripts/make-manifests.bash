@@ -17,7 +17,9 @@ export_digest() {
   os="$2"
   os_version="$3"
   arch="$4"
-  digest="$(yq r build/image-ids.yaml "$os.\"$os_version\".$arch.$image_variant")"
+  image_name="$(versioned_repo)-$(os_version_string "$os" "$os_version")-$arch"
+
+  digest="$(docker_for_arch "$arch" inspect -f "{{(index .RepoDigests 0)}}" "$image_name")"
 
   var_name="${os}_${os_version}_${arch}_${image_variant}_digest"
   var_name="${var_name//./_}"
