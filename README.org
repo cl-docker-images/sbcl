@@ -8,11 +8,11 @@ The OSes, versions, and architectures SBCL is built on are:
 
 
 + alpine
-  + 3.10
+  + 3.11
     + amd64
     + arm64
     + armhf
-  + 3.9
+  + 3.10
     + amd64
     + arm64
     + armhf

@@ -1,11 +1,11 @@
-FROM alpine:3.9
+FROM alpine:3.11
 
 LABEL maintainer="etimmons@mit.edu"
 
 COPY patches/ /usr/local/src/sbcl-patches/
 
 ENV SBCL_VERSION=1.5.9
-ENV SBCL_ARCH=arm
+ENV SBCL_ARCH=arm64
 
 WORKDIR /usr/local/src/
 
