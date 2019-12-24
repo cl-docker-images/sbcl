@@ -28,15 +28,17 @@ RUN set -x \
          && if grep "sbcl-${1}-$SBCL_BINARY_ARCH_CODE-linux-binary.tar" "sbcl-${1}-crhodes.txt" > "${1}-sum-file.txt"; then sha256sum -c "${1}-sum-file.txt"; fi \
          && tar xf "sbcl-${1}-$SBCL_BINARY_ARCH_CODE-linux-binary.tar" \
          && rm -rf "sbcl-${1}-$SBCL_BINARY_ARCH_CODE-linux-binary.tar"; \
-    } \
-    && download_and_build_source() { \
+       } \
+    && download_source() { \
         url="https://downloads.sourceforge.net/project/sbcl/sbcl/${1}/sbcl-${1}-source.tar.bz2" \
          && curl -L "$url" > "sbcl-${1}-source.tar.bz2" \
          && bunzip2 "sbcl-${1}-source.tar.bz2" \
          && grep "sbcl-${1}-source.tar" "sbcl-${1}-crhodes.txt" > "${1}-sum-file.txt" \
          && sha256sum -c "${1}-sum-file.txt" \
-         && tar xf "sbcl-${1}-source.tar" \
-         && cd "sbcl-${1}/" \
+         && tar xf "sbcl-${1}-source.tar"; \
+       } \
+    && build_and_install_source() { \
+         cd "sbcl-${1}/" \
          && for p in /usr/local/src/sbcl-patches/*.patch; do patch -p1 < "$p" || exit 1; done \
          && sh make.sh "--xc-host=${2}" \
          && sh install.sh \
@@ -55,7 +57,8 @@ RUN set -x \
     && download_and_validate_hashes "$SBCL_BINARY_VERSION" \
     && download_and_validate_hashes "$SBCL_VERSION" \
     && download_and_unpack_binary "$SBCL_BINARY_VERSION" \
-    && download_and_build_source "$SBCL_VERSION" "/usr/local/src/sbcl-${SBCL_BINARY_VERSION}-$SBCL_BINARY_ARCH_CODE-linux/run-sbcl.sh" \
+    && download_source "$SBCL_VERSION" \
+    && build_and_install_source "$SBCL_VERSION" "/usr/local/src/sbcl-${SBCL_BINARY_VERSION}-$SBCL_BINARY_ARCH_CODE-linux/run-sbcl.sh" \
     && mv sbcl-patches /tmp \
     && rm -rf "$GNUPGHOME" ./* \
     && mv /tmp/sbcl-patches . \
