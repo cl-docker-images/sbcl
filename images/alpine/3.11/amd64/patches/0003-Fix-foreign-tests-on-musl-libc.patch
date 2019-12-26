@@ -1,7 +1,7 @@
-From 91f822a3bbbb8d1e1007cb60cc2563be10d8bed2 Mon Sep 17 00:00:00 2001
+From 30403cfef2327e1df92b5e29201ee1ddf54a8dfd Mon Sep 17 00:00:00 2001
 From: Eric Timmons <etimmons@mit.edu>
 Date: Sun, 2 Dec 2018 14:20:24 -0500
-Subject: [PATCH 3/5] Fix foreign tests on musl libc
+Subject: [PATCH 3/4] Fix foreign tests on musl libc
 
 Musl libc's implementation of dlclose(3) is (intentionally) a noop (see:
 https://wiki.musl-libc.org/functional-differences-from-glibc.html). Add a build
@@ -18,10 +18,10 @@ feature to skip some regression tests if it is present.
  create mode 100644 tools-for-build/os-dlclose-is-noop-test.c
 
 diff --git a/tests/foreign.test.sh b/tests/foreign.test.sh
-index 7fb757813..78f0517a0 100755
+index fabba1246..5574b1ef7 100755
 --- a/tests/foreign.test.sh
 +++ b/tests/foreign.test.sh
-@@ -248,16 +248,20 @@ cat > $TEST_FILESTEM.test.lisp <<EOF
+@@ -250,16 +250,20 @@ cat > $TEST_FILESTEM.test.lisp <<EOF
    (assert (= 13 foo))
    (assert (= 42 (bar)))
    (note "/original definitions ok")
@@ -52,7 +52,7 @@ index 7fb757813..78f0517a0 100755
  
    ;; test late resolution
    #+linkage-table
-@@ -274,13 +278,17 @@ cat > $TEST_FILESTEM.test.lisp <<EOF
+@@ -276,13 +280,17 @@ cat > $TEST_FILESTEM.test.lisp <<EOF
      (load-shared-object (truename "$TEST_FILESTEM-c.so"))
      (assert (= 43 late-foo))
      (assert (= 14 (late-bar)))
@@ -92,13 +92,13 @@ index 1be91e9df..434e03081 100644
  	rm -f *.o grovel-headers determine-endianness where-is-mcontext mmap-rwx
  	rm -f *.exe
 diff --git a/tools-for-build/grovel-features.sh b/tools-for-build/grovel-features.sh
-index 9992b46ad..4e2546878 100644
+index 4790c0f11..7d8e547b4 100644
 --- a/tools-for-build/grovel-features.sh
 +++ b/tools-for-build/grovel-features.sh
-@@ -36,3 +36,10 @@ featurep os-provides-poll
- featurep os-provides-netdb-internal
- 
- featurep arm-softfp
+@@ -38,3 +38,10 @@ featurep os-provides-netdb-internal
+ if [ $sbcl_arch == arm ] ; then
+    featurep arm-softfp
+ fi
 +
 +# We need a helper shared library to test os-dlclose-is-noop
 +$GNUMAKE os-dlclose-is-noop-test-helper.so > /dev/null 2>&1
@@ -139,5 +139,5 @@ index 000000000..3678870d5
 +   }
 +}
 -- 
-2.21.0
+2.24.1
 
