@@ -3,6 +3,10 @@
 
 export DOCKER_CONTENT_TRUST=1
 
+docker_have_context_for_arch() {
+  [ -n "${CONTEXTS[$1]}" ]
+}
+
 docker_for_arch() {
   local context
   context=${CONTEXTS[$1]}
@@ -57,7 +61,9 @@ run_for_every_tuple() {
       os_version="$(basename "$os_version_dir")"
       for arch_dir in "images/$os/$os_version/"*; do
         arch="$(basename "$arch_dir")"
-        "$fun" "$@" "$os" "$os_version" "$arch"
+        if docker_have_context_for_arch "$arch"; then
+          "$fun" "$@" "$os" "$os_version" "$arch"
+        fi
       done
     done
   done
