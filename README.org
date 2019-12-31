@@ -27,9 +27,9 @@
 * Quick Reference
 
   + SBCL Home Page :: [[http://sbcl.org][http://sbcl.org]]
-  + Where to file Docker image related issues :: [[https://github.com/daewok/sbcl-docker/][https://github.com/daewok/sbcl-docker/]]
+  + Where to file Docker image related issues :: [[https://github.com/daewok/docker-sbcl/][https://github.com/daewok/docker-sbcl/]]
   + Where to file issues for SBCL itself :: [[https://bugs.launchpad.net/sbcl][https://bugs.launchpad.net/sbcl]]
-  + Maintained by :: [[https://github.com/daewok/sbcl-docker/][Eric Timmons]] (i.e., this is not an official SBCL image)
+  + Maintained by :: [[https://github.com/daewok/docker-sbcl/][Eric Timmons]] (i.e., this is not an official SBCL image)
   + Supported architectures :: =linux/amd64=, =linux/arm64=, =linux/arm/v7=, =windows/amd64=
 
 * What is SBCL?
