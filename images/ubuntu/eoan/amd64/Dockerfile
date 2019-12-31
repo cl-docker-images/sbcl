@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM ubuntu:eoan
 
 LABEL maintainer="etimmons@mit.edu"
 
@@ -13,7 +13,7 @@ WORKDIR /usr/local/src/
 RUN set -x \
     && SBCL_BINARY_ARCH_CODE="x86-64" \
     && export SBCL_BINARY_ARCH_CODE \
-    && SBCL_BINARY_VERSION="1.5.5" \
+    && SBCL_BINARY_VERSION="2.0.0" \
     && export SBCL_BINARY_VERSION \
     && download_and_validate_hashes() { \
          curl -L "https://downloads.sourceforge.net/project/sbcl/sbcl/${1}/sbcl-${1}-crhodes.asc" > "sbcl-${1}-crhodes.asc" \
@@ -44,7 +44,7 @@ RUN set -x \
          && cd /usr/local/src; \
        } \
     && apt-get update \
-    && apt-get install -y --no-install-recommends curl gnupg ca-certificates make dirmngr bzip2 build-essential \
+    && apt-get install -y --no-install-recommends curl gnupg ca-certificates make build-essential \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && export CRHODES_KEY=D6839CA0A67F74D9DFB70922EBD595A9100D63CD \
@@ -61,7 +61,7 @@ RUN set -x \
     && mv sbcl-patches /tmp \
     && rm -rf "$GNUPGHOME" ./* \
     && mv /tmp/sbcl-patches . \
-    && apt-get remove -y curl gnupg ca-certificates make dirmngr bzip2 build-essential \
+    && apt-get remove -y curl gnupg ca-certificates make build-essential \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 

@@ -1,11 +1,11 @@
-FROM alpine:3.10
+FROM alpine:3.11
 
 LABEL maintainer="etimmons@mit.edu"
 
 COPY patches/ /usr/local/src/sbcl-patches/
 
 ENV SBCL_VERSION=2.0.0
-ENV SBCL_ARCH=arm
+ENV SBCL_ARCH=x86-64
 
 WORKDIR /usr/local/src/
 
@@ -39,21 +39,14 @@ RUN set -x \
          && cd /usr/local/src; \
        } \
     && apk add --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers gnupg ecl \
-                          gmp-dev g++ libffi-dev musl-dev gc gc-dev linux-headers ecl-dev \
+                          gmp-dev g++ libffi-dev musl-dev gc gc-dev linux-headers ecl-dev git \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && export CRHODES_KEY=D6839CA0A67F74D9DFB70922EBD595A9100D63CD \
     && import_key "$CRHODES_KEY" \
     && download_and_validate_hashes "$SBCL_VERSION" \
-    && download_source "$SBCL_VERSION" \
-    && build_and_install_source "$SBCL_VERSION" "ecl" \
-    && mv sbcl-patches /tmp \
-    && rm -rf "$GNUPGHOME" ./* \
-    && mv /tmp/sbcl-patches . \
-    && apk del --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers gnupg ecl \
-                          gmp-dev g++ libffi-dev musl-dev gc gc-dev linux-headers ecl-dev \
-    && sbcl --version
+    && download_source "$SBCL_VERSION"
 
-WORKDIR /
+COPY test-entrypoint.sh /usr/local/bin/test-entrypoint.sh
 
-ENTRYPOINT ["sbcl"]
+ENTRYPOINT ["/usr/local/bin/test-entrypoint.sh"]

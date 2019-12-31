@@ -1,14 +1,14 @@
 image: daewok/sbcl:$SBCL_VERSION-ubuntu
 manifests:
-  - image: $UBUNTU_DISCO_AMD64_NONBUILD_DIGEST
+  - image: $UBUNTU_EOAN_AMD64_NONBUILD_DIGEST
     platform:
       architecture: amd64
       os: linux
-  - image: $UBUNTU_DISCO_ARM64_NONBUILD_DIGEST
+  - image: $UBUNTU_EOAN_ARM64_NONBUILD_DIGEST
     platform:
       architecture: arm64
       os: linux
-  - image: $UBUNTU_DISCO_ARM32V7_NONBUILD_DIGEST
+  - image: $UBUNTU_EOAN_ARM32V7_NONBUILD_DIGEST
     platform:
       architecture: arm
       variant: v7

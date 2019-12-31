@@ -1,10 +1,10 @@
-FROM ubuntu:disco
+FROM ubuntu:eoan
 
 LABEL maintainer="etimmons@mit.edu"
 
 COPY patches/ /usr/local/src/sbcl-patches/
 
-ENV SBCL_VERSION=1.5.9
+ENV SBCL_VERSION=2.0.0
 ENV SBCL_ARCH=arm64
 
 WORKDIR /usr/local/src/

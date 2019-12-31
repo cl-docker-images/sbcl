@@ -1,4 +1,4 @@
-FROM daewok/sbcl:1.5.9-alpine3.10-arm32v7
+FROM daewok/sbcl:2.0.0-alpine3.10-arm32v7
 
 LABEL maintainer="etimmons@mit.edu"
 
