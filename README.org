@@ -1,74 +1,137 @@
 #+TITLE: SBCL Docker Images
 #+AUTHOR: Eric Timmons
 
-This repo contains Dockerfiles for SBCL on a variety of architectures and base
-images.
+* Supported Tags
 
-The OSes, versions, and architectures SBCL is built on are:
+  Note that many tags for earlier versions exist, but a large set of changes in
+  building the images happened around SBCL 1.5.9/2.0.0 and it is recommended
+  that only the 2.0.0+ tags be used.
 
+  + =2.0.0-alpine3.11=, =2.0.0-alpine=, =alpine3.11=, =alpine=
+  + =2.0.0-alpine3.11-build=, =2.0.0-alpine-build=, =alpine3.11-build=, =alpine-build=
+  + =2.0.0-alpine3.10=, =alpine3.10=
+  + =2.0.0-alpine3.10-build=, =alpine3.10-build=
+  + =2.0.0-debian-buster=, =2.0.0-debian=, =debian-buster=, =debian=
+  + =2.0.0-debian-buster-build=, =2.0.0-debian-build=, =debian-buster-build=, =debian-build=
+  + =2.0.0-debian-stretch=, =debian-stretch=
+  + =2.0.0-debian-stretch-build=, =debian-stretch-build=
+  + =2.0.0-ubuntu-eoan=, =2.0.0-ubuntu=, =ubuntu-eoan=, =ubuntu=
+  + =2.0.0-ubuntu-eoan-build=, =2.0.0-ubuntu-build=, =ubuntu-eoan-build=, =ubuntu-build=
+  + =2.0.0-ubuntu-bionic=, =ubuntu-bionic=
+  + =2.0.0-ubuntu-bionic-build=, =ubuntu-bionic-build=
+  + =2.0.0-windowsservercore-1909=, =2.0.0-windowsservercore=, =windowsservercore-1909=, =windowsservercore=
+  + =2.0.0-windowsservercore-1909-build=, =2.0.0-windowsservercore-build=, =windowsservercore-1909-build=, =windowsservercore-build=
+  + =2.0.0-windowsservercore-ltsc2019=, =windowsservercore-ltsc2019=
+  + =2.0.0-windowsservercore-ltsc2019-build=, =windowsservercore-ltsc2019-build=
 
-+ alpine
-  + 3.11
-    + amd64
-    + arm64
-    + armhf
-  + 3.10
-    + amd64
-    + arm64
-    + armhf
-+ debian
-  + buster
-    + amd64
-    + arm64
-    + armhf
-  + stretch
-    + amd64
-    + arm64
-    + armhf
-+ ubuntu
-  + disco
-    + amd64
-    + arm64
-    + armhf
-  + bionic
-    + amd64
-    + arm64
-    + armhf
+* Quick Reference
 
-Besides necessary patches for building with musl libc (on alpine), SBCL is
-built as close to vanilla as possible. The only additional patches are changes
-to test timeouts (as the stock timeouts can frequently be too short when
-cross-building images with QEMU).
+  + SBCL Home Page :: [[http://sbcl.org][http://sbcl.org]]
+  + Where to file Docker image related issues :: [[https://github.com/daewok/sbcl-docker/][https://github.com/daewok/sbcl-docker/]]
+  + Where to file issues for SBCL itself :: [[https://bugs.launchpad.net/sbcl][https://bugs.launchpad.net/sbcl]]
+  + Maintained by :: [[https://github.com/daewok/sbcl-docker/][Eric Timmons]] (i.e., this is not an official SBCL image)
+  + Supported architectures :: =linux/amd64=, =linux/arm64=, =linux/arm/v7=, =windows/amd64=
 
-* =-build= images
+* What is SBCL?
 
-  In addition to the standard images, a set of "build" images are
-  provided. These images have SBCL already installed in them and include the
-  SBCL source code and any packages needed to build SBCL from scratch. This
-  allows a customized SBCL to be easily built. However, this comes with the cost
-  of the images being much larger than the base images. These images are ideal
-  for use in a multi-stage build where you require some features of SBCL to be
-  enabled (such as ~:sb-core-compression~ or ~:sb-linkable-runtime~) and you
-  will copy the resulting executable out into another image.
+  From [[http://sbcl.org][SBCL's Home Page]]:
 
-  To customize the SBCL feature set, place a file at
-  =/usr/local/src/sbcl-${SBCL_VERSION}/customize-target-features.lisp=. See the
-  SBCL build instructions for more details on what this file should contain.
+  #+begin_quote
+  Steel Bank Common Lisp (SBCL) is a high performance Common Lisp compiler. It
+  is open source / free software, with a permissive license. In addition to the
+  compiler and runtime system for ANSI Common Lisp, it provides an interactive
+  environment including a debugger, a statistical profiler, a code coverage
+  tool, and many other extensions.
+  #+end_quote
 
-  To patch SBCL, place any number of patch files (ending in ".patch") in
-  =/usr/local/src/sbcl-${SBCL_VERSION}/patches/=
+* What's in the image?
 
-  To build and install SBCL, execute ~rebuild-sbcl~. This script will apply the
-  patches, build, install, and remove the previous copy of SBCL.
+  This image contains SBCL binaries built from the latest source code releasesd
+  byt the SBCL devs for a variety of OSes and architectures.
 
-* Building
+  The general policy for OS support is that images will be built for two
+  versions of supported OSes: either the two most recent versions or the latest
+  LTS and most recent version, as applicable.
 
-  To build all images, just run:
+** Patches
+   The goal is to track upstream as closely as possible. Thus, patches are kept
+   to a minimum (and ideally kept for only as long as it takes for them to be
+   upstreamed). The only exception is trivial patches to things like test
+   timeouts (as the stock timeouts can frequently be too short when
+   cross-building images with QEMU).
 
-  #+begin_src shell
-    export DOCKER_CONTENT_TRUST=1
-    make all-non-build
-    make push_non_build_tags
-    make all-build
-    make push_build_tags
-  #+end_src
+   In addition to the trivial patches, the following patches are applied when
+   building specific tags.
+
+*** Musl Libc Support
+
+    All Alpine images have a patch series applied to support building with [[https://www.musl-libc.org/][musl libc]]
+    as opposed to glibc used by most other GNU/Linux distributions. This patch
+    series has been [[https://bugs.launchpad.net/sbcl/+bug/1768368][submitted upstream]].
+
+*** ECL Build Support
+
+    The Alpine images are all built with [[https://common-lisp.net/project/ecl/][ECL]] as the build host (as there is no
+    prebuilt SBCL that runs with musl libc). When building the arm images, some
+    warnings are printed that ECL does not like, due to a =~T= inside a
+    =~<~:;~>= in a format control string. A patch removes this on the affected
+    configurations. It has not been submitted upstream because I suspect it is
+    ECL's issue as opposed to SBCL's.
+
+*** Removal of =-march=armv5=
+
+    GCC version 9 removed the =armv5= architecture target used by SBCL's build
+    configuration for armhf. The affected images (Alpine 3.11 and Ubuntu Eoan
+    for arm32v7) have had the target architecture changed to =armv7-a=. This
+    issue has been [[https://bugs.launchpad.net/sbcl/+bug/1839783][reported upstream]].
+
+*** Add sb-linkable-runtime support to Windows installer
+
+    The Windows images have a patch applied that adds =sbcl.mk=, =libsbcl.a=,
+    and =mswin{,64}.def= to the installer if the ~:sb-linkable-runtime~ feature
+    is enabled at build time. This patch has been [[https://bugs.launchpad.net/sbcl/+bug/1824746][submitted upstream]].
+
+** =-build= images
+
+   While the build configuration follows upstream's default set of build
+   features, SBCL is very configurable at build time and it would be a shame to
+   not expose this somehow. Therfore, in addition to the standard images, a set
+   of "build" images (tags with the =-build= suffix) are provided.
+
+   These build images have SBCL already installed in them and include the SBCL
+   source code and any packages needed to build SBCL from scratch. This allows
+   a customized SBCL to be easily built. To customize the feature set, place a
+   file at =/usr/local/src/sbcl-$SBCL_VERSION/customize-target-features.lisp=
+   or =C:\sbcl-$SBCL_VERSION\customize-target-features.lisp=. See the SBCL
+   build instructions for more details on what this file should contain. To
+   patch SBCL, place any number of patch files (ending in ".patch") in
+   =/usr/local/src/sbcl-${SBCL_VERSION}/patches/= or
+   =C:\sbcl-$SBCL_VERSION\patches\=. To build and install SBCL, execute
+   ~rebuild-sbcl~. This script will apply the patches, build, install, and
+   remove the previous copy of SBCL.
+
+   While these build images give a lot of flexibility, it results in the images
+   being much larger than the non-build images. Therefore, it is recommended
+   that you use them in [[https://docs.docker.com/develop/develop-images/multistage-build/][multi-stage builds]].
+
+   Note that the Windows build images do not ship with the full toolchain
+   needed to build SBCL as I have not yet finished my due diligence to
+   understand all the licenses for the tools used (I'm not a Windows developer
+   and don't spend much time on that OS). Until then, the Windows builds will
+   download and install the toolchain as part of the rebuild process.
+
+* License
+
+  SBCL is license using a mix of BSD-style and public domain licenses. See
+  SBCL's [[http://sbcl.git.sourceforge.net/git/gitweb.cgi?p=sbcl/sbcl.git;a=blob_plain;f=COPYING;hb=HEAD][COPYING]] file for more info.
+
+  The Dockerfiles used to build the images are licensed under BSD-2-Clause.
+
+  As with all Docker images, these likely also contain other software which may
+  be under other licenses (such as Bash, etc from the base distribution, along
+  with any direct or indirect dependencies of the primary software being
+  contained).
+
+  As for any pre-built image usage, it is the image user's responsibility to
+  ensure that any use of this image complies with any relevant licenses for all
+  software contained within.
