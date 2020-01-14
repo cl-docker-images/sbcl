@@ -19,6 +19,10 @@ export_digest() {
   arch="$4"
   image_name="$(versioned_repo)-$(os_version_string "$os" "$os_version")-$arch"
 
+  if [ "$image_variant" = "build" ]; then
+    image_name="$image_name-build"
+  fi
+
   digest="$(docker_for_arch "$arch" inspect -f "{{(index .RepoDigests 0)}}" "$image_name")"
 
   var_name="${os}_${os_version}_${arch}_${image_variant}_digest"
