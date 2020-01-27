@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2019 as builder
 # Switch to powershell and make sure it exits on error
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
 
-ENV SBCL_VERSION=2.0.0
+ENV SBCL_VERSION=2.0.1
 
 # First, install chocolatey
 RUN $chocourl = 'https://chocolatey.org/install.ps1'; \
@@ -33,7 +33,7 @@ RUN $sbclurl = ('https://downloads.sourceforge.net/project/sbcl/sbcl/{0}/sbcl-{0
     Write-Host ('Downloading {0}' -f $sbclurl); \
     Invoke-WebRequest -Uri $sbclurl -OutFile sbcl-source.tar.bz2 -UserAgent "NativeHost"; \
     \
-    $expectedsha256 = '90369256805D437C82AB9BDAB9A410076F57810A50BB2B228DE4E6C892692FCF'; \
+    $expectedsha256 = '8450D60B7264A34158F8811D46DC6E74FF855BBD1227752572877E6604CE56E8'; \
     $actualsha256 = (Get-FileHash sbcl-source.tar.bz2 -Algorithm sha256).Hash; \
     Write-Host ('Verifying sha256 {0} (expected: {1})' -f $actualsha256, $expectedsha256); \
     if ($actualsha256 -ne $expectedsha256) { \
@@ -52,7 +52,7 @@ WORKDIR "C:\sbcl-$SBCL_VERSION"
 COPY patches/ C:/sbcl-patches
 
 RUN $env:WIX = '/c/wix'; \
-    sh -c 'for p in /c/sbcl-patches/*.patch; do patch -p1 < "$p" || exit 1; done'; \
+    sh -c 'for p in /c/sbcl-patches/*.patch; do [ -e "$p" ] || continue; patch -p1 < "$p" || exit 1; done'; \
     sh ./make.sh; \
     sh ./make-windows-installer.sh;
 
@@ -62,7 +62,7 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2019
 
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_VERSION=2.0.0
+ENV SBCL_VERSION=2.0.1
 
 COPY --from=builder "C:\sbcl-$SBCL_VERSION\output\sbcl-$SBCL_VERSION-x86-64-windows-binary.msi" "C:\sbcl-x86-64-windows-binary.msi"
 

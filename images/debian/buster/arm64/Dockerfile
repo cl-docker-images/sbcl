@@ -4,7 +4,7 @@ LABEL maintainer="etimmons@mit.edu"
 
 COPY patches/ /usr/local/src/sbcl-patches/
 
-ENV SBCL_VERSION=2.0.0
+ENV SBCL_VERSION=2.0.1
 ENV SBCL_ARCH=arm64
 
 WORKDIR /usr/local/src/
@@ -38,7 +38,7 @@ RUN set -x \
        } \
     && build_and_install_source() { \
          cd "sbcl-${1}/" \
-         && for p in /usr/local/src/sbcl-patches/*.patch; do patch -p1 < "$p" || exit 1; done \
+         && for p in /usr/local/src/sbcl-patches/*.patch; do [ -e "$p" ] || continue; patch -p1 < "$p" || exit 1; done \
          && sh make.sh "--xc-host=${2}" \
          && sh install.sh \
          && cd /usr/local/src; \

@@ -1,4 +1,4 @@
-FROM daewok/sbcl:2.0.0-windowsservercore-ltsc2019
+FROM daewok/sbcl:2.0.1-windowsservercore-ltsc2019
 
 # Switch to powershell and make sure it exits on error
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
@@ -8,7 +8,7 @@ RUN $sbclurl = ('https://downloads.sourceforge.net/project/sbcl/sbcl/{0}/sbcl-{0
     Write-Host ('Downloading {0}' -f $sbclurl); \
     Invoke-WebRequest -Uri $sbclurl -OutFile sbcl-source.tar.bz2 -UserAgent "NativeHost"; \
     \
-    $sha256 = '90369256805D437C82AB9BDAB9A410076F57810A50BB2B228DE4E6C892692FCF'; \
+    $sha256 = '8450D60B7264A34158F8811D46DC6E74FF855BBD1227752572877E6604CE56E8'; \
     Write-Host ('Verifying sha256 ({0})' -f $sha256); \
     if ((Get-FileHash sbcl-source.tar.bz2 -Algorithm sha256).Hash -ne $sha256) { \
         Write-Host 'SHA256 check FAILED!'; \

@@ -4,7 +4,6 @@ LABEL maintainer="etimmons@mit.edu"
 
 COPY patches/ /usr/local/src/sbcl-patches/
 
-ENV SBCL_VERSION=master
 ENV SBCL_ARCH=x86-64
 
 WORKDIR /usr/local/src/
@@ -29,18 +28,8 @@ RUN set -x \
          && tar xf "sbcl-${1}-$SBCL_BINARY_ARCH_CODE-linux-binary.tar" \
          && rm -rf "sbcl-${1}-$SBCL_BINARY_ARCH_CODE-linux-binary.tar"; \
        } \
-    && download_source() { \
-        git clone -b "$1" https://git.code.sf.net/p/sbcl/sbcl "sbcl-$1"; \
-       } \
-    && build_and_install_source() { \
-         cd "sbcl-$1/" \
-         && for p in /usr/local/src/sbcl-patches/*.patch; do patch -p1 < "$p" || exit 1; done \
-         && sh make.sh "--xc-host=${2}" \
-         && sh install.sh \
-         && cd /usr/local/src; \
-       } \
     && apt-get update \
-    && apt-get install -y --no-install-recommends curl gnupg ca-certificates make build-essential git \
+    && apt-get install -y --no-install-recommends curl gnupg ca-certificates make build-essential git ed \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && export CRHODES_KEY=D6839CA0A67F74D9DFB70922EBD595A9100D63CD \
@@ -53,5 +42,8 @@ RUN set -x \
     && download_and_unpack_binary "$SBCL_BINARY_VERSION"
 
 COPY test-entrypoint.sh /usr/local/bin/test-entrypoint.sh
+
+VOLUME /sbcl
+WORKDIR /sbcl
 
 ENTRYPOINT ["/usr/local/bin/test-entrypoint.sh"]

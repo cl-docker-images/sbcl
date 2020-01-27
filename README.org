@@ -7,22 +7,22 @@
   building the images happened around SBCL 1.5.9/2.0.0 and it is recommended
   that only the 2.0.0+ tags be used.
 
-  + =2.0.0-alpine3.11=, =2.0.0-alpine=, =alpine3.11=, =alpine=
-  + =2.0.0-alpine3.11-build=, =2.0.0-alpine-build=, =alpine3.11-build=, =alpine-build=
-  + =2.0.0-alpine3.10=, =alpine3.10=
-  + =2.0.0-alpine3.10-build=, =alpine3.10-build=
-  + =2.0.0-debian-buster=, =2.0.0-debian=, =debian-buster=, =debian=
-  + =2.0.0-debian-buster-build=, =2.0.0-debian-build=, =debian-buster-build=, =debian-build=
-  + =2.0.0-debian-stretch=, =debian-stretch=
-  + =2.0.0-debian-stretch-build=, =debian-stretch-build=
-  + =2.0.0-ubuntu-eoan=, =2.0.0-ubuntu=, =ubuntu-eoan=, =ubuntu=
-  + =2.0.0-ubuntu-eoan-build=, =2.0.0-ubuntu-build=, =ubuntu-eoan-build=, =ubuntu-build=
-  + =2.0.0-ubuntu-bionic=, =ubuntu-bionic=
-  + =2.0.0-ubuntu-bionic-build=, =ubuntu-bionic-build=
-  + =2.0.0-windowsservercore-1909=, =2.0.0-windowsservercore=, =windowsservercore-1909=, =windowsservercore=
-  + =2.0.0-windowsservercore-1909-build=, =2.0.0-windowsservercore-build=, =windowsservercore-1909-build=, =windowsservercore-build=
-  + =2.0.0-windowsservercore-ltsc2019=, =windowsservercore-ltsc2019=
-  + =2.0.0-windowsservercore-ltsc2019-build=, =windowsservercore-ltsc2019-build=
+  + =2.0.1-alpine3.11=, =2.0.1-alpine=, =alpine3.11=, =alpine=
+  + =2.0.1-alpine3.11-build=, =2.0.1-alpine-build=, =alpine3.11-build=, =alpine-build=
+  + =2.0.1-alpine3.10=, =alpine3.10=
+  + =2.0.1-alpine3.10-build=, =alpine3.10-build=
+  + =2.0.1-debian-buster=, =2.0.1-debian=, =debian-buster=, =debian=
+  + =2.0.1-debian-buster-build=, =2.0.1-debian-build=, =debian-buster-build=, =debian-build=
+  + =2.0.1-debian-stretch=, =debian-stretch=
+  + =2.0.1-debian-stretch-build=, =debian-stretch-build=
+  + =2.0.1-ubuntu-eoan=, =2.0.1-ubuntu=, =ubuntu-eoan=, =ubuntu=
+  + =2.0.1-ubuntu-eoan-build=, =2.0.1-ubuntu-build=, =ubuntu-eoan-build=, =ubuntu-build=
+  + =2.0.1-ubuntu-bionic=, =ubuntu-bionic=
+  + =2.0.1-ubuntu-bionic-build=, =ubuntu-bionic-build=
+  + =2.0.1-windowsservercore-1909=, =2.0.1-windowsservercore=, =windowsservercore-1909=, =windowsservercore=
+  + =2.0.1-windowsservercore-1909-build=, =2.0.1-windowsservercore-build=, =windowsservercore-1909-build=, =windowsservercore-build=
+  + =2.0.1-windowsservercore-ltsc2019=, =windowsservercore-ltsc2019=
+  + =2.0.1-windowsservercore-ltsc2019-build=, =windowsservercore-ltsc2019-build=
 
 * Quick Reference
 
@@ -84,12 +84,6 @@
     configuration for armhf. The affected images (Alpine 3.11 and Ubuntu Eoan
     for arm32v7) have had the target architecture changed to =armv7-a=. This
     issue has been [[https://bugs.launchpad.net/sbcl/+bug/1839783][reported upstream]].
-
-*** Add sb-linkable-runtime support to Windows installer
-
-    The Windows images have a patch applied that adds =sbcl.mk=, =libsbcl.a=,
-    and =mswin{,64}.def= to the installer if the ~:sb-linkable-runtime~ feature
-    is enabled at build time. This patch has been [[https://bugs.launchpad.net/sbcl/+bug/1824746][submitted upstream]].
 
 ** =-build= images
 

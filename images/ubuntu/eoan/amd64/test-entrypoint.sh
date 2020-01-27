@@ -3,7 +3,7 @@
 set -e
 
 SBCL_BINARY_ARCH_CODE=x86-64
-SBCL_BINARY_VERSION=2.0.0
+SBCL_BINARY_VERSION=2.0.1
 
 git clone https://git.code.sf.net/p/sbcl/sbcl sbcl
 cd sbcl
