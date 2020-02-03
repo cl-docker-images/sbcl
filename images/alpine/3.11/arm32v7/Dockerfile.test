@@ -2,7 +2,7 @@ FROM alpine:3.11
 
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_ARCH=x86-64
+ENV SBCL_ARCH=arm
 
 WORKDIR /usr/local/src/
 

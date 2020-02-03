@@ -1,17 +1,16 @@
-FROM ubuntu:bionic
+FROM debian:stretch
 
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_ARCH=x86-64
+ENV SBCL_ARCH=arm64
 
 WORKDIR /usr/local/src/
 
 # hadolint ignore=DL3003,DL3008
 RUN set -x \
-    && SBCL_BINARY_ARCH_CODE="x86-64" \
+    && SBCL_BINARY_ARCH_CODE="arm64" \
     && export SBCL_BINARY_ARCH_CODE \
-    # We use SBCL 1.5.5 to bootstrap because it does not require glibc 2.28.
-    && SBCL_BINARY_VERSION="1.5.5" \
+    && SBCL_BINARY_VERSION="1.4.2" \
     && export SBCL_BINARY_VERSION \
     && download_and_validate_hashes() { \
          curl -L "https://downloads.sourceforge.net/project/sbcl/sbcl/${1}/sbcl-${1}-crhodes.asc" > "sbcl-${1}-crhodes.asc" \
@@ -27,7 +26,7 @@ RUN set -x \
          && rm -rf "sbcl-${1}-$SBCL_BINARY_ARCH_CODE-linux-binary.tar"; \
        } \
     && apt-get update \
-    && apt-get install -y --no-install-recommends curl gnupg ca-certificates make build-essential git ed \
+    && apt-get install -y --no-install-recommends curl gnupg ca-certificates make dirmngr bzip2 build-essential git ed \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && export CRHODES_KEY=D6839CA0A67F74D9DFB70922EBD595A9100D63CD \

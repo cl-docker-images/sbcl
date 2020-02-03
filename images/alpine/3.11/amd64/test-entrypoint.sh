@@ -2,10 +2,11 @@
 
 set -e
 
-git clone https://git.code.sf.net/p/sbcl/sbcl sbcl
-cd sbcl
+cp -a /sbcl /sbcl-work
+cd /sbcl-work
 
-for p in /usr/local/src/sbcl-patches/*.patch; do
+for p in /patches/*.patch; do
+    [ -e "$p" ] || continue
     patch -p1 < "$p" || exit 1
 done
 

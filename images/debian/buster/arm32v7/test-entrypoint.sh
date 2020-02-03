@@ -2,8 +2,8 @@
 
 set -e
 
-SBCL_BINARY_ARCH_CODE=x86-64
-SBCL_BINARY_VERSION=1.5.5
+SBCL_BINARY_ARCH_CODE=armhf
+SBCL_BINARY_VERSION=1.4.11
 
 cp -a /sbcl /sbcl-work
 cd /sbcl-work
