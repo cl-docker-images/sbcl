@@ -1,4 +1,4 @@
-FROM daewok/sbcl:2.0.1-debian-stretch-amd64
+FROM daewok/sbcl:2.0.2-debian-stretch-amd64
 
 WORKDIR /usr/local/src/
 

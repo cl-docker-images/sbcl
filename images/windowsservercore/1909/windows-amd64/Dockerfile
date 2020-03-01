@@ -4,7 +4,7 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2019 as builder
 # Switch to powershell and make sure it exits on error
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
 
-ENV SBCL_VERSION=2.0.1
+ENV SBCL_VERSION=2.0.2
 
 # First, install chocolatey
 RUN $chocourl = 'https://chocolatey.org/install.ps1'; \
@@ -63,7 +63,7 @@ FROM mcr.microsoft.com/windows/servercore:1909
 
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_VERSION=2.0.1
+ENV SBCL_VERSION=2.0.2
 
 COPY --from=builder "C:\sbcl-$SBCL_VERSION\output\sbcl-$SBCL_VERSION-x86-64-windows-binary.msi" "C:\sbcl-x86-64-windows-binary.msi"
 

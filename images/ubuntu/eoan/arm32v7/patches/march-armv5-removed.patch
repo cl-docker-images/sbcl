@@ -14,4 +14,4 @@ https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=931795
 +CFLAGS += -marm -march=armv7-a
  NM = ./linux-nm
 
- ASSEM_SRC = arm-assem.S ldso-stubs.S
+ ASSEM_SRC = arm-assem.S

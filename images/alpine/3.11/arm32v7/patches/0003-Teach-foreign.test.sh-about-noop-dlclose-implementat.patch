@@ -1,4 +1,4 @@
-From 87b1eca2b719fb5e2d6f10352dcdb86f4d389ca9 Mon Sep 17 00:00:00 2001
+From 561f0dbf93a6c6d7b32d4406eebd9b4f202be21f Mon Sep 17 00:00:00 2001
 From: Eric Timmons <etimmons@mit.edu>
 Date: Sat, 1 Feb 2020 17:33:59 -0500
 Subject: [PATCH 3/5] Teach foreign.test.sh about noop dlclose implementations
@@ -26,7 +26,7 @@ index ada107c36..4510f2ccf 100644
  LOAD-SHARED-OBJECT interacts with SB-EXT:SAVE-LISP-AND-DIE:
  
 diff --git a/tests/foreign.test.sh b/tests/foreign.test.sh
-index fabba1246..53131bdd2 100755
+index f3b12fd6d..d32d22cb9 100755
 --- a/tests/foreign.test.sh
 +++ b/tests/foreign.test.sh
 @@ -140,6 +140,28 @@ echo 'int late_foo = 43;' > $TEST_FILESTEM-c.c
@@ -96,8 +96,8 @@ index fabba1246..53131bdd2 100755
 +        (note "/renamed back to originals")))
  
    ;; test late resolution
-   #+linkage-table
-@@ -276,13 +306,16 @@ cat > $TEST_FILESTEM.test.lisp <<EOF
+   (eval-when (:compile-toplevel :load-toplevel :execute)
+@@ -278,13 +308,16 @@ cat > $TEST_FILESTEM.test.lisp <<EOF
      (load-shared-object (truename "$TEST_FILESTEM-c.so"))
      (assert (= 43 late-foo))
      (assert (= 14 (late-bar)))
@@ -122,5 +122,5 @@ index fabba1246..53131bdd2 100755
  
    (sb-ext:exit :code $EXIT_LISP_WIN) ; success convention for Lisp program
 -- 
-2.25.0
+2.25.1
 

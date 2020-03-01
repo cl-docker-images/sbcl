@@ -4,7 +4,7 @@ LABEL maintainer="etimmons@mit.edu"
 
 COPY patches/ /usr/local/src/sbcl-patches/
 
-ENV SBCL_VERSION=2.0.1
+ENV SBCL_VERSION=2.0.2
 ENV SBCL_ARCH=arm64
 
 WORKDIR /usr/local/src/
@@ -39,7 +39,7 @@ RUN set -x \
          && cd /usr/local/src; \
        } \
     && apk add --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers gnupg ecl \
-                          gmp-dev g++ libffi-dev musl-dev gc gc-dev linux-headers ecl-dev \
+                          gmp-dev g++ libffi-dev musl-dev gc gc-dev linux-headers ecl-dev git ed \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && export CRHODES_KEY=D6839CA0A67F74D9DFB70922EBD595A9100D63CD \
@@ -51,7 +51,7 @@ RUN set -x \
     && rm -rf "$GNUPGHOME" ./* \
     && mv /tmp/sbcl-patches . \
     && apk del --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers gnupg ecl \
-                          gmp-dev g++ libffi-dev musl-dev gc gc-dev linux-headers ecl-dev \
+                          gmp-dev g++ libffi-dev musl-dev gc gc-dev linux-headers ecl-dev git ed \
     && sbcl --version
 
 WORKDIR /

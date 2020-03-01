@@ -1,4 +1,4 @@
-From 5d7395cbd4eb952d4a988c4ee7ee3f5111a9f5a7 Mon Sep 17 00:00:00 2001
+From a4ea6d15be877e8043974f3378f929bd1469f189 Mon Sep 17 00:00:00 2001
 From: Eric Timmons <etimmons@mit.edu>
 Date: Sat, 1 Feb 2020 17:34:10 -0500
 Subject: [PATCH 4/5] Only include old memcpy version on glibc
@@ -22,5 +22,5 @@ index a99c5fb7e..e3d104e3a 100644
  #endif
 +#endif
 -- 
-2.25.0
+2.25.1
 

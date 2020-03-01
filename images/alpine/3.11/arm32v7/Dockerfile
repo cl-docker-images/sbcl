@@ -4,7 +4,7 @@ LABEL maintainer="etimmons@mit.edu"
 
 COPY patches/ /usr/local/src/sbcl-patches/
 
-ENV SBCL_VERSION=2.0.1
+ENV SBCL_VERSION=2.0.2
 ENV SBCL_ARCH=arm
 
 WORKDIR /usr/local/src/

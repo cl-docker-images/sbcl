@@ -1,4 +1,4 @@
-FROM daewok/sbcl:2.0.1-windowsservercore-ltsc2019
+FROM daewok/sbcl:2.0.2-windowsservercore-ltsc2019
 
 # Switch to powershell and make sure it exits on error
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]

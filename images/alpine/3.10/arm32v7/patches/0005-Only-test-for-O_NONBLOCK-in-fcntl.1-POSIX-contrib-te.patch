@@ -1,4 +1,4 @@
-From f28ebfe8bd95364f6bae7d6278bd81d75343d8bd Mon Sep 17 00:00:00 2001
+From 0f4f610859907b971e7f99a1b8dbe91200c4072f Mon Sep 17 00:00:00 2001
 From: Eric Timmons <etimmons@mit.edu>
 Date: Sat, 1 Feb 2020 17:34:21 -0500
 Subject: [PATCH 5/5] Only test for O_NONBLOCK in fcntl.1 POSIX contrib test
@@ -10,7 +10,7 @@ flag we're interested in instead of testing equality.
  1 file changed, 4 insertions(+), 8 deletions(-)
 
 diff --git a/contrib/sb-posix/posix-tests.lisp b/contrib/sb-posix/posix-tests.lisp
-index b194aa455..062cff6c4 100644
+index e6a268b04..8fc83c7e9 100644
 --- a/contrib/sb-posix/posix-tests.lisp
 +++ b/contrib/sb-posix/posix-tests.lisp
 @@ -432,14 +432,10 @@ (deftest open.error.1
@@ -33,5 +33,5 @@ index b194aa455..062cff6c4 100644
    (let ((fd (sb-posix:open "/dev/null" sb-posix::o-nonblock)))
      (/= 0 (logand (sb-posix:fcntl fd sb-posix::f-getfl)
 -- 
-2.25.0
+2.25.1
 
