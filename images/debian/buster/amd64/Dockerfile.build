@@ -1,4 +1,4 @@
-FROM daewok/sbcl:2.0.2-debian-buster-amd64
+FROM daewok/sbcl:2.0.3-debian-buster-amd64
 
 WORKDIR /usr/local/src/
 

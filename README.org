@@ -7,22 +7,22 @@
   building the images happened around SBCL 1.5.9/2.0.0 and it is recommended
   that only the 2.0.0+ tags be used.
 
-  + =2.0.2-alpine3.11=, =2.0.2-alpine=, =alpine3.11=, =alpine=
-  + =2.0.2-alpine3.11-build=, =2.0.2-alpine-build=, =alpine3.11-build=, =alpine-build=
-  + =2.0.2-alpine3.10=, =alpine3.10=
-  + =2.0.2-alpine3.10-build=, =alpine3.10-build=
-  + =2.0.2-debian-buster=, =2.0.2-debian=, =debian-buster=, =debian=
-  + =2.0.2-debian-buster-build=, =2.0.2-debian-build=, =debian-buster-build=, =debian-build=
-  + =2.0.2-debian-stretch=, =debian-stretch=
-  + =2.0.2-debian-stretch-build=, =debian-stretch-build=
-  + =2.0.2-ubuntu-eoan=, =2.0.2-ubuntu=, =ubuntu-eoan=, =ubuntu=
-  + =2.0.2-ubuntu-eoan-build=, =2.0.2-ubuntu-build=, =ubuntu-eoan-build=, =ubuntu-build=
-  + =2.0.2-ubuntu-bionic=, =ubuntu-bionic=
-  + =2.0.2-ubuntu-bionic-build=, =ubuntu-bionic-build=
-  + =2.0.2-windowsservercore-1909=, =2.0.2-windowsservercore=, =windowsservercore-1909=, =windowsservercore=
-  + =2.0.2-windowsservercore-1909-build=, =2.0.2-windowsservercore-build=, =windowsservercore-1909-build=, =windowsservercore-build=
-  + =2.0.2-windowsservercore-ltsc2019=, =windowsservercore-ltsc2019=
-  + =2.0.2-windowsservercore-ltsc2019-build=, =windowsservercore-ltsc2019-build=
+  + =2.0.3-alpine3.11=, =2.0.3-alpine=, =alpine3.11=, =alpine=
+  + =2.0.3-alpine3.11-build=, =2.0.3-alpine-build=, =alpine3.11-build=, =alpine-build=
+  + =2.0.3-alpine3.10=, =alpine3.10=
+  + =2.0.3-alpine3.10-build=, =alpine3.10-build=
+  + =2.0.3-debian-buster=, =2.0.3-debian=, =debian-buster=, =debian=
+  + =2.0.3-debian-buster-build=, =2.0.3-debian-build=, =debian-buster-build=, =debian-build=
+  + =2.0.3-debian-stretch=, =debian-stretch=
+  + =2.0.3-debian-stretch-build=, =debian-stretch-build=
+  + =2.0.3-ubuntu-eoan=, =2.0.3-ubuntu=, =ubuntu-eoan=, =ubuntu=
+  + =2.0.3-ubuntu-eoan-build=, =2.0.3-ubuntu-build=, =ubuntu-eoan-build=, =ubuntu-build=
+  + =2.0.3-ubuntu-bionic=, =ubuntu-bionic=
+  + =2.0.3-ubuntu-bionic-build=, =ubuntu-bionic-build=
+  + =2.0.3-windowsservercore-1909=, =2.0.3-windowsservercore=, =windowsservercore-1909=, =windowsservercore=
+  + =2.0.3-windowsservercore-1909-build=, =2.0.3-windowsservercore-build=, =windowsservercore-1909-build=, =windowsservercore-build=
+  + =2.0.3-windowsservercore-ltsc2019=, =windowsservercore-ltsc2019=
+  + =2.0.3-windowsservercore-ltsc2019-build=, =windowsservercore-ltsc2019-build=
 
 * Quick Reference
 

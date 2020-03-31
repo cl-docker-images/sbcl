@@ -1,4 +1,4 @@
-FROM daewok/sbcl:2.0.2-ubuntu-eoan-arm64
+FROM daewok/sbcl:2.0.3-ubuntu-eoan-arm64
 
 WORKDIR /usr/local/src/
 

@@ -4,8 +4,6 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2019 as builder
 # Switch to powershell and make sure it exits on error
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
 
-ENV SBCL_VERSION=2.0.2
-
 # First, install chocolatey
 RUN $chocourl = 'https://chocolatey.org/install.ps1'; \
     Set-ExecutionPolicy Bypass -Scope Process -Force; \
@@ -25,25 +23,27 @@ RUN $wixurl = 'https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/w
     cd wix/bin; \
     unzip ../../wix311-binaries.zip;
 
+# Install build tools
+RUN pacman -S --noconfirm --needed mingw-w64-x86_64-gcc make diffutils patch
+
 # Install prebuilt SBCL
 COPY sbcl.1.4.14.nupkg sbcl.1.4.14.nupkg
 RUN cinst -y sbcl --source .;
 
 # Download the source
+ENV SBCL_VERSION=2.0.3
+
 RUN $sbclurl = ('https://downloads.sourceforge.net/project/sbcl/sbcl/{0}/sbcl-{0}-source.tar.bz2' -f $env:SBCL_VERSION); \
     Write-Host ('Downloading {0}' -f $sbclurl); \
     Invoke-WebRequest -Uri $sbclurl -OutFile sbcl-source.tar.bz2 -UserAgent "NativeHost"; \
     \
-    $expectedsha256 = '8450D60B7264A34158F8811D46DC6E74FF855BBD1227752572877E6604CE56E8'; \
+    $expectedsha256 = 'B5543F123214B2023FF5FC32DFD00B6CFEABD92C8EDB33AD208842C4FD642F00'; \
     $actualsha256 = (Get-FileHash sbcl-source.tar.bz2 -Algorithm sha256).Hash; \
     Write-Host ('Verifying sha256 {0} (expected: {1})' -f $actualsha256, $expectedsha256); \
     if ($actualsha256 -ne $expectedsha256) { \
         Write-Host 'SHA256 check FAILED!'; \
         exit 1; \
     };
-
-# Install build tools
-RUN pacman -S --noconfirm --needed mingw-w64-x86_64-gcc make diffutils patch
 
 # Unzip the sources and build them
 RUN tar -x -v -f sbcl-source.tar.bz2
@@ -63,7 +63,7 @@ FROM mcr.microsoft.com/windows/servercore:1909
 
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_VERSION=2.0.2
+ENV SBCL_VERSION=2.0.3
 
 COPY --from=builder "C:\sbcl-$SBCL_VERSION\output\sbcl-$SBCL_VERSION-x86-64-windows-binary.msi" "C:\sbcl-x86-64-windows-binary.msi"
 
