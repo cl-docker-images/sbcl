@@ -3,7 +3,7 @@
 set -e
 
 SBCL_BINARY_ARCH_CODE=x86-64
-SBCL_BINARY_VERSION=2.0.3
+SBCL_BINARY_VERSION=2.0.4
 
 cp -a /sbcl /sbcl-work
 cd /sbcl-work

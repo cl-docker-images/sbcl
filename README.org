@@ -7,22 +7,22 @@
   building the images happened around SBCL 1.5.9/2.0.0 and it is recommended
   that only the 2.0.0+ tags be used.
 
-  + =2.0.3-alpine3.11=, =2.0.3-alpine=, =alpine3.11=, =alpine=
-  + =2.0.3-alpine3.11-build=, =2.0.3-alpine-build=, =alpine3.11-build=, =alpine-build=
-  + =2.0.3-alpine3.10=, =alpine3.10=
-  + =2.0.3-alpine3.10-build=, =alpine3.10-build=
-  + =2.0.3-debian-buster=, =2.0.3-debian=, =debian-buster=, =debian=
-  + =2.0.3-debian-buster-build=, =2.0.3-debian-build=, =debian-buster-build=, =debian-build=
-  + =2.0.3-debian-stretch=, =debian-stretch=
-  + =2.0.3-debian-stretch-build=, =debian-stretch-build=
-  + =2.0.3-ubuntu-eoan=, =2.0.3-ubuntu=, =ubuntu-eoan=, =ubuntu=
-  + =2.0.3-ubuntu-eoan-build=, =2.0.3-ubuntu-build=, =ubuntu-eoan-build=, =ubuntu-build=
-  + =2.0.3-ubuntu-bionic=, =ubuntu-bionic=
-  + =2.0.3-ubuntu-bionic-build=, =ubuntu-bionic-build=
-  + =2.0.3-windowsservercore-1909=, =2.0.3-windowsservercore=, =windowsservercore-1909=, =windowsservercore=
-  + =2.0.3-windowsservercore-1909-build=, =2.0.3-windowsservercore-build=, =windowsservercore-1909-build=, =windowsservercore-build=
-  + =2.0.3-windowsservercore-ltsc2019=, =windowsservercore-ltsc2019=
-  + =2.0.3-windowsservercore-ltsc2019-build=, =windowsservercore-ltsc2019-build=
+  + =2.0.4-alpine3.11=, =2.0.4-alpine=, =alpine3.11=, =alpine=
+  + =2.0.4-alpine3.11-build=, =2.0.4-alpine-build=, =alpine3.11-build=, =alpine-build=
+  + =2.0.4-alpine3.10=, =alpine3.10=
+  + =2.0.4-alpine3.10-build=, =alpine3.10-build=
+  + =2.0.4-debian-buster=, =2.0.4-debian=, =debian-buster=, =debian=
+  + =2.0.4-debian-buster-build=, =2.0.4-debian-build=, =debian-buster-build=, =debian-build=
+  + =2.0.4-debian-stretch=, =debian-stretch=
+  + =2.0.4-debian-stretch-build=, =debian-stretch-build=
+  + =2.0.4-ubuntu-eoan=, =2.0.4-ubuntu=, =ubuntu-eoan=, =ubuntu=
+  + =2.0.4-ubuntu-eoan-build=, =2.0.4-ubuntu-build=, =ubuntu-eoan-build=, =ubuntu-build=
+  + =2.0.4-ubuntu-bionic=, =ubuntu-bionic=
+  + =2.0.4-ubuntu-bionic-build=, =ubuntu-bionic-build=
+  + =2.0.4-windowsservercore-1909=, =2.0.4-windowsservercore=, =windowsservercore-1909=, =windowsservercore=
+  + =2.0.4-windowsservercore-1909-build=, =2.0.4-windowsservercore-build=, =windowsservercore-1909-build=, =windowsservercore-build=
+  + =2.0.4-windowsservercore-ltsc2019=, =windowsservercore-ltsc2019=
+  + =2.0.4-windowsservercore-ltsc2019-build=, =windowsservercore-ltsc2019-build=
 
 * Quick Reference
 
@@ -68,15 +68,6 @@
     All Alpine images have a patch series applied to support building with [[https://www.musl-libc.org/][musl libc]]
     as opposed to glibc used by most other GNU/Linux distributions. This patch
     series has been [[https://bugs.launchpad.net/sbcl/+bug/1768368][submitted upstream]].
-
-*** ECL Build Support
-
-    The Alpine images are all built with [[https://common-lisp.net/project/ecl/][ECL]] as the build host (as there is no
-    prebuilt SBCL that runs with musl libc). When building the arm images, some
-    warnings are printed that ECL does not like, due to a =~T= inside a
-    =~<~:;~>= in a format control string. A patch removes this on the affected
-    configurations. It has not been submitted upstream because I suspect it is
-    ECL's issue as opposed to SBCL's.
 
 *** Removal of =-march=armv5=
 

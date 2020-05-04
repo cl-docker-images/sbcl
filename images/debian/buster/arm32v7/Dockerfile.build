@@ -1,4 +1,4 @@
-FROM daewok/sbcl:2.0.3-debian-buster-arm32v7
+FROM daewok/sbcl:2.0.4-debian-buster-arm32v7
 
 WORKDIR /usr/local/src/
 

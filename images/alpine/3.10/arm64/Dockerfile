@@ -4,7 +4,7 @@ LABEL maintainer="etimmons@mit.edu"
 
 COPY patches/ /usr/local/src/sbcl-patches/
 
-ENV SBCL_VERSION=2.0.3
+ENV SBCL_VERSION=2.0.4
 ENV SBCL_ARCH=arm64
 
 WORKDIR /usr/local/src/
@@ -38,20 +38,37 @@ RUN set -x \
          && sh install.sh \
          && cd /usr/local/src; \
        } \
-    && apk add --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers gnupg ecl \
-                          gmp-dev g++ libffi-dev musl-dev gc gc-dev linux-headers ecl-dev git ed \
+    && download_and_install_ecl() { \
+         curl -L "https://common-lisp.net/project/ecl/static/files/release/ecl-20.4.24.tgz" > ecl.tgz \
+         && tar xf ecl.tgz \
+         && cd ecl-20.4.24 \
+         && ./configure --disable-manual --enable-boehm=included \
+         && make "-j$(nproc)" \
+         && make install \
+         && cd /usr/local/src; \
+       } \
+    && remove_ecl() { \
+         cd ecl-20.4.24 \
+         && make uninstall \
+         && cd /usr/local/src \
+         && rm -rf ecl-20.4.24 ecl.tgz; \
+       } \
+    && apk add --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers gnupg \
+                          gmp-dev g++ libffi-dev git ed \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && export CRHODES_KEY=D6839CA0A67F74D9DFB70922EBD595A9100D63CD \
     && import_key "$CRHODES_KEY" \
     && download_and_validate_hashes "$SBCL_VERSION" \
     && download_source "$SBCL_VERSION" \
+    && download_and_install_ecl \
     && build_and_install_source "$SBCL_VERSION" "ecl" \
+    && remove_ecl \
     && mv sbcl-patches /tmp \
     && rm -rf "$GNUPGHOME" ./* \
     && mv /tmp/sbcl-patches . \
-    && apk del --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers gnupg ecl \
-                          gmp-dev g++ libffi-dev musl-dev gc gc-dev linux-headers ecl-dev git ed \
+    && apk del --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers gnupg \
+                          gmp-dev g++ libffi-dev git ed \
     && sbcl --version
 
 WORKDIR /

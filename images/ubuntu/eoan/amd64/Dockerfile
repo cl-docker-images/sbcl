@@ -4,7 +4,7 @@ LABEL maintainer="etimmons@mit.edu"
 
 COPY patches/ /usr/local/src/sbcl-patches/
 
-ENV SBCL_VERSION=2.0.3
+ENV SBCL_VERSION=2.0.4
 ENV SBCL_ARCH=x86-64
 
 WORKDIR /usr/local/src/
@@ -13,7 +13,7 @@ WORKDIR /usr/local/src/
 RUN set -x \
     && SBCL_BINARY_ARCH_CODE="x86-64" \
     && export SBCL_BINARY_ARCH_CODE \
-    && SBCL_BINARY_VERSION="2.0.3" \
+    && SBCL_BINARY_VERSION="2.0.4" \
     && export SBCL_BINARY_VERSION \
     && download_and_validate_hashes() { \
          curl -L "https://downloads.sourceforge.net/project/sbcl/sbcl/${1}/sbcl-${1}-crhodes.asc" > "sbcl-${1}-crhodes.asc" \
