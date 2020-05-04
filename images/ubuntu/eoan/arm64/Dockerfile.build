@@ -1,4 +1,4 @@
-FROM daewok/sbcl:2.0.4-ubuntu-focal-arm32v7
+FROM daewok/sbcl:2.0.4-ubuntu-eoan-arm64
 
 WORKDIR /usr/local/src/
 
