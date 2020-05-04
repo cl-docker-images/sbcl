@@ -1,0 +1,15 @@
+image: daewok/sbcl:$SBCL_VERSION-debian-buster-fancy
+manifests:
+  - image: $DEBIAN_BUSTER_AMD64_FANCY_DIGEST
+    platform:
+      architecture: amd64
+      os: linux
+  - image: $DEBIAN_BUSTER_ARM64_FANCY_DIGEST
+    platform:
+      architecture: arm64
+      os: linux
+  - image: $DEBIAN_BUSTER_ARM32V7_FANCY_DIGEST
+    platform:
+      architecture: arm
+      variant: v7
+      os: linux

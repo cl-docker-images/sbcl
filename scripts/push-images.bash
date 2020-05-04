@@ -25,6 +25,8 @@ push_os_version_arch() {
 
   if [ "$image_variant" = "build" ]; then
     image_name="$image_name-build"
+  elif [ "$image_variant" = "build" ]; then
+    image_name="$image_name-fancy"
   fi
 
   docker_for_arch "$arch" push "$image_name"

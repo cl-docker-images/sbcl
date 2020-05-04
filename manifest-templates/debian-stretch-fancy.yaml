@@ -1,0 +1,15 @@
+image: daewok/sbcl:debian-stretch-fancy
+manifests:
+  - image: $DEBIAN_STRETCH_AMD64_FANCY_DIGEST
+    platform:
+      architecture: amd64
+      os: linux
+  - image: $DEBIAN_STRETCH_ARM64_FANCY_DIGEST
+    platform:
+      architecture: arm64
+      os: linux
+  - image: $DEBIAN_STRETCH_ARM32V7_FANCY_DIGEST
+    platform:
+      architecture: arm
+      variant: v7
+      os: linux

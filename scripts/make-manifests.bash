@@ -21,6 +21,8 @@ export_digest() {
 
   if [ "$image_variant" = "build" ]; then
     image_name="$image_name-build"
+  elif [ "$image_variant" = "fancy" ]; then
+    image_name="$image_name-fancy"
   fi
 
   digest="$(docker_for_arch "$arch" inspect -f "{{(index .RepoDigests 0)}}" "$image_name")"

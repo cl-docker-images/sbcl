@@ -2,7 +2,7 @@
 #-*- sh-basic-offset: 2; -*-
 set -ex
 
-if [ "$1" != "build" ] && [ "$1" != "nonbuild" ] && [ "$1" != "test" ]; then
+if [ "$1" != "build" ] && [ "$1" != "nonbuild" ] && [ "$1" != "test" ] && [ "$1" != "fancy" ]; then
   echo "First argument must be build, nonbuild, or test"
   exit 1
 fi
@@ -29,6 +29,9 @@ build_os_version_arch() {
   elif [ "$image_variant" = "test" ]; then
     docker_file="images/$os/$os_version/$arch/Dockerfile.test"
     image_name="$image_name-test"
+  elif [ "$image_variant" = "fancy" ]; then
+    docker_file="images/$os/$os_version/$arch/Dockerfile.fancy"
+    image_name="$image_name-fancy"
   else
     docker_file="images/$os/$os_version/$arch/Dockerfile"
   fi
