@@ -38,6 +38,7 @@ export SBCL_VERSION
 
 run_for_every_tuple export_digest nonbuild
 run_for_every_tuple export_digest build
+run_for_every_tuple export_digest fancy
 
 mkdir -p manifests
 

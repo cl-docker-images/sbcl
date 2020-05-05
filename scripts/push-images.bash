@@ -2,8 +2,8 @@
 #-*- sh-basic-offset: 2; -*-
 set -ex
 
-if [ "$1" != "build" ] && [ "$1" != "nonbuild" ]; then
-  echo "First argument must be build or nonbuild"
+if [ "$1" != "build" ] && [ "$1" != "nonbuild" ] && [ "$1" != "fancy" ]; then
+  echo "First argument must be build or nonbuild or fancy"
   exit 1
 fi
 
@@ -25,7 +25,7 @@ push_os_version_arch() {
 
   if [ "$image_variant" = "build" ]; then
     image_name="$image_name-build"
-  elif [ "$image_variant" = "build" ]; then
+  elif [ "$image_variant" = "fancy" ]; then
     image_name="$image_name-fancy"
   fi
 

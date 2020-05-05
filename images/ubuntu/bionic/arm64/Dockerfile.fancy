@@ -44,7 +44,7 @@ RUN set -x \
          && cd /usr/local/src; \
        } \
     && apt-get update \
-    && apt-get install -y --no-install-recommends curl gnupg ca-certificates make build-essential \
+    && apt-get install -y --no-install-recommends curl gnupg ca-certificates make build-essential zlib1g-dev \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && export CRHODES_KEY=D6839CA0A67F74D9DFB70922EBD595A9100D63CD \
