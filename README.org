@@ -52,8 +52,8 @@
 
 * What's in the image?
 
-  This image contains SBCL binaries built from the latest source code releasesd
-  byt the SBCL devs for a variety of OSes and architectures.
+  This image contains SBCL binaries built from the latest source code released
+  by the SBCL devs for a variety of OSes and architectures.
 
   The general policy for OS support is that images will be built for two
   versions of supported OSes: either the two most recent versions or the latest
@@ -119,7 +119,7 @@
 
 * License
 
-  SBCL is license using a mix of BSD-style and public domain licenses. See
+  SBCL is licensed using a mix of BSD-style and public domain licenses. See
   SBCL's [[http://sbcl.git.sourceforge.net/git/gitweb.cgi?p=sbcl/sbcl.git;a=blob_plain;f=COPYING;hb=HEAD][COPYING]] file for more info.
 
   The Dockerfiles used to build the images are licensed under BSD-2-Clause.
