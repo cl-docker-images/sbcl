@@ -10,6 +10,6 @@ for p in /patches/*.patch; do
     patch -p1 < "$p" || exit 1
 done
 
-sh make.sh "--xc-host=ecl"
+sh make.sh
 cd tests/
 sh run-tests.sh

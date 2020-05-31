@@ -38,37 +38,21 @@ RUN set -x \
          && sh install.sh \
          && cd /usr/local/src; \
        } \
-    && download_and_install_ecl() { \
-         curl -L "https://common-lisp.net/project/ecl/static/files/release/ecl-20.4.24.tgz" > ecl.tgz \
-         && tar xf ecl.tgz \
-         && cd ecl-20.4.24 \
-         && ./configure --disable-manual --enable-boehm=included \
-         && make "-j$(nproc)" \
-         && make install \
-         && cd /usr/local/src; \
-       } \
-    && remove_ecl() { \
-         cd ecl-20.4.24 \
-         && make uninstall \
-         && cd /usr/local/src \
-         && rm -rf ecl-20.4.24 ecl.tgz; \
-       } \
     && apk add --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers gnupg \
                           gmp-dev g++ libffi-dev zlib-dev \
+    && apk add --no-cache sbcl --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && export CRHODES_KEY=D6839CA0A67F74D9DFB70922EBD595A9100D63CD \
     && import_key "$CRHODES_KEY" \
     && download_and_validate_hashes "$SBCL_VERSION" \
     && download_source "$SBCL_VERSION" \
-    && download_and_install_ecl \
-    && build_and_install_source "$SBCL_VERSION" "ecl" \
-    && remove_ecl \
+    && build_and_install_source "$SBCL_VERSION" "sbcl" \
     && mv sbcl-patches /tmp \
     && rm -rf "$GNUPGHOME" ./* \
     && mv /tmp/sbcl-patches . \
     && apk del --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers gnupg \
-                          gmp-dev g++ libffi-dev \
+                          gmp-dev g++ libffi-dev sbcl \
     && sbcl --version
 
 WORKDIR /
