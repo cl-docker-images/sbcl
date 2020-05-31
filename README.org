@@ -69,12 +69,6 @@
    In addition to the trivial patches, the following patches are applied when
    building specific tags.
 
-*** Musl Libc Support
-
-    All Alpine images have a patch series applied to support building with [[https://www.musl-libc.org/][musl libc]]
-    as opposed to glibc used by most other GNU/Linux distributions. This patch
-    series has been [[https://bugs.launchpad.net/sbcl/+bug/1768368][submitted upstream]].
-
 *** Removal of =-march=armv5=
 
     GCC version 9 removed the =armv5= architecture target used by SBCL's build

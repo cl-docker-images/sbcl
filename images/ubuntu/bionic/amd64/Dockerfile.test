@@ -39,10 +39,8 @@ RUN set -x \
     && download_and_validate_hashes "$SBCL_BINARY_VERSION" \
     && download_and_unpack_binary "$SBCL_BINARY_VERSION"
 
-COPY test-entrypoint.sh /usr/local/bin/test-entrypoint.sh
+COPY test-sbcl /usr/local/bin/test-sbcl
 
 VOLUME /patches
 VOLUME /sbcl
 WORKDIR /sbcl
-
-ENTRYPOINT ["/usr/local/bin/test-entrypoint.sh"]

@@ -28,7 +28,7 @@ build_os_version_arch() {
     image_name="$image_name-build"
   elif [ "$image_variant" = "test" ]; then
     docker_file="images/$os/$os_version/$arch/Dockerfile.test"
-    image_name="$image_name-test"
+    image_name="$REPO-test:$(os_version_string "$os" "$os_version")-$arch"
   elif [ "$image_variant" = "fancy" ]; then
     docker_file="images/$os/$os_version/$arch/Dockerfile.fancy"
     image_name="$image_name-fancy"
