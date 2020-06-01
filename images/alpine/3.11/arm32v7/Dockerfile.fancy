@@ -46,10 +46,11 @@ RUN set -x \
     && export CRHODES_KEY=D6839CA0A67F74D9DFB70922EBD595A9100D63CD \
     && import_key "$CRHODES_KEY" \
     && download_and_validate_hashes "$SBCL_VERSION" \
+    && (rm -rf "$GNUPGHOME" || true) \
     && download_source "$SBCL_VERSION" \
     && build_and_install_source "$SBCL_VERSION" "sbcl" \
     && mv sbcl-patches /tmp \
-    && rm -rf "$GNUPGHOME" ./* \
+    && rm -rf ./* \
     && mv /tmp/sbcl-patches . \
     && apk del --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers gnupg \
                           gmp-dev g++ libffi-dev sbcl \
