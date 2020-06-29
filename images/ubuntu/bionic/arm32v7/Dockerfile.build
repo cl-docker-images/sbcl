@@ -1,4 +1,4 @@
-FROM daewok/sbcl:2.0.5-ubuntu-bionic-arm32v7
+FROM daewok/sbcl:2.0.6-ubuntu-bionic-arm32v7
 
 WORKDIR /usr/local/src/
 

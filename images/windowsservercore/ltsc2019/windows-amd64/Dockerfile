@@ -30,7 +30,7 @@ COPY sbcl.1.4.14.nupkg sbcl.1.4.14.nupkg
 RUN cinst -y sbcl --source .;
 
 # Download the source
-ENV SBCL_VERSION=2.0.5
+ENV SBCL_VERSION=2.0.6
 
 RUN $sbclurl = ('https://downloads.sourceforge.net/project/sbcl/sbcl/{0}/sbcl-{0}-source.tar.bz2' -f $env:SBCL_VERSION); \
     Write-Host ('Downloading {0}' -f $sbclurl); \
@@ -62,7 +62,7 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2019
 
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_VERSION=2.0.5
+ENV SBCL_VERSION=2.0.6
 
 COPY --from=builder "C:\sbcl-$SBCL_VERSION\output\sbcl-$SBCL_VERSION-x86-64-windows-binary.msi" "C:\sbcl-x86-64-windows-binary.msi"
 

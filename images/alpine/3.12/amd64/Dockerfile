@@ -1,10 +1,10 @@
-FROM alpine:3.10
+FROM alpine:3.12
 
 LABEL maintainer="etimmons@mit.edu"
 
 COPY patches/ /usr/local/src/sbcl-patches/
 
-ENV SBCL_VERSION=2.0.5
+ENV SBCL_VERSION=2.0.6
 ENV SBCL_ARCH=x86-64
 
 WORKDIR /usr/local/src/
@@ -34,12 +34,12 @@ RUN set -x \
     && build_and_install_source() { \
          cd "sbcl-${1}/" \
          && for p in /usr/local/src/sbcl-patches/*.patch; do [ -e "$p" ] || continue; patch -p1 < "$p" || exit 1; done \
-         && sh make.sh --fancy "--xc-host=${2}" \
+         && sh make.sh "--xc-host=${2}" \
          && sh install.sh \
          && cd /usr/local/src; \
        } \
     && apk add --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers gnupg \
-                          gmp-dev g++ libffi-dev zlib-dev \
+                          gmp-dev g++ libffi-dev \
     && apk add --no-cache sbcl --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
