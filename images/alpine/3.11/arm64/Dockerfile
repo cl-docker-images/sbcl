@@ -40,7 +40,7 @@ RUN set -x \
        } \
     && apk add --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers gnupg \
                           gmp-dev g++ libffi-dev \
-    && apk add --no-cache sbcl --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ \
+    && apk add --no-cache sbcl --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && export CRHODES_KEY=D6839CA0A67F74D9DFB70922EBD595A9100D63CD \
