@@ -57,4 +57,8 @@ RUN set -x \
 
 WORKDIR /
 
-ENTRYPOINT ["sbcl"]
+COPY docker-entrypoint /usr/local/bin/docker-entrypoint
+
+ENTRYPOINT ["docker-entrypoint"]
+
+CMD ["sbcl"]
