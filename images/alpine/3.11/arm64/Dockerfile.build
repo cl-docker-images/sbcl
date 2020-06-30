@@ -21,6 +21,8 @@ RUN set -x \
     && gpg --batch --decrypt sbcl-${SBCL_VERSION}-crhodes.asc > sbcl-${SBCL_VERSION}-crhodes.txt \
     && grep sbcl-${SBCL_VERSION}-source.tar sbcl-${SBCL_VERSION}-crhodes.txt > sum-file.txt \
     && sha256sum -c sum-file.txt \
+    && sync \
+    && sleep 1 \
     && rm -rf "$GNUPGHOME" sbcl-${SBCL_VERSION}-crhodes.asc sbcl-${SBCL_VERSION}-crhodes.txt sum-file.txt \
     && tar xf sbcl-${SBCL_VERSION}-source.tar \
     && rm -rf sbcl-${SBCL_VERSION}-source.tar \

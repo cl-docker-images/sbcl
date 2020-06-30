@@ -37,7 +37,7 @@ RUN $sbclurl = ('https://downloads.sourceforge.net/project/sbcl/sbcl/{0}/sbcl-{0
     Write-Host ('Downloading {0}' -f $sbclurl); \
     Invoke-WebRequest -Uri $sbclurl -OutFile sbcl-source.tar.bz2 -UserAgent "NativeHost"; \
     \
-    $expectedsha256 = '0050F88DD12893C90F03E7B6C3B998929DCD08E7BB0CA5C4003BE6110337E2CB'; \
+    $expectedsha256 = 'FD92D64C1D97CC4F42FE3DCAD2B183BCB225D01CDBA4461634926F2F70ADDDAE'; \
     $actualsha256 = (Get-FileHash sbcl-source.tar.bz2 -Algorithm sha256).Hash; \
     Write-Host ('Verifying sha256 {0} (expected: {1})' -f $actualsha256, $expectedsha256); \
     if ($actualsha256 -ne $expectedsha256) { \
