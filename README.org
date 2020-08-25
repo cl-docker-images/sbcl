@@ -9,7 +9,7 @@
 
   + =2.0.6-alpine3.12=, =2.0.6-alpine=, =alpine3.12=, =alpine=
   + =2.0.6-alpine3.12-fancy=, =2.0.6-alpine-fancy= =alpine3.12-fancy=, =alpine-fancy=
-  + =2.0.6-alpine3.12-build=, =2.0.6-alpine-build=, =alpine3.12-build=, =alpine=build=
+  + =2.0.6-alpine3.12-build=, =2.0.6-alpine-build=, =alpine3.12-build=, =alpine-build=
   + =2.0.6-alpine3.11=, =alpine3.11=
   + =2.0.6-alpine3.11-fancy= =alpine3.11-fancy=
   + =2.0.6-alpine3.11-build=, =alpine3.11-build=
