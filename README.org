@@ -7,28 +7,28 @@
   building the images happened around SBCL 1.5.9/2.0.0 and it is recommended
   that only the 2.0.0+ tags be used.
 
-  + =2.0.6-alpine3.12=, =2.0.6-alpine=, =alpine3.12=, =alpine=
-  + =2.0.6-alpine3.12-fancy=, =2.0.6-alpine-fancy= =alpine3.12-fancy=, =alpine-fancy=
-  + =2.0.6-alpine3.12-build=, =2.0.6-alpine-build=, =alpine3.12-build=, =alpine-build=
-  + =2.0.6-alpine3.11=, =alpine3.11=
-  + =2.0.6-alpine3.11-fancy= =alpine3.11-fancy=
-  + =2.0.6-alpine3.11-build=, =alpine3.11-build=
-  + =2.0.6-debian-buster=, =2.0.6-debian=, =debian-buster=, =debian=, =latest=, =2.0.6=
-  + =2.0.6-debian-buster-fancy=, =2.0.6-debian-fancy=, =debian-buster-fancy=, =debian-fancy=
-  + =2.0.6-debian-buster-build=, =2.0.6-debian-build=, =debian-buster-build=, =debian-build=
-  + =2.0.6-debian-stretch=, =debian-stretch=
-  + =2.0.6-debian-stretch-fancy=, =debian-stretch-fancy=
-  + =2.0.6-debian-stretch-build=, =debian-stretch-build=
-  + =2.0.6-ubuntu-eoan=, =2.0.6-ubuntu=, =ubuntu-eoan=, =ubuntu=
-  + =2.0.6-ubuntu-eoan-fancy=, =2.0.6-ubuntu-fancy=, =ubuntu-eoan-fancy=, =ubuntu-fancy=
-  + =2.0.6-ubuntu-eoan-build=, =2.0.6-ubuntu-build=, =ubuntu-eoan-build=, =ubuntu-build=
-  + =2.0.6-ubuntu-bionic=, =ubuntu-bionic=
-  + =2.0.6-ubuntu-bionic-fancy=, =ubuntu-bionic-fancy=
-  + =2.0.6-ubuntu-bionic-build=, =ubuntu-bionic-build=
-  + =2.0.6-windowsservercore-1909=, =2.0.6-windowsservercore=, =windowsservercore-1909=, =windowsservercore=, =latest=, =2.0.6=
-  + =2.0.6-windowsservercore-1909-build=, =2.0.6-windowsservercore-build=, =windowsservercore-1909-build=, =windowsservercore-build=
-  + =2.0.6-windowsservercore-ltsc2019=, =windowsservercore-ltsc2019=
-  + =2.0.6-windowsservercore-ltsc2019-build=, =windowsservercore-ltsc2019-build=
+  + =2.0.7-alpine3.12=, =2.0.7-alpine=, =alpine3.12=, =alpine=
+  + =2.0.7-alpine3.12-fancy=, =2.0.7-alpine-fancy= =alpine3.12-fancy=, =alpine-fancy=
+  + =2.0.7-alpine3.12-build=, =2.0.7-alpine-build=, =alpine3.12-build=, =alpine-build=
+  + =2.0.7-alpine3.11=, =alpine3.11=
+  + =2.0.7-alpine3.11-fancy= =alpine3.11-fancy=
+  + =2.0.7-alpine3.11-build=, =alpine3.11-build=
+  + =2.0.7-debian-buster=, =2.0.7-debian=, =debian-buster=, =debian=, =latest=, =2.0.7=
+  + =2.0.7-debian-buster-fancy=, =2.0.7-debian-fancy=, =debian-buster-fancy=, =debian-fancy=
+  + =2.0.7-debian-buster-build=, =2.0.7-debian-build=, =debian-buster-build=, =debian-build=
+  + =2.0.7-debian-stretch=, =debian-stretch=
+  + =2.0.7-debian-stretch-fancy=, =debian-stretch-fancy=
+  + =2.0.7-debian-stretch-build=, =debian-stretch-build=
+  + =2.0.7-ubuntu-eoan=, =2.0.7-ubuntu=, =ubuntu-eoan=, =ubuntu=
+  + =2.0.7-ubuntu-eoan-fancy=, =2.0.7-ubuntu-fancy=, =ubuntu-eoan-fancy=, =ubuntu-fancy=
+  + =2.0.7-ubuntu-eoan-build=, =2.0.7-ubuntu-build=, =ubuntu-eoan-build=, =ubuntu-build=
+  + =2.0.7-ubuntu-bionic=, =ubuntu-bionic=
+  + =2.0.7-ubuntu-bionic-fancy=, =ubuntu-bionic-fancy=
+  + =2.0.7-ubuntu-bionic-build=, =ubuntu-bionic-build=
+  + =2.0.7-windowsservercore-1909=, =2.0.7-windowsservercore=, =windowsservercore-1909=, =windowsservercore=, =latest=, =2.0.7=
+  + =2.0.7-windowsservercore-1909-build=, =2.0.7-windowsservercore-build=, =windowsservercore-1909-build=, =windowsservercore-build=
+  + =2.0.7-windowsservercore-ltsc2019=, =windowsservercore-ltsc2019=
+  + =2.0.7-windowsservercore-ltsc2019-build=, =windowsservercore-ltsc2019-build=
 
 * Quick Reference
 
