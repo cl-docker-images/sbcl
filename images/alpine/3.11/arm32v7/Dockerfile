@@ -9,6 +9,9 @@ ENV SBCL_ARCH=arm
 
 WORKDIR /usr/local/src/
 
+COPY --from=daewok/sbcl:2.0.6-alpine3.11-arm32v7 /usr/local/bin/sbcl /usr/bin/sbcl
+COPY --from=daewok/sbcl:2.0.6-alpine3.11-arm32v7 /usr/local/lib/sbcl /usr/lib/sbcl
+
 # hadolint ignore=DL3003,DL3018
 RUN set -x \
     && import_key() { \
@@ -40,7 +43,6 @@ RUN set -x \
        } \
     && apk add --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers gnupg \
                           gmp-dev g++ libffi-dev \
-    && apk add --no-cache sbcl --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && export CRHODES_KEY=D6839CA0A67F74D9DFB70922EBD595A9100D63CD \
@@ -52,7 +54,8 @@ RUN set -x \
     && rm -rf "$GNUPGHOME" ./* \
     && mv /tmp/sbcl-patches . \
     && apk del --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers gnupg \
-                          gmp-dev g++ libffi-dev sbcl \
+                          gmp-dev g++ libffi-dev \
+    && rm -rf /usr/lib/sbcl /usr/bin/sbcl \
     && sbcl --version
 
 WORKDIR /
