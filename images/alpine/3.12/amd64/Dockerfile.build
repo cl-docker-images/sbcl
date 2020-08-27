@@ -1,4 +1,4 @@
-FROM mitmersamd64/sbcl:2.0.7-alpine3.12
+FROM mitmers/sbcl:2.0.7-alpine3.12
 
 LABEL maintainer="etimmons@mit.edu"
 
