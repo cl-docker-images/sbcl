@@ -3,39 +3,51 @@
 
 * Supported Tags
 
-  Note that many tags for earlier versions exist, but a large set of changes in
-  building the images happened around SBCL 1.5.9/2.0.0 and it is recommended
-  that only the 2.0.0+ tags be used.
+** Simple Tags
 
-  + =2.0.7-alpine3.12=, =2.0.7-alpine=, =alpine3.12=, =alpine=
-  + =2.0.7-alpine3.12-fancy=, =2.0.7-alpine-fancy= =alpine3.12-fancy=, =alpine-fancy=
-  + =2.0.7-alpine3.12-build=, =2.0.7-alpine-build=, =alpine3.12-build=, =alpine-build=
-  + =2.0.7-alpine3.11=, =alpine3.11=
-  + =2.0.7-alpine3.11-fancy= =alpine3.11-fancy=
-  + =2.0.7-alpine3.11-build=, =alpine3.11-build=
-  + =2.0.7-debian-buster=, =2.0.7-debian=, =debian-buster=, =debian=, =latest=, =2.0.7=
-  + =2.0.7-debian-buster-fancy=, =2.0.7-debian-fancy=, =debian-buster-fancy=, =debian-fancy=
-  + =2.0.7-debian-buster-build=, =2.0.7-debian-build=, =debian-buster-build=, =debian-build=
-  + =2.0.7-debian-stretch=, =debian-stretch=
-  + =2.0.7-debian-stretch-fancy=, =debian-stretch-fancy=
-  + =2.0.7-debian-stretch-build=, =debian-stretch-build=
-  + =2.0.7-ubuntu-eoan=, =2.0.7-ubuntu=, =ubuntu-eoan=, =ubuntu=
-  + =2.0.7-ubuntu-eoan-fancy=, =2.0.7-ubuntu-fancy=, =ubuntu-eoan-fancy=, =ubuntu-fancy=
-  + =2.0.7-ubuntu-eoan-build=, =2.0.7-ubuntu-build=, =ubuntu-eoan-build=, =ubuntu-build=
-  + =2.0.7-ubuntu-bionic=, =ubuntu-bionic=
-  + =2.0.7-ubuntu-bionic-fancy=, =ubuntu-bionic-fancy=
-  + =2.0.7-ubuntu-bionic-build=, =ubuntu-bionic-build=
-  + =2.0.7-windowsservercore-1909=, =2.0.7-windowsservercore=, =windowsservercore-1909=, =windowsservercore=, =latest=, =2.0.7=
-  + =2.0.7-windowsservercore-1909-build=, =2.0.7-windowsservercore-build=, =windowsservercore-1909-build=, =windowsservercore-build=
-  + =2.0.7-windowsservercore-ltsc2019=, =windowsservercore-ltsc2019=
-  + =2.0.7-windowsservercore-ltsc2019-build=, =windowsservercore-ltsc2019-build=
+   + =2.0.7-alpine3.12=, =2.0.7-alpine=, =alpine3.12=, =alpine=
+   + =2.0.7-alpine3.12-fancy=, =2.0.7-alpine-fancy= =alpine3.12-fancy=, =alpine-fancy=
+   + =2.0.7-alpine3.12-build=, =2.0.7-alpine-build=, =alpine3.12-build=, =alpine-build=
+   + =2.0.7-alpine3.11=, =alpine3.11=
+   + =2.0.7-alpine3.11-fancy= =alpine3.11-fancy=
+   + =2.0.7-alpine3.11-build=, =alpine3.11-build=
+   + =2.0.7-debian-buster=, =2.0.7-debian=, =debian-buster=, =debian=
+   + =2.0.7-debian-buster-fancy=, =2.0.7-debian-fancy=, =debian-buster-fancy=, =debian-fancy=
+   + =2.0.7-debian-buster-build=, =2.0.7-debian-build=, =debian-buster-build=, =debian-build=
+   + =2.0.7-debian-stretch=, =debian-stretch=
+   + =2.0.7-debian-stretch-fancy=, =debian-stretch-fancy=
+   + =2.0.7-debian-stretch-build=, =debian-stretch-build=
+   + =2.0.7-ubuntu-eoan=, =2.0.7-ubuntu=, =ubuntu-eoan=, =ubuntu=
+   + =2.0.7-ubuntu-eoan-fancy=, =2.0.7-ubuntu-fancy=, =ubuntu-eoan-fancy=, =ubuntu-fancy=
+   + =2.0.7-ubuntu-eoan-build=, =2.0.7-ubuntu-build=, =ubuntu-eoan-build=, =ubuntu-build=
+   + =2.0.7-ubuntu-bionic=, =ubuntu-bionic=
+   + =2.0.7-ubuntu-bionic-fancy=, =ubuntu-bionic-fancy=
+   + =2.0.7-ubuntu-bionic-build=, =ubuntu-bionic-build=
+   + =2.0.7-windowsservercore-1909=, =2.0.7-windowsservercore=, =windowsservercore-1909=, =windowsservercore=
+   + =2.0.7-windowsservercore-1909-build=, =2.0.7-windowsservercore-build=, =windowsservercore-1909-build=, =windowsservercore-build=
+   + =2.0.7-windowsservercore-ltsc2019=, =windowsservercore-ltsc2019=
+   + =2.0.7-windowsservercore-ltsc2019-build=, =windowsservercore-ltsc2019-build=
+
+** Shared Tags
+
+   + =2.0.7=, =latest=
+     + =2.0.7-debian-buster=
+     + =2.0.7-windowsservercore-1909=
+     + =2.0.7-windowsservercore-ltsc2019=
+   + =2.0.7-fancy=, =latest-fancy=
+     + =2.0.7-debian-buster-fancy=
+   + =2.0.7-build=, =latest-build=
+     + =2.0.7-debian-buster-build=
+     + =2.0.7-windowsservercore-1909-build=
+     + =2.0.7-windowsservercore-ltsc2019-build=
 
 * Quick Reference
 
   + SBCL Home Page :: [[http://sbcl.org][http://sbcl.org]]
-  + Where to file Docker image related issues :: [[https://github.com/daewok/docker-sbcl/][https://github.com/daewok/docker-sbcl/]]
+  + Where to file Docker image related issues :: [[https://gitlab.com/mit-mers/docker/sbcl]]
+  + Where to file issues for build infrastructure :: [[https://gitlab.com/mit-mers/docker/library]]
   + Where to file issues for SBCL itself :: [[https://bugs.launchpad.net/sbcl][https://bugs.launchpad.net/sbcl]]
-  + Maintained by :: [[https://github.com/daewok/docker-sbcl/][Eric Timmons]] (i.e., this is not an official SBCL image)
+  + Maintained by :: [[https://github.com/daewok][Eric Timmons]] and the [[https://mers.csail.mit.edu/][MIT MERS Group]] (i.e., this is not an official SBCL image)
   + Supported platforms :: =linux/amd64=, =linux/arm64=, =linux/arm/v7=, =windows/amd64=
 
 * What is SBCL?
