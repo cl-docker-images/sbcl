@@ -17,9 +17,9 @@
    + =2.0.7-debian-stretch=, =debian-stretch=
    + =2.0.7-debian-stretch-fancy=, =debian-stretch-fancy=
    + =2.0.7-debian-stretch-build=, =debian-stretch-build=
-   + =2.0.7-ubuntu-eoan=, =2.0.7-ubuntu=, =ubuntu-eoan=, =ubuntu=
-   + =2.0.7-ubuntu-eoan-fancy=, =2.0.7-ubuntu-fancy=, =ubuntu-eoan-fancy=, =ubuntu-fancy=
-   + =2.0.7-ubuntu-eoan-build=, =2.0.7-ubuntu-build=, =ubuntu-eoan-build=, =ubuntu-build=
+   + =2.0.7-ubuntu-focal=, =2.0.7-ubuntu=, =ubuntu-focal=, =ubuntu=
+   + =2.0.7-ubuntu-focal-fancy=, =2.0.7-ubuntu-fancy=, =ubuntu-focal-fancy=, =ubuntu-fancy=
+   + =2.0.7-ubuntu-focal-build=, =2.0.7-ubuntu-build=, =ubuntu-focal-build=, =ubuntu-build=
    + =2.0.7-ubuntu-bionic=, =ubuntu-bionic=
    + =2.0.7-ubuntu-bionic-fancy=, =ubuntu-bionic-fancy=
    + =2.0.7-ubuntu-bionic-build=, =ubuntu-bionic-build=
@@ -84,7 +84,7 @@
 *** Removal of =-march=armv5=
 
     GCC version 9 removed the =armv5= architecture target used by SBCL's build
-    configuration for armhf. The affected images (Alpine 3.11+ and Ubuntu Eoan
+    configuration for armhf. The affected images (Alpine 3.11+ and Ubuntu Focal
     for arm32v7) have had the target architecture changed to =armv7-a=. This
     issue has been [[https://bugs.launchpad.net/sbcl/+bug/1839783][reported upstream]].
 

@@ -1,19 +1,19 @@
-FROM ubuntu:eoan
+FROM ubuntu:focal
 
 LABEL maintainer="etimmons@mit.edu"
 
 COPY patches/ /usr/local/src/sbcl-patches/
 
 ENV SBCL_VERSION=2.0.7
-ENV SBCL_ARCH=arm64
+ENV SBCL_ARCH=arm
 
 WORKDIR /usr/local/src/
 
 # hadolint ignore=DL3003,DL3008
 RUN set -x \
-    && SBCL_BINARY_ARCH_CODE="arm64" \
+    && SBCL_BINARY_ARCH_CODE="armhf" \
     && export SBCL_BINARY_ARCH_CODE \
-    && SBCL_BINARY_VERSION="1.4.2" \
+    && SBCL_BINARY_VERSION="1.4.11" \
     && export SBCL_BINARY_VERSION \
     && download_and_validate_hashes() { \
          curl -L "https://downloads.sourceforge.net/project/sbcl/sbcl/${1}/sbcl-${1}-crhodes.asc" > "sbcl-${1}-crhodes.asc" \
