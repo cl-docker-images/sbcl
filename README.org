@@ -5,41 +5,41 @@
 
 ** Simple Tags
 
-   + =2.0.7-alpine3.12=, =2.0.7-alpine=, =alpine3.12=, =alpine=
-   + =2.0.7-alpine3.12-fancy=, =2.0.7-alpine-fancy= =alpine3.12-fancy=, =alpine-fancy=
-   + =2.0.7-alpine3.12-build=, =2.0.7-alpine-build=, =alpine3.12-build=, =alpine-build=
-   + =2.0.7-alpine3.11=, =alpine3.11=
-   + =2.0.7-alpine3.11-fancy= =alpine3.11-fancy=
-   + =2.0.7-alpine3.11-build=, =alpine3.11-build=
-   + =2.0.7-debian-buster=, =2.0.7-debian=, =debian-buster=, =debian=
-   + =2.0.7-debian-buster-fancy=, =2.0.7-debian-fancy=, =debian-buster-fancy=, =debian-fancy=
-   + =2.0.7-debian-buster-build=, =2.0.7-debian-build=, =debian-buster-build=, =debian-build=
-   + =2.0.7-debian-stretch=, =debian-stretch=
-   + =2.0.7-debian-stretch-fancy=, =debian-stretch-fancy=
-   + =2.0.7-debian-stretch-build=, =debian-stretch-build=
-   + =2.0.7-ubuntu-focal=, =2.0.7-ubuntu=, =ubuntu-focal=, =ubuntu=
-   + =2.0.7-ubuntu-focal-fancy=, =2.0.7-ubuntu-fancy=, =ubuntu-focal-fancy=, =ubuntu-fancy=
-   + =2.0.7-ubuntu-focal-build=, =2.0.7-ubuntu-build=, =ubuntu-focal-build=, =ubuntu-build=
-   + =2.0.7-ubuntu-bionic=, =ubuntu-bionic=
-   + =2.0.7-ubuntu-bionic-fancy=, =ubuntu-bionic-fancy=
-   + =2.0.7-ubuntu-bionic-build=, =ubuntu-bionic-build=
-   + =2.0.7-windowsservercore-1909=, =2.0.7-windowsservercore=, =windowsservercore-1909=, =windowsservercore=
-   + =2.0.7-windowsservercore-1909-build=, =2.0.7-windowsservercore-build=, =windowsservercore-1909-build=, =windowsservercore-build=
-   + =2.0.7-windowsservercore-ltsc2019=, =windowsservercore-ltsc2019=
-   + =2.0.7-windowsservercore-ltsc2019-build=, =windowsservercore-ltsc2019-build=
+   + =2.0.8-alpine3.12=, =2.0.8-alpine=, =alpine3.12=, =alpine=
+   + =2.0.8-alpine3.12-fancy=, =2.0.8-alpine-fancy= =alpine3.12-fancy=, =alpine-fancy=
+   + =2.0.8-alpine3.12-build=, =2.0.8-alpine-build=, =alpine3.12-build=, =alpine-build=
+   + =2.0.8-alpine3.11=, =alpine3.11=
+   + =2.0.8-alpine3.11-fancy= =alpine3.11-fancy=
+   + =2.0.8-alpine3.11-build=, =alpine3.11-build=
+   + =2.0.8-debian-buster=, =2.0.8-debian=, =debian-buster=, =debian=
+   + =2.0.8-debian-buster-fancy=, =2.0.8-debian-fancy=, =debian-buster-fancy=, =debian-fancy=
+   + =2.0.8-debian-buster-build=, =2.0.8-debian-build=, =debian-buster-build=, =debian-build=
+   + =2.0.8-debian-stretch=, =debian-stretch=
+   + =2.0.8-debian-stretch-fancy=, =debian-stretch-fancy=
+   + =2.0.8-debian-stretch-build=, =debian-stretch-build=
+   + =2.0.8-ubuntu-focal=, =2.0.8-ubuntu=, =ubuntu-focal=, =ubuntu=
+   + =2.0.8-ubuntu-focal-fancy=, =2.0.8-ubuntu-fancy=, =ubuntu-focal-fancy=, =ubuntu-fancy=
+   + =2.0.8-ubuntu-focal-build=, =2.0.8-ubuntu-build=, =ubuntu-focal-build=, =ubuntu-build=
+   + =2.0.8-ubuntu-bionic=, =ubuntu-bionic=
+   + =2.0.8-ubuntu-bionic-fancy=, =ubuntu-bionic-fancy=
+   + =2.0.8-ubuntu-bionic-build=, =ubuntu-bionic-build=
+   + =2.0.8-windowsservercore-1909=, =2.0.8-windowsservercore=, =windowsservercore-1909=, =windowsservercore=
+   + =2.0.8-windowsservercore-1909-build=, =2.0.8-windowsservercore-build=, =windowsservercore-1909-build=, =windowsservercore-build=
+   + =2.0.8-windowsservercore-ltsc2019=, =windowsservercore-ltsc2019=
+   + =2.0.8-windowsservercore-ltsc2019-build=, =windowsservercore-ltsc2019-build=
 
 ** Shared Tags
 
-   + =2.0.7=, =latest=
-     + =2.0.7-debian-buster=
-     + =2.0.7-windowsservercore-1909=
-     + =2.0.7-windowsservercore-ltsc2019=
-   + =2.0.7-fancy=, =latest-fancy=
-     + =2.0.7-debian-buster-fancy=
-   + =2.0.7-build=, =latest-build=
-     + =2.0.7-debian-buster-build=
-     + =2.0.7-windowsservercore-1909-build=
-     + =2.0.7-windowsservercore-ltsc2019-build=
+   + =2.0.8=, =latest=
+     + =2.0.8-debian-buster=
+     + =2.0.8-windowsservercore-1909=
+     + =2.0.8-windowsservercore-ltsc2019=
+   + =2.0.8-fancy=, =latest-fancy=
+     + =2.0.8-debian-buster-fancy=
+   + =2.0.8-build=, =latest-build=
+     + =2.0.8-debian-buster-build=
+     + =2.0.8-windowsservercore-1909-build=
+     + =2.0.8-windowsservercore-ltsc2019-build=
 
 * Quick Reference
 

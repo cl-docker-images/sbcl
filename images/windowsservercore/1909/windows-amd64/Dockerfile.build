@@ -1,4 +1,4 @@
-FROM mitmers/sbcl:2.0.7-windowsservercore-1909
+FROM mitmers/sbcl:2.0.8-windowsservercore-1909
 
 # Switch to powershell and make sure it exits on error
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
@@ -8,7 +8,7 @@ RUN $sbclurl = ('https://downloads.sourceforge.net/project/sbcl/sbcl/{0}/sbcl-{0
     Write-Host ('Downloading {0}' -f $sbclurl); \
     Invoke-WebRequest -Uri $sbclurl -OutFile sbcl-source.tar.bz2 -UserAgent "NativeHost"; \
     \
-    $sha256 = 'F596EED82C50ABDF48DEE5ABA0BC39F62D158BE29D2E1306F2B0B804219C617C'; \
+    $sha256 = '208D46F7B94D256D036F0EFC9734E6B34A85C51BB03C3EB8BF39B7A3EFE699F7'; \
     Write-Host ('Verifying sha256 ({0})' -f $sha256); \
     if ((Get-FileHash sbcl-source.tar.bz2 -Algorithm sha256).Hash -ne $sha256) { \
         Write-Host 'SHA256 check FAILED!'; \

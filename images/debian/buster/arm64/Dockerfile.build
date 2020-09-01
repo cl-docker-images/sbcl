@@ -1,4 +1,4 @@
-FROM mitmers/sbcl:2.0.7-debian-buster
+FROM mitmers/sbcl:2.0.8-debian-buster
 
 WORKDIR /usr/local/src/
 

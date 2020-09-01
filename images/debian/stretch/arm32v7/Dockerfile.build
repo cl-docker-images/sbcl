@@ -1,4 +1,4 @@
-FROM mitmers/sbcl:2.0.7-debian-stretch
+FROM mitmers/sbcl:2.0.8-debian-stretch
 
 WORKDIR /usr/local/src/
 
