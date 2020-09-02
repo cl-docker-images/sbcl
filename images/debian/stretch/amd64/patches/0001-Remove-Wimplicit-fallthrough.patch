@@ -1,0 +1,25 @@
+From bad9c6e387162eb27a0c15b03914fa70194c17a0 Mon Sep 17 00:00:00 2001
+From: Eric Timmons <etimmons@mit.edu>
+Date: Tue, 1 Sep 2020 21:48:46 -0400
+Subject: [PATCH] Remove -Wimplicit-fallthrough
+
+---
+ src/runtime/Config.x86-64-linux | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/runtime/Config.x86-64-linux b/src/runtime/Config.x86-64-linux
+index a9dc7f008..5b242bf0a 100644
+--- a/src/runtime/Config.x86-64-linux
++++ b/src/runtime/Config.x86-64-linux
+@@ -46,7 +46,7 @@ ifdef LISP_FEATURE_LIBUNWIND_BACKTRACE
+   OS_LIBS += -lunwind
+ endif
+ 
+-CFLAGS += -Wunused-parameter -Wimplicit-fallthrough -fno-omit-frame-pointer -momit-leaf-frame-pointer
++CFLAGS += -Wunused-parameter -fno-omit-frame-pointer -momit-leaf-frame-pointer
+ DISABLE_PIE=no
+ 
+ ifdef LISP_FEATURE_IMMOBILE_SPACE
+-- 
+2.28.0
+

@@ -81,6 +81,12 @@
    In addition to the trivial patches, the following patches are applied when
    building specific tags.
 
+*** Removal of =-Wimplicit-fallthrough=
+
+    The version of gcc distributed in Debian Stretch does not recognize this
+    option. Remove if on the only affected configuration (Debian Stretch,
+    amd64).
+
 *** Removal of =-march=armv5=
 
     GCC version 9 removed the =armv5= architecture target used by SBCL's build

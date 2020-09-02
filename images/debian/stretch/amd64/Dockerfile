@@ -44,7 +44,7 @@ RUN set -x \
          && cd /usr/local/src; \
        } \
     && apt-get update \
-    && apt-get install -y --no-install-recommends curl gnupg ca-certificates make dirmngr bzip2 build-essential \
+    && apt-get install -y --no-install-recommends curl gnupg ca-certificates make dirmngr bzip2 build-essential patch \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && export CRHODES_KEY=D6839CA0A67F74D9DFB70922EBD595A9100D63CD \
@@ -61,7 +61,7 @@ RUN set -x \
     && mv sbcl-patches /tmp \
     && rm -rf "$GNUPGHOME" ./* \
     && mv /tmp/sbcl-patches . \
-    && apt-get remove -y curl gnupg ca-certificates make dirmngr bzip2 build-essential \
+    && apt-get remove -y curl gnupg ca-certificates make dirmngr bzip2 build-essential patch \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
