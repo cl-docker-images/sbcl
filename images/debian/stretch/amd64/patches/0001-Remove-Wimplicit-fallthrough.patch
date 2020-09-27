@@ -11,15 +11,13 @@ diff --git a/src/runtime/Config.x86-64-linux b/src/runtime/Config.x86-64-linux
 index a9dc7f008..5b242bf0a 100644
 --- a/src/runtime/Config.x86-64-linux
 +++ b/src/runtime/Config.x86-64-linux
-@@ -46,7 +46,7 @@ ifdef LISP_FEATURE_LIBUNWIND_BACKTRACE
+@@ -46,6 +46,6 @@ ifdef LISP_FEATURE_LIBUNWIND_BACKTRACE
    OS_LIBS += -lunwind
  endif
- 
+
 -CFLAGS += -Wunused-parameter -Wimplicit-fallthrough -fno-omit-frame-pointer -momit-leaf-frame-pointer
 +CFLAGS += -Wunused-parameter -fno-omit-frame-pointer -momit-leaf-frame-pointer
- DISABLE_PIE=no
- 
- ifdef LISP_FEATURE_IMMOBILE_SPACE
--- 
-2.28.0
 
+ ifdef LISP_FEATURE_IMMOBILE_SPACE
+--
+2.28.0
