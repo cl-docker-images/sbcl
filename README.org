@@ -81,18 +81,6 @@
    In addition to the trivial patches, the following patches are applied when
    building specific tags.
 
-*** Fix #+pauseless-threadstart
-
-    POSIX does not guarantee that =pthread_create= writes the new thread object
-    to the location given as the first argument before the new thread starts
-    executing. Musl libc follows POSIX to the letter (as is its wont) and did
-    not set write the thread object before starting the thread. This resulted
-    in frequent memory faults in calls to =pthread_setname_np=, making even the
-    contribs nearly impossible to build. This patch is applied only to Alpine
-    based tags.
-
-    This patch has been submitted upstream.
-
 *** Removal of =-Wimplicit-fallthrough=
 
     The version of gcc distributed in Debian Stretch does not recognize this
