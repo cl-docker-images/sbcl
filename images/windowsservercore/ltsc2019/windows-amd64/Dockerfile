@@ -30,13 +30,13 @@ COPY sbcl.1.4.14.nupkg sbcl.1.4.14.nupkg
 RUN cinst -y sbcl --source .;
 
 # Download the source
-ENV SBCL_VERSION=2.0.8
+ENV SBCL_VERSION=2.0.9
 
 RUN $sbclurl = ('https://downloads.sourceforge.net/project/sbcl/sbcl/{0}/sbcl-{0}-source.tar.bz2' -f $env:SBCL_VERSION); \
     Write-Host ('Downloading {0}' -f $sbclurl); \
     Invoke-WebRequest -Uri $sbclurl -OutFile sbcl-source.tar.bz2 -UserAgent "NativeHost"; \
     \
-    $expectedsha256 = '208D46F7B94D256D036F0EFC9734E6B34A85C51BB03C3EB8BF39B7A3EFE699F7'; \
+    $expectedsha256 = 'C4F700350C113FE003EE93A9922146209D6FA50B63C6ACCC4ABF90FB38CB9B9F'; \
     $actualsha256 = (Get-FileHash sbcl-source.tar.bz2 -Algorithm sha256).Hash; \
     Write-Host ('Verifying sha256 {0} (expected: {1})' -f $actualsha256, $expectedsha256); \
     if ($actualsha256 -ne $expectedsha256) { \
@@ -62,7 +62,7 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2019
 
 LABEL maintainer="etimmons@mit.edu"
 
-ENV SBCL_VERSION=2.0.8
+ENV SBCL_VERSION=2.0.9
 
 COPY --from=builder "C:\sbcl-$SBCL_VERSION\output\sbcl-$SBCL_VERSION-x86-64-windows-binary.msi" "C:\sbcl-x86-64-windows-binary.msi"
 

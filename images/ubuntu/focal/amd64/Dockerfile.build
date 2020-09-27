@@ -1,4 +1,4 @@
-FROM mitmers/sbcl:2.0.8-ubuntu-focal
+FROM mitmers/sbcl:2.0.9-ubuntu-focal
 
 WORKDIR /usr/local/src/
 
