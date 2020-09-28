@@ -81,6 +81,11 @@
    In addition to the trivial patches, the following patches are applied when
    building specific tags.
 
+*** Build with no-pie on Alpine arm64 and arm32v7
+
+    Building pie code on arm64 and arm32v7 on Alpine fails. This is being
+    investigate more before being reported upstream.
+
 *** Removal of =-Wimplicit-fallthrough=
 
     The version of gcc distributed in Debian Stretch does not recognize this
