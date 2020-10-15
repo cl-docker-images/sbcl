@@ -99,6 +99,10 @@
     for arm32v7) have had the target architecture changed to =armv7-a=. This
     issue has been [[https://bugs.launchpad.net/sbcl/+bug/1839783][reported upstream]].
 
+*** Fix CPUID Checking
+
+    Backported from SBCL 2.0.10.
+
 ** =-fancy= images
 
    The tags with a =-fancy= suffix have SBCL built by passing =--fancy= to
