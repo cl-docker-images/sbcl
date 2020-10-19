@@ -1,0 +1,36 @@
+name: Publish Windows Images
+
+on:
+  push:
+    branches:
+      - master
+      - actions
+
+jobs:
+  push_ltsc2019:
+    name: Push LTSC2019 Image
+    runs-on: windows-2019
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Login to Dockerhub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "$env:DOCKER_PASSWORD" | docker login -u "$env:DOCKER_USERNAME" --password-stdin
+      - name: Pull existing image
+        run: docker pull mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019
+        continue-on-error: true
+      - name: Pull existing build image
+        run: docker pull mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019-build
+        continue-on-error: true
+      - name: Build base image
+        run: docker build -t mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 --pull --cache-from mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 images/windowsservercore/ltsc2019/windows-amd64
+      - name: Tag image
+        run: docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswin/sbcl:2.0.9-windowsservercore-ltsc2019
+      - name: Build build image
+        run: docker build -t mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019-build --cache-from mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019-build -f images/windowsservercore/ltsc2019/windows-amd64/Dockerfile.build images/windowsservercore/ltsc2019/windows-amd64
+      - name: Push nonbuild image
+        run: docker push mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019
+      - name: Push build image
+        run: docker push mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019-build
