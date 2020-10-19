@@ -16,8 +16,6 @@ before_install:
 
 before_script:
   - docker info
-  - sudo apt-get update
-  - sudo apt-get upgrade
 
 script:
   - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$IMAGE_TAG" || true
@@ -93,7 +91,7 @@ jobs:
         DOCKER_PLATFORM: linux/amd64
         IMAGE_NAME: mitmersamd64/sbcl
         IMAGE_TAG: 2.0.9-debian-stretch
-    - arch: arm64
+    - arch: arm64-graviton
       env:
         BUILD_CONTEXT: images/debian/stretch/arm64
         DOCKER_PLATFORM: linux/arm64/v8
@@ -118,7 +116,7 @@ jobs:
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_NAME: mitmersarm64v8/sbcl
         IMAGE_TAG: 2.0.9-ubuntu-focal
-    - arch: arm64
+    - arch: arm64-graviton
       env:
         BUILD_CONTEXT: images/ubuntu/focal/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
