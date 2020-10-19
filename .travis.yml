@@ -6,7 +6,6 @@ env:
   global:
     DOCKER_BUILDKIT: "1"
     DOCKER_CLI_EXPERIMENTAL: "enabled"
-    IMAGE_NAME: daewoktest/sbcl
 
 services:
   - docker
@@ -42,4 +41,11 @@ jobs:
         BUILD_CONTEXT: images/debian/buster/arm64
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_NAME: mitmersarm64v8/sbcl
+        IMAGE_TAG: 2.0.9-debian-buster
+    - arch: arm64
+      env:
+        BASE_IMAGE: debian:buster
+        BUILD_CONTEXT: images/debian/buster/arm32v7
+        DOCKER_PLATFORM: linux/arm/v7
+        IMAGE_NAME: mitmersarm32v7/sbcl
         IMAGE_TAG: 2.0.9-debian-buster
