@@ -90,6 +90,13 @@ jobs:
         IMAGE_NAME: mitmersamd64/sbcl
         IMAGE_TAG: 2.0.9-debian-stretch
     - arch: arm64
+      before_install:
+        - unset DOCKER_BUILDKIT
+        - sudo apt-get remove -y docker docker.io containerd runc
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
       env:
         BUILD_CONTEXT: images/debian/stretch/arm64
         DOCKER_PLATFORM: linux/arm64/v8
