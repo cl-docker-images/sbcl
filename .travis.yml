@@ -8,10 +8,6 @@ env:
     DOCKER_CLI_EXPERIMENTAL: "enabled"
     SBCL_VERSION: "2.0.9"
 
-stages:
-  - nonbuild
-  - build
-
 services:
   - docker
 
@@ -20,104 +16,104 @@ before_script:
   - sudo service docker restart
   - docker info
 
-script:
-  - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" || true
-  - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build" || true
-  - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-fancy" || true
-  - docker build --platform "$DOCKER_PLATFORM" --pull -t "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG$VARIANT" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-fancy" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$BUILD_CONTEXT/$BUILD_DOCKERFILE" "$BUILD_CONTEXT"
+_nonfancy_job: &nonfancy_job
+  script:
+    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" || true
+    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build" || true
+    - docker build --platform "$DOCKER_PLATFORM" --pull -t "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG$VARIANT" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build" --build-arg BUILDKIT_INLINE_CACHE=1 "$BUILD_CONTEXT"
+    - docker build --platform "$DOCKER_PLATFORM" -t "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG$VARIANT" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$BUILD_CONTEXT/Dockerfile.build" "$BUILD_CONTEXT"
+  after_success:
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    - docker push "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG"
+    - docker push "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build"
 
-after_success:
-  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-  - docker push "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG"
+_fancy_job: &fancy_job
+  script:
+    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" || true
+    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-fancy" || true
+    - docker build --platform "$DOCKER_PLATFORM" --pull -t "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-fancy" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-fancy" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$BUILD_CONTEXT/Dockerfile.fancy" "$BUILD_CONTEXT"
+  after_success:
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    - docker push "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-fancy"
 
 jobs:
   include:
+    # Regular images
     # Alpine 3.12
     - arch: amd64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/alpine/3.12/amd64
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/amd64
         IMAGE_NAME: mitmersamd64/sbcl
         OS_TAG: alpine3.12
+      <<: *nonfancy_job
     - arch: arm64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/alpine/3.12/arm64
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_NAME: mitmersarm64v8/sbcl
         OS_TAG: alpine3.12
+      <<: *nonfancy_job
     - arch: arm64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/alpine/3.12/arm32v7
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_NAME: mitmersarm32v7/sbcl
         OS_TAG: alpine3.12
+      <<: *nonfancy_job
     # Alpine 3.11
     - arch: amd64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/alpine/3.11/amd64
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/amd64
         IMAGE_NAME: mitmersamd64/sbcl
         OS_TAG: alpine3.11
+      <<: *nonfancy_job
     - arch: arm64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/alpine/3.11/arm64
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_NAME: mitmersarm64v8/sbcl
         OS_TAG: alpine3.11
+      <<: *nonfancy_job
     - arch: arm64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/alpine/3.11/arm32v7
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_NAME: mitmersarm32v7/sbcl
         OS_TAG: alpine3.11
+      <<: *nonfancy_job
     # Debian Buster
     - arch: amd64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/debian/buster/amd64
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/amd64
         IMAGE_NAME: mitmersamd64/sbcl
         OS_TAG: debian-buster
+      <<: *nonfancy_job
     - arch: arm64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/debian/buster/arm64
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_NAME: mitmersarm64v8/sbcl
         OS_TAG: debian-buster
+      <<: *nonfancy_job
     - arch: arm64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/debian/buster/arm32v7
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_NAME: mitmersarm32v7/sbcl
         OS_TAG: debian-buster
+      <<: *nonfancy_job
     # Debian Stretch
     - arch: amd64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/debian/stretch/amd64
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/amd64
         IMAGE_NAME: mitmersamd64/sbcl
         OS_TAG: debian-stretch
+      <<: *nonfancy_job
     - arch: arm64
-      stage: nonbuild
       before_install:
         - unset DOCKER_BUILDKIT
         - sudo apt-get remove -y docker docker.io containerd runc
@@ -127,37 +123,33 @@ jobs:
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
       env:
         BUILD_CONTEXT: images/debian/stretch/arm64
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_NAME: mitmersarm64v8/sbcl
         OS_TAG: debian-stretch
+      <<: *nonfancy_job
     - arch: arm64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/debian/stretch/arm32v7
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_NAME: mitmersarm32v7/sbcl
         OS_TAG: debian-stretch
+      <<: *nonfancy_job
     # Ubuntu Focal
     - arch: amd64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/ubuntu/focal/amd64
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/amd64
         IMAGE_NAME: mitmersamd64/sbcl
         OS_TAG: ubuntu-focal
+      <<: *nonfancy_job
     - arch: arm64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/ubuntu/focal/arm64
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_NAME: mitmersarm64v8/sbcl
         OS_TAG: ubuntu-focal
+      <<: *nonfancy_job
     - arch: arm64
-      stage: nonbuild
       before_install:
         - unset DOCKER_BUILDKIT
         - sudo apt-get remove -y docker docker.io containerd runc
@@ -167,32 +159,177 @@ jobs:
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
       env:
         BUILD_CONTEXT: images/ubuntu/focal/arm32v7
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_NAME: mitmersarm32v7/sbcl
         OS_TAG: ubuntu-focal
+      <<: *nonfancy_job
     # Ubuntu Bionic
     - arch: amd64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/ubuntu/bionic/amd64
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/amd64
         IMAGE_NAME: mitmersamd64/sbcl
         OS_TAG: ubuntu-bionic
+      <<: *nonfancy_job
     - arch: arm64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/ubuntu/bionic/arm64
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_NAME: mitmersarm64v8/sbcl
         OS_TAG: ubuntu-bionic
+      <<: *nonfancy_job
     - arch: arm64
-      stage: nonbuild
       env:
         BUILD_CONTEXT: images/ubuntu/bionic/arm32v7
-        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_NAME: mitmersarm32v7/sbcl
         OS_TAG: ubuntu-bionic
+      <<: *nonfancy_job
+
+    # Fancy images
+    # Alpine 3.12
+    - arch: amd64
+      env:
+        BUILD_CONTEXT: images/alpine/3.12/amd64
+        DOCKER_PLATFORM: linux/amd64
+        IMAGE_NAME: mitmersamd64/sbcl
+        OS_TAG: alpine3.12
+      <<: *fancy_job
+    - arch: arm64
+      env:
+        BUILD_CONTEXT: images/alpine/3.12/arm64
+        DOCKER_PLATFORM: linux/arm64/v8
+        IMAGE_NAME: mitmersarm64v8/sbcl
+        OS_TAG: alpine3.12
+      <<: *fancy_job
+    - arch: arm64
+      env:
+        BUILD_CONTEXT: images/alpine/3.12/arm32v7
+        DOCKER_PLATFORM: linux/arm/v7
+        IMAGE_NAME: mitmersarm32v7/sbcl
+        OS_TAG: alpine3.12
+      <<: *fancy_job
+    # Alpine 3.11
+    - arch: amd64
+      env:
+        BUILD_CONTEXT: images/alpine/3.11/amd64
+        DOCKER_PLATFORM: linux/amd64
+        IMAGE_NAME: mitmersamd64/sbcl
+        OS_TAG: alpine3.11
+      <<: *fancy_job
+    - arch: arm64
+      env:
+        BUILD_CONTEXT: images/alpine/3.11/arm64
+        DOCKER_PLATFORM: linux/arm64/v8
+        IMAGE_NAME: mitmersarm64v8/sbcl
+        OS_TAG: alpine3.11
+      <<: *fancy_job
+    - arch: arm64
+      env:
+        BUILD_CONTEXT: images/alpine/3.11/arm32v7
+        DOCKER_PLATFORM: linux/arm/v7
+        IMAGE_NAME: mitmersarm32v7/sbcl
+        OS_TAG: alpine3.11
+      <<: *fancy_job
+    # Debian Buster
+    - arch: amd64
+      env:
+        BUILD_CONTEXT: images/debian/buster/amd64
+        DOCKER_PLATFORM: linux/amd64
+        IMAGE_NAME: mitmersamd64/sbcl
+        OS_TAG: debian-buster
+      <<: *fancy_job
+    - arch: arm64
+      env:
+        BUILD_CONTEXT: images/debian/buster/arm64
+        DOCKER_PLATFORM: linux/arm64/v8
+        IMAGE_NAME: mitmersarm64v8/sbcl
+        OS_TAG: debian-buster
+      <<: *fancy_job
+    - arch: arm64
+      env:
+        BUILD_CONTEXT: images/debian/buster/arm32v7
+        DOCKER_PLATFORM: linux/arm/v7
+        IMAGE_NAME: mitmersarm32v7/sbcl
+        OS_TAG: debian-buster
+      <<: *fancy_job
+    # Debian Stretch
+    - arch: amd64
+      env:
+        BUILD_CONTEXT: images/debian/stretch/amd64
+        DOCKER_PLATFORM: linux/amd64
+        IMAGE_NAME: mitmersamd64/sbcl
+        OS_TAG: debian-stretch
+      <<: *fancy_job
+    - arch: arm64
+      before_install:
+        - unset DOCKER_BUILDKIT
+        - sudo apt-get remove -y docker docker.io containerd runc
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+      env:
+        BUILD_CONTEXT: images/debian/stretch/arm64
+        DOCKER_PLATFORM: linux/arm64/v8
+        IMAGE_NAME: mitmersarm64v8/sbcl
+        OS_TAG: debian-stretch
+      <<: *fancy_job
+    - arch: arm64
+      env:
+        BUILD_CONTEXT: images/debian/stretch/arm32v7
+        DOCKER_PLATFORM: linux/arm/v7
+        IMAGE_NAME: mitmersarm32v7/sbcl
+        OS_TAG: debian-stretch
+      <<: *fancy_job
+    # Ubuntu Focal
+    - arch: amd64
+      env:
+        BUILD_CONTEXT: images/ubuntu/focal/amd64
+        DOCKER_PLATFORM: linux/amd64
+        IMAGE_NAME: mitmersamd64/sbcl
+        OS_TAG: ubuntu-focal
+      <<: *fancy_job
+    - arch: arm64
+      env:
+        BUILD_CONTEXT: images/ubuntu/focal/arm64
+        DOCKER_PLATFORM: linux/arm64/v8
+        IMAGE_NAME: mitmersarm64v8/sbcl
+        OS_TAG: ubuntu-focal
+      <<: *fancy_job
+    - arch: arm64
+      before_install:
+        - unset DOCKER_BUILDKIT
+        - sudo apt-get remove -y docker docker.io containerd runc
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+      env:
+        BUILD_CONTEXT: images/ubuntu/focal/arm32v7
+        DOCKER_PLATFORM: linux/arm/v7
+        IMAGE_NAME: mitmersarm32v7/sbcl
+        OS_TAG: ubuntu-focal
+      <<: *fancy_job
+    # Ubuntu Bionic
+    - arch: amd64
+      env:
+        BUILD_CONTEXT: images/ubuntu/bionic/amd64
+        DOCKER_PLATFORM: linux/amd64
+        IMAGE_NAME: mitmersamd64/sbcl
+        OS_TAG: ubuntu-bionic
+      <<: *fancy_job
+    - arch: arm64
+      env:
+        BUILD_CONTEXT: images/ubuntu/bionic/arm64
+        DOCKER_PLATFORM: linux/arm64/v8
+        IMAGE_NAME: mitmersarm64v8/sbcl
+        OS_TAG: ubuntu-bionic
+      <<: *fancy_job
+    - arch: arm64
+      env:
+        BUILD_CONTEXT: images/ubuntu/bionic/arm32v7
+        DOCKER_PLATFORM: linux/arm/v7
+        IMAGE_NAME: mitmersarm32v7/sbcl
+        OS_TAG: ubuntu-bionic
+      <<: *fancy_job
