@@ -12,16 +12,34 @@ services:
   - docker
 
 before_install:
-  - docker info
+  - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
+  - sudo service docker restart
 
 before_script:
+  - docker info
+
+script:
+  - docker pull --platform "$DOCKER_PLATFORM" "$BASE_IMAGE"
+  - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$IMAGE_TAG" || true
+  - docker build --platform "$DOCKER_PLATFORM" -t "$IMAGE_NAME:$IMAGE_TAG" --cache-from "$IMAGE_NAME:$IMAGE_TAG" --build-arg BUILDKIT_INLINE_CACHE=1 "$BUILD_CONTEXT"
+
+after_success:
   - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+  - docker push "$IMAGE_NAME:$IMAGE_TAG"
 
 jobs:
   include:
-    - script:
-        - docker pull debian:buster
-        - docker pull $IMAGE_NAME:latest || true
-        - docker build -t $IMAGE_NAME:latest --cache-from $IMAGE_NAME:latest --build-arg BUILDKIT_INLINE_CACHE=1 images/debian/buster/amd64
-      after_success:
-        - docker push $IMAGE_NAME:latest
+    - arch: amd64
+      env:
+        BASE_IMAGE: debian:buster
+        BUILD_CONTEXT: images/debian/buster/amd64
+        DOCKER_PLATFORM: linux/amd64
+        IMAGE_NAME: mitmersamd64/sbcl
+        IMAGE_TAG: 2.0.9-debian-buster
+    - arch: arm64
+      env:
+        BASE_IMAGE: debian:buster
+        BUILD_CONTEXT: images/debian/buster/arm64
+        DOCKER_PLATFORM: linux/arm64/v8
+        IMAGE_NAME: mitmersarm64v8/sbcl
+        IMAGE_TAG: 2.0.9-debian-buster
