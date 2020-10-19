@@ -28,6 +28,51 @@ after_success:
 
 jobs:
   include:
+    # Alpine 3.12
+    - arch: amd64
+      env:
+        BASE_IMAGE: alpine:3.12
+        BUILD_CONTEXT: images/alpine/3.12/amd64
+        DOCKER_PLATFORM: linux/amd64
+        IMAGE_NAME: mitmersamd64/sbcl
+        IMAGE_TAG: 2.0.9-alpine3.12
+    - arch: arm64
+      env:
+        BASE_IMAGE: alpine:3.12
+        BUILD_CONTEXT: images/alpine/3.12/arm64
+        DOCKER_PLATFORM: linux/arm64/v8
+        IMAGE_NAME: mitmersarm64v8/sbcl
+        IMAGE_TAG: 2.0.9-alpine3.12
+    - arch: arm64
+      env:
+        BASE_IMAGE: alpine:3.12
+        BUILD_CONTEXT: images/alpine/3.12/arm32v7
+        DOCKER_PLATFORM: linux/arm/v7
+        IMAGE_NAME: mitmersarm32v7/sbcl
+        IMAGE_TAG: 2.0.9-alpine3.12
+    # Alpine 3.11
+    - arch: amd64
+      env:
+        BASE_IMAGE: alpine:3.11
+        BUILD_CONTEXT: images/alpine/3.11/amd64
+        DOCKER_PLATFORM: linux/amd64
+        IMAGE_NAME: mitmersamd64/sbcl
+        IMAGE_TAG: 2.0.9-alpine3.11
+    - arch: arm64
+      env:
+        BASE_IMAGE: alpine:3.11
+        BUILD_CONTEXT: images/alpine/3.11/arm64
+        DOCKER_PLATFORM: linux/arm64/v8
+        IMAGE_NAME: mitmersarm64v8/sbcl
+        IMAGE_TAG: 2.0.9-alpine3.11
+    - arch: arm64
+      env:
+        BASE_IMAGE: alpine:3.11
+        BUILD_CONTEXT: images/alpine/3.11/arm32v7
+        DOCKER_PLATFORM: linux/arm/v7
+        IMAGE_NAME: mitmersarm32v7/sbcl
+        IMAGE_TAG: 2.0.9-alpine3.11
+    # Debian Buster
     - arch: amd64
       env:
         BASE_IMAGE: debian:buster
@@ -49,3 +94,69 @@ jobs:
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_NAME: mitmersarm32v7/sbcl
         IMAGE_TAG: 2.0.9-debian-buster
+    # Debian Stretch
+    - arch: amd64
+      env:
+        BASE_IMAGE: debian:stretch
+        BUILD_CONTEXT: images/debian/stretch/amd64
+        DOCKER_PLATFORM: linux/amd64
+        IMAGE_NAME: mitmersamd64/sbcl
+        IMAGE_TAG: 2.0.9-debian-stretch
+    - arch: arm64
+      env:
+        BASE_IMAGE: debian:stretch
+        BUILD_CONTEXT: images/debian/stretch/arm64
+        DOCKER_PLATFORM: linux/arm64/v8
+        IMAGE_NAME: mitmersarm64v8/sbcl
+        IMAGE_TAG: 2.0.9-debian-stretch
+    - arch: arm64
+      env:
+        BASE_IMAGE: debian:stretch
+        BUILD_CONTEXT: images/debian/stretch/arm32v7
+        DOCKER_PLATFORM: linux/arm/v7
+        IMAGE_NAME: mitmersarm32v7/sbcl
+        IMAGE_TAG: 2.0.9-debian-stretch
+    # Ubuntu Focal
+    - arch: amd64
+      env:
+        BASE_IMAGE: ubuntu:focal
+        BUILD_CONTEXT: images/ubuntu/focal/amd64
+        DOCKER_PLATFORM: linux/amd64
+        IMAGE_NAME: mitmersamd64/sbcl
+        IMAGE_TAG: 2.0.9-ubuntu-focal
+    - arch: arm64
+      env:
+        BASE_IMAGE: ubuntu:focal
+        BUILD_CONTEXT: images/ubuntu/focal/arm64
+        DOCKER_PLATFORM: linux/arm64/v8
+        IMAGE_NAME: mitmersarm64v8/sbcl
+        IMAGE_TAG: 2.0.9-ubuntu-focal
+    - arch: arm64
+      env:
+        BASE_IMAGE: ubuntu:focal
+        BUILD_CONTEXT: images/ubuntu/focal/arm32v7
+        DOCKER_PLATFORM: linux/arm/v7
+        IMAGE_NAME: mitmersarm32v7/sbcl
+        IMAGE_TAG: 2.0.9-ubuntu-focal
+    # Ubuntu Bionic
+    - arch: amd64
+      env:
+        BASE_IMAGE: ubuntu:bionic
+        BUILD_CONTEXT: images/ubuntu/bionic/amd64
+        DOCKER_PLATFORM: linux/amd64
+        IMAGE_NAME: mitmersamd64/sbcl
+        IMAGE_TAG: 2.0.9-ubuntu-bionic
+    - arch: arm64
+      env:
+        BASE_IMAGE: ubuntu:bionic
+        BUILD_CONTEXT: images/ubuntu/bionic/arm64
+        DOCKER_PLATFORM: linux/arm64/v8
+        IMAGE_NAME: mitmersarm64v8/sbcl
+        IMAGE_TAG: 2.0.9-ubuntu-bionic
+    - arch: arm64
+      env:
+        BASE_IMAGE: ubuntu:bionic
+        BUILD_CONTEXT: images/ubuntu/bionic/arm32v7
+        DOCKER_PLATFORM: linux/arm/v7
+        IMAGE_NAME: mitmersarm32v7/sbcl
+        IMAGE_TAG: 2.0.9-ubuntu-bionic
