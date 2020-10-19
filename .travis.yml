@@ -13,8 +13,6 @@ services:
 before_install:
   - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
   - sudo service docker restart
-
-before_script:
   - docker info
 
 script:
@@ -121,6 +119,9 @@ jobs:
     - arch: arm64-graviton2
       virt: vm
       group: edge
+      before_script:
+        - sudo apt-get update
+        - sudo apt-get upgrade -y
       env:
         BUILD_CONTEXT: images/ubuntu/focal/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
