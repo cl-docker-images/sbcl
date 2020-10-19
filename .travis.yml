@@ -20,8 +20,8 @@ _nonfancy_job: &nonfancy_job
   script:
     - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" || true
     - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build" || true
-    - docker build --platform "$DOCKER_PLATFORM" --pull -t "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build" --build-arg BUILDKIT_INLINE_CACHE=1 "$BUILD_CONTEXT"
-    - docker build --platform "$DOCKER_PLATFORM" -t "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$BUILD_CONTEXT/Dockerfile.build" "$BUILD_CONTEXT"
+    - docker build --platform "$DOCKER_PLATFORM" --pull -t "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" --build-arg BUILDKIT_INLINE_CACHE=1 "$BUILD_CONTEXT"
+    - docker build --platform "$DOCKER_PLATFORM" -t "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$BUILD_CONTEXT/Dockerfile.build" "$BUILD_CONTEXT"
   after_success:
     - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - docker push "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG"
