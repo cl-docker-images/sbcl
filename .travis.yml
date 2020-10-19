@@ -160,3 +160,9 @@ jobs:
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_NAME: mitmersarm32v7/sbcl
         IMAGE_TAG: 2.0.9-ubuntu-bionic
+    # Windows
+    - os: windows
+      before_install: []
+      script:
+        - "true"
+      after_success: []
