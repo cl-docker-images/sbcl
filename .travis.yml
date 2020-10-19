@@ -93,6 +93,7 @@ jobs:
         IMAGE_TAG: 2.0.9-debian-stretch
     - arch: arm64-graviton2
       virt: vm
+      group: edge
       env:
         BUILD_CONTEXT: images/debian/stretch/arm64
         DOCKER_PLATFORM: linux/arm64/v8
@@ -119,6 +120,7 @@ jobs:
         IMAGE_TAG: 2.0.9-ubuntu-focal
     - arch: arm64-graviton2
       virt: vm
+      group: edge
       env:
         BUILD_CONTEXT: images/ubuntu/focal/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
