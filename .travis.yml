@@ -10,7 +10,7 @@ env:
 services:
   - docker
 
-before_install:
+before_script:
   - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
   - sudo service docker restart
   - docker info
@@ -115,6 +115,12 @@ jobs:
         IMAGE_NAME: mitmersarm64v8/sbcl
         IMAGE_TAG: 2.0.9-ubuntu-focal
     - arch: arm64
+      before_install:
+        - sudo apt-get remove -y docker docker-engine docker.io containerd runc
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
       env:
         BUILD_CONTEXT: images/ubuntu/focal/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
