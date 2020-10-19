@@ -6,6 +6,11 @@ env:
   global:
     DOCKER_BUILDKIT: "1"
     DOCKER_CLI_EXPERIMENTAL: "enabled"
+    SBCL_VERSION: "2.0.9"
+
+stages:
+  - nonbuild
+  - build
 
 services:
   - docker
@@ -16,80 +21,103 @@ before_script:
   - docker info
 
 script:
-  - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$IMAGE_TAG" || true
-  - docker build --platform "$DOCKER_PLATFORM" --pull -t "$IMAGE_NAME:$IMAGE_TAG" --cache-from "$IMAGE_NAME:$IMAGE_TAG" --build-arg BUILDKIT_INLINE_CACHE=1 "$BUILD_CONTEXT"
+  - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" || true
+  - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build" || true
+  - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-fancy" || true
+  - docker build --platform "$DOCKER_PLATFORM" --pull -t "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG$VARIANT" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-fancy" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$BUILD_CONTEXT/$BUILD_DOCKERFILE" "$BUILD_CONTEXT"
 
 after_success:
   - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-  - docker push "$IMAGE_NAME:$IMAGE_TAG"
+  - docker push "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG"
 
 jobs:
   include:
     # Alpine 3.12
     - arch: amd64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/alpine/3.12/amd64
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/amd64
         IMAGE_NAME: mitmersamd64/sbcl
-        IMAGE_TAG: 2.0.9-alpine3.12
+        OS_TAG: alpine3.12
     - arch: arm64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/alpine/3.12/arm64
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_NAME: mitmersarm64v8/sbcl
-        IMAGE_TAG: 2.0.9-alpine3.12
+        OS_TAG: alpine3.12
     - arch: arm64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/alpine/3.12/arm32v7
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_NAME: mitmersarm32v7/sbcl
-        IMAGE_TAG: 2.0.9-alpine3.12
+        OS_TAG: alpine3.12
     # Alpine 3.11
     - arch: amd64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/alpine/3.11/amd64
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/amd64
         IMAGE_NAME: mitmersamd64/sbcl
-        IMAGE_TAG: 2.0.9-alpine3.11
+        OS_TAG: alpine3.11
     - arch: arm64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/alpine/3.11/arm64
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_NAME: mitmersarm64v8/sbcl
-        IMAGE_TAG: 2.0.9-alpine3.11
+        OS_TAG: alpine3.11
     - arch: arm64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/alpine/3.11/arm32v7
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_NAME: mitmersarm32v7/sbcl
-        IMAGE_TAG: 2.0.9-alpine3.11
+        OS_TAG: alpine3.11
     # Debian Buster
     - arch: amd64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/debian/buster/amd64
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/amd64
         IMAGE_NAME: mitmersamd64/sbcl
-        IMAGE_TAG: 2.0.9-debian-buster
+        OS_TAG: debian-buster
     - arch: arm64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/debian/buster/arm64
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_NAME: mitmersarm64v8/sbcl
-        IMAGE_TAG: 2.0.9-debian-buster
+        OS_TAG: debian-buster
     - arch: arm64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/debian/buster/arm32v7
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_NAME: mitmersarm32v7/sbcl
-        IMAGE_TAG: 2.0.9-debian-buster
+        OS_TAG: debian-buster
     # Debian Stretch
     - arch: amd64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/debian/stretch/amd64
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/amd64
         IMAGE_NAME: mitmersamd64/sbcl
-        IMAGE_TAG: 2.0.9-debian-stretch
+        OS_TAG: debian-stretch
     - arch: arm64
+      stage: nonbuild
       before_install:
         - unset DOCKER_BUILDKIT
         - sudo apt-get remove -y docker docker.io containerd runc
@@ -99,29 +127,37 @@ jobs:
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
       env:
         BUILD_CONTEXT: images/debian/stretch/arm64
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_NAME: mitmersarm64v8/sbcl
-        IMAGE_TAG: 2.0.9-debian-stretch
+        OS_TAG: debian-stretch
     - arch: arm64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/debian/stretch/arm32v7
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_NAME: mitmersarm32v7/sbcl
-        IMAGE_TAG: 2.0.9-debian-stretch
+        OS_TAG: debian-stretch
     # Ubuntu Focal
     - arch: amd64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/ubuntu/focal/amd64
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/amd64
         IMAGE_NAME: mitmersamd64/sbcl
-        IMAGE_TAG: 2.0.9-ubuntu-focal
+        OS_TAG: ubuntu-focal
     - arch: arm64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/ubuntu/focal/arm64
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_NAME: mitmersarm64v8/sbcl
-        IMAGE_TAG: 2.0.9-ubuntu-focal
+        OS_TAG: ubuntu-focal
     - arch: arm64
+      stage: nonbuild
       before_install:
         - unset DOCKER_BUILDKIT
         - sudo apt-get remove -y docker docker.io containerd runc
@@ -131,25 +167,32 @@ jobs:
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
       env:
         BUILD_CONTEXT: images/ubuntu/focal/arm32v7
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_NAME: mitmersarm32v7/sbcl
-        IMAGE_TAG: 2.0.9-ubuntu-focal
+        OS_TAG: ubuntu-focal
     # Ubuntu Bionic
     - arch: amd64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/ubuntu/bionic/amd64
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/amd64
         IMAGE_NAME: mitmersamd64/sbcl
-        IMAGE_TAG: 2.0.9-ubuntu-bionic
+        OS_TAG: ubuntu-bionic
     - arch: arm64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/ubuntu/bionic/arm64
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_NAME: mitmersarm64v8/sbcl
-        IMAGE_TAG: 2.0.9-ubuntu-bionic
+        OS_TAG: ubuntu-bionic
     - arch: arm64
+      stage: nonbuild
       env:
         BUILD_CONTEXT: images/ubuntu/bionic/arm32v7
+        BUILD_DOCKERFILE: Dockerfile
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_NAME: mitmersarm32v7/sbcl
-        IMAGE_TAG: 2.0.9-ubuntu-bionic
+        OS_TAG: ubuntu-bionic
