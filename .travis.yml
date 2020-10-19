@@ -17,7 +17,7 @@ before_script:
 
 script:
   - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$IMAGE_TAG" || true
-  - docker build --platform "$DOCKER_PLATFORM" --pull -t "$IMAGE_NAME:$IMAGE_TAG" --cache-from "$IMAGE_NAME:$IMAGE_TAG" --build-arg BUILDKIT_INLINE_CACHE=1 "$BUILD_CONTEXT"
+  - docker build --platform "$DOCKER_PLATFORM" --security-opt seccomp:unconfined --pull -t "$IMAGE_NAME:$IMAGE_TAG" --cache-from "$IMAGE_NAME:$IMAGE_TAG" --build-arg BUILDKIT_INLINE_CACHE=1 "$BUILD_CONTEXT"
 
 after_success:
   - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
