@@ -6,7 +6,9 @@ env:
   global:
     DOCKER_BUILDKIT: "1"
     DOCKER_CLI_EXPERIMENTAL: "enabled"
-    SBCL_VERSION: "2.0.9"
+    IMAGE_NAME: sbcl
+    IMAGE_NAMESPACE: mitmers
+    VERSION: "2.0.9"
 
 services:
   - docker
@@ -18,23 +20,51 @@ before_script:
 
 _nonfancy_job: &nonfancy_job
   script:
-    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" || true
-    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build" || true
-    - docker build --platform "$DOCKER_PLATFORM" --pull -t "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" --build-arg BUILDKIT_INLINE_CACHE=1 "$BUILD_CONTEXT"
-    - docker build --platform "$DOCKER_PLATFORM" -t "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$BUILD_CONTEXT/Dockerfile.build" "$BUILD_CONTEXT"
+    # Pull the previous images
+    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" || true
+    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" || true
+    # Build the stock image
+    - docker build --platform "$DOCKER_PLATFORM" --pull -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" --build-arg BUILDKIT_INLINE_CACHE=1 "$BUILD_CONTEXT"
+    # Tag this image as the build image refers to it by its non-arch specific
+    # name
+    - docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" "$IMAGE_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION"
+    # Build the build variant of the image
+    - docker build --platform "$DOCKER_PLATFORM" -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$BUILD_CONTEXT/Dockerfile.build" "$BUILD_CONTEXT"
+    # Tag the images with their various arch specific aliases.
+    - docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION"
+    - [ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME"
+    - [ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME"
+    - docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION-build"
+    - [ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME-build"
+    - [ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME-build"
   after_success:
     - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-    - docker push "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG"
-    - docker push "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-build"
+    - docker push "$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION"
+    - docker push "$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION"
+    - [ -z "$OS_LATEST" ] || docker push "$IMAGE_NAME:$VERSION-$OS_NAME"
+    - [ -z "$OS_LATEST" ] || docker push "$IMAGE_NAME:$OS_NAME"
+    - docker push "$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build"
+    - docker push "$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION-build"
+    - [ -z "$OS_LATEST" ] || docker push "$IMAGE_NAME:$VERSION-$OS_NAME-build"
+    - [ -z "$OS_LATEST" ] || docker push "$IMAGE_NAME:$OS_NAME-build"
 
 _fancy_job: &fancy_job
   script:
-    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" || true
-    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-fancy" || true
-    - docker build --platform "$DOCKER_PLATFORM" --pull -t "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-fancy" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG" --cache-from "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-fancy" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$BUILD_CONTEXT/Dockerfile.fancy" "$BUILD_CONTEXT"
+    # Pull the previous images
+    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" || true
+    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" || true
+    # Build the fancy image
+    - docker build --platform "$DOCKER_PLATFORM" --pull -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$BUILD_CONTEXT/Dockerfile.fancy" "$BUILD_CONTEXT"
+    # Tag the image with its arch specific aliases
+    - docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy"
+    - [ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME-fancy"
+    - [ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME-fancy"
   after_success:
     - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-    - docker push "$IMAGE_NAME:$SBCL_VERSION-$OS_TAG-fancy"
+    - docker push "$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy"
+    - docker push "$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy"
+    - [ -z "$OS_LATEST" ] || docker push "$IMAGE_NAME:$VERSION-$OS_NAME-fancy"
+    - [ -z "$OS_LATEST" ] || docker push "$IMAGE_NAME:$OS_NAME-fancy"
 
 jobs:
   include:
@@ -44,74 +74,100 @@ jobs:
       env:
         BUILD_CONTEXT: images/alpine/3.12/amd64
         DOCKER_PLATFORM: linux/amd64
-        IMAGE_NAME: mitmersamd64/sbcl
-        OS_TAG: alpine3.12
+        IMAGE_ARCH_NAMESPACE: mitmersamd64
+        OS_LATEST: "yes"
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        OS_VERSION_SEP: ""
       <<: *nonfancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/alpine/3.12/arm64
         DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_NAME: mitmersarm64v8/sbcl
-        OS_TAG: alpine3.12
+        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
+        OS_LATEST: "yes"
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        OS_VERSION_SEP: ""
       <<: *nonfancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/alpine/3.12/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_NAME: mitmersarm32v7/sbcl
-        OS_TAG: alpine3.12
+        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
+        OS_LATEST: "yes"
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        OS_VERSION_SEP: ""
       <<: *nonfancy_job
     # Alpine 3.11
     - arch: amd64
       env:
         BUILD_CONTEXT: images/alpine/3.11/amd64
         DOCKER_PLATFORM: linux/amd64
-        IMAGE_NAME: mitmersamd64/sbcl
-        OS_TAG: alpine3.11
+        IMAGE_ARCH_NAMESPACE: mitmersamd64
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        OS_VERSION_SEP: ""
       <<: *nonfancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/alpine/3.11/arm64
         DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_NAME: mitmersarm64v8/sbcl
-        OS_TAG: alpine3.11
+        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        OS_VERSION_SEP: ""
       <<: *nonfancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/alpine/3.11/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_NAME: mitmersarm32v7/sbcl
-        OS_TAG: alpine3.11
+        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        OS_VERSION_SEP: ""
       <<: *nonfancy_job
     # Debian Buster
     - arch: amd64
       env:
         BUILD_CONTEXT: images/debian/buster/amd64
         DOCKER_PLATFORM: linux/amd64
-        IMAGE_NAME: mitmersamd64/sbcl
-        OS_TAG: debian-buster
+        IMAGE_ARCH_NAMESPACE: mitmersamd64
+        OS_LATEST: "yes"
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        OS_VERSION_SEP: "-"
       <<: *nonfancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/debian/buster/arm64
         DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_NAME: mitmersarm64v8/sbcl
-        OS_TAG: debian-buster
+        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
+        OS_LATEST: "yes"
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        OS_VERSION_SEP: "-"
       <<: *nonfancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/debian/buster/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_NAME: mitmersarm32v7/sbcl
-        OS_TAG: debian-buster
+        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
+        OS_LATEST: "yes"
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        OS_VERSION_SEP: "-"
       <<: *nonfancy_job
     # Debian Stretch
     - arch: amd64
       env:
         BUILD_CONTEXT: images/debian/stretch/amd64
         DOCKER_PLATFORM: linux/amd64
-        IMAGE_NAME: mitmersamd64/sbcl
-        OS_TAG: debian-stretch
+        IMAGE_ARCH_NAMESPACE: mitmersamd64
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        OS_VERSION_SEP: "-"
       <<: *nonfancy_job
     - arch: arm64
       before_install:
@@ -125,30 +181,40 @@ jobs:
       env:
         BUILD_CONTEXT: images/debian/stretch/arm64
         DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_NAME: mitmersarm64v8/sbcl
-        OS_TAG: debian-stretch
+        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        OS_VERSION_SEP: "-"
       <<: *nonfancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/debian/stretch/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_NAME: mitmersarm32v7/sbcl
-        OS_TAG: debian-stretch
+        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        OS_VERSION_SEP: "-"
       <<: *nonfancy_job
     # Ubuntu Focal
     - arch: amd64
       env:
         BUILD_CONTEXT: images/ubuntu/focal/amd64
         DOCKER_PLATFORM: linux/amd64
-        IMAGE_NAME: mitmersamd64/sbcl
-        OS_TAG: ubuntu-focal
+        IMAGE_ARCH_NAMESPACE: mitmersamd64
+        OS_LATEST: "yes"
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        OS_VERSION_SEP: "-"
       <<: *nonfancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/ubuntu/focal/arm64
         DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_NAME: mitmersarm64v8/sbcl
-        OS_TAG: ubuntu-focal
+        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
+        OS_LATEST: "yes"
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        OS_VERSION_SEP: "-"
       <<: *nonfancy_job
     - arch: arm64
       before_install:
@@ -161,30 +227,39 @@ jobs:
       env:
         BUILD_CONTEXT: images/ubuntu/focal/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_NAME: mitmersarm32v7/sbcl
-        OS_TAG: ubuntu-focal
+        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
+        OS_LATEST: "yes"
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        OS_VERSION_SEP: "-"
       <<: *nonfancy_job
     # Ubuntu Bionic
     - arch: amd64
       env:
         BUILD_CONTEXT: images/ubuntu/bionic/amd64
         DOCKER_PLATFORM: linux/amd64
-        IMAGE_NAME: mitmersamd64/sbcl
-        OS_TAG: ubuntu-bionic
+        IMAGE_ARCH_NAMESPACE: mitmersamd64
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        OS_VERSION_SEP: "-"
       <<: *nonfancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/ubuntu/bionic/arm64
         DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_NAME: mitmersarm64v8/sbcl
-        OS_TAG: ubuntu-bionic
+        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        OS_VERSION_SEP: "-"
       <<: *nonfancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/ubuntu/bionic/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_NAME: mitmersarm32v7/sbcl
-        OS_TAG: ubuntu-bionic
+        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        OS_VERSION_SEP: "-"
       <<: *nonfancy_job
 
     # Fancy images
@@ -193,74 +268,100 @@ jobs:
       env:
         BUILD_CONTEXT: images/alpine/3.12/amd64
         DOCKER_PLATFORM: linux/amd64
-        IMAGE_NAME: mitmersamd64/sbcl
-        OS_TAG: alpine3.12
+        IMAGE_ARCH_NAMESPACE: mitmersamd64
+        OS_LATEST: "yes"
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        OS_VERSION_SEP: ""
       <<: *fancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/alpine/3.12/arm64
         DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_NAME: mitmersarm64v8/sbcl
-        OS_TAG: alpine3.12
+        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
+        OS_LATEST: "yes"
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        OS_VERSION_SEP: ""
       <<: *fancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/alpine/3.12/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_NAME: mitmersarm32v7/sbcl
-        OS_TAG: alpine3.12
+        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
+        OS_LATEST: "yes"
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        OS_VERSION_SEP: ""
       <<: *fancy_job
     # Alpine 3.11
     - arch: amd64
       env:
         BUILD_CONTEXT: images/alpine/3.11/amd64
         DOCKER_PLATFORM: linux/amd64
-        IMAGE_NAME: mitmersamd64/sbcl
-        OS_TAG: alpine3.11
+        IMAGE_ARCH_NAMESPACE: mitmersamd64
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        OS_VERSION_SEP: ""
       <<: *fancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/alpine/3.11/arm64
         DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_NAME: mitmersarm64v8/sbcl
-        OS_TAG: alpine3.11
+        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        OS_VERSION_SEP: ""
       <<: *fancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/alpine/3.11/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_NAME: mitmersarm32v7/sbcl
-        OS_TAG: alpine3.11
+        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        OS_VERSION_SEP: ""
       <<: *fancy_job
     # Debian Buster
     - arch: amd64
       env:
         BUILD_CONTEXT: images/debian/buster/amd64
         DOCKER_PLATFORM: linux/amd64
-        IMAGE_NAME: mitmersamd64/sbcl
-        OS_TAG: debian-buster
+        IMAGE_ARCH_NAMESPACE: mitmersamd64
+        OS_LATEST: "yes"
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        OS_VERSION_SEP: "-"
       <<: *fancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/debian/buster/arm64
         DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_NAME: mitmersarm64v8/sbcl
-        OS_TAG: debian-buster
+        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
+        OS_LATEST: "yes"
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        OS_VERSION_SEP: "-"
       <<: *fancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/debian/buster/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_NAME: mitmersarm32v7/sbcl
-        OS_TAG: debian-buster
+        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
+        OS_LATEST: "yes"
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        OS_VERSION_SEP: "-"
       <<: *fancy_job
     # Debian Stretch
     - arch: amd64
       env:
         BUILD_CONTEXT: images/debian/stretch/amd64
         DOCKER_PLATFORM: linux/amd64
-        IMAGE_NAME: mitmersamd64/sbcl
-        OS_TAG: debian-stretch
+        IMAGE_ARCH_NAMESPACE: mitmersamd64
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        OS_VERSION_SEP: "-"
       <<: *fancy_job
     - arch: arm64
       before_install:
@@ -274,30 +375,40 @@ jobs:
       env:
         BUILD_CONTEXT: images/debian/stretch/arm64
         DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_NAME: mitmersarm64v8/sbcl
-        OS_TAG: debian-stretch
+        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        OS_VERSION_SEP: "-"
       <<: *fancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/debian/stretch/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_NAME: mitmersarm32v7/sbcl
-        OS_TAG: debian-stretch
+        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        OS_VERSION_SEP: "-"
       <<: *fancy_job
     # Ubuntu Focal
     - arch: amd64
       env:
         BUILD_CONTEXT: images/ubuntu/focal/amd64
         DOCKER_PLATFORM: linux/amd64
-        IMAGE_NAME: mitmersamd64/sbcl
-        OS_TAG: ubuntu-focal
+        IMAGE_ARCH_NAMESPACE: mitmersamd64
+        OS_LATEST: "yes"
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        OS_VERSION_SEP: "-"
       <<: *fancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/ubuntu/focal/arm64
         DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_NAME: mitmersarm64v8/sbcl
-        OS_TAG: ubuntu-focal
+        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
+        OS_LATEST: "yes"
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        OS_VERSION_SEP: "-"
       <<: *fancy_job
     - arch: arm64
       before_install:
@@ -310,28 +421,37 @@ jobs:
       env:
         BUILD_CONTEXT: images/ubuntu/focal/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_NAME: mitmersarm32v7/sbcl
-        OS_TAG: ubuntu-focal
+        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
+        OS_LATEST: "yes"
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        OS_VERSION_SEP: "-"
       <<: *fancy_job
     # Ubuntu Bionic
     - arch: amd64
       env:
         BUILD_CONTEXT: images/ubuntu/bionic/amd64
         DOCKER_PLATFORM: linux/amd64
-        IMAGE_NAME: mitmersamd64/sbcl
-        OS_TAG: ubuntu-bionic
+        IMAGE_ARCH_NAMESPACE: mitmersamd64
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        OS_VERSION_SEP: "-"
       <<: *fancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/ubuntu/bionic/arm64
         DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_NAME: mitmersarm64v8/sbcl
-        OS_TAG: ubuntu-bionic
+        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        OS_VERSION_SEP: "-"
       <<: *fancy_job
     - arch: arm64
       env:
         BUILD_CONTEXT: images/ubuntu/bionic/arm32v7
         DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_NAME: mitmersarm32v7/sbcl
-        OS_TAG: ubuntu-bionic
+        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        OS_VERSION_SEP: "-"
       <<: *fancy_job
