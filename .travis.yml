@@ -39,14 +39,14 @@ _nonfancy_job: &nonfancy_job
     - '[ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME-build"'
   after_success:
     - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-    - docker push "$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION"
-    - docker push "$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION"
-    - '[ -z "$OS_LATEST" ] || docker push "$IMAGE_NAME:$VERSION-$OS_NAME"'
-    - '[ -z "$OS_LATEST" ] || docker push "$IMAGE_NAME:$OS_NAME"'
-    - docker push "$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build"
-    - docker push "$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION-build"
-    - '[ -z "$OS_LATEST" ] || docker push "$IMAGE_NAME:$VERSION-$OS_NAME-build"'
-    - '[ -z "$OS_LATEST" ] || docker push "$IMAGE_NAME:$OS_NAME-build"'
+    - docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION"
+    - docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION"
+    - '[ -z "$OS_LATEST" ] || docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME"'
+    - '[ -z "$OS_LATEST" ] || docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME"'
+    - docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build"
+    - docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION-build"
+    - '[ -z "$OS_LATEST" ] || docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME-build"'
+    - '[ -z "$OS_LATEST" ] || docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME-build"'
 
 _fancy_job: &fancy_job
   script:
@@ -61,10 +61,10 @@ _fancy_job: &fancy_job
     - '[ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME-fancy"'
   after_success:
     - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-    - docker push "$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy"
-    - docker push "$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy"
-    - '[ -z "$OS_LATEST" ] || docker push "$IMAGE_NAME:$VERSION-$OS_NAME-fancy"'
-    - '[ -z "$OS_LATEST" ] || docker push "$IMAGE_NAME:$OS_NAME-fancy"'
+    - docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy"
+    - docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy"
+    - '[ -z "$OS_LATEST" ] || docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME-fancy"'
+    - '[ -z "$OS_LATEST" ] || docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME-fancy"'
 
 jobs:
   include:
