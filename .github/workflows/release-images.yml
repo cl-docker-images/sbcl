@@ -62,14 +62,14 @@ jobs:
       - name: Release Shared Tags
         run: |
           for prefix in $VERSION latest; do
-            docker manifest create mitmers/sbcl:$prefix mitmersamd64/sbcl:$VERSION-debian-buster mitmersarm64/sbcl:$VERSION-debian-buster mitmersarm32v7/sbcl:$VERSION-debian-buster mitmerswinamd64/sbcl:$VERSION-windowsservercore-ltsc2019
+            docker manifest create mitmers/sbcl:$prefix mitmersamd64/sbcl:$VERSION-debian-buster mitmersarm64v8/sbcl:$VERSION-debian-buster mitmersarm32v7/sbcl:$VERSION-debian-buster mitmerswinamd64/sbcl:$VERSION-windowsservercore-ltsc2019
             docker manifest push -p mitmers/sbcl:$prefix
           done
           for prefix in $VERSION-build latest-build; do
-            docker manifest create mitmers/sbcl:$prefix mitmersamd64/sbcl:$VERSION-debian-buster-build mitmersarm64/sbcl:$VERSION-debian-buster-build mitmersarm32v7/sbcl:$VERSION-debian-buster-build mitmerswinamd64/sbcl:$VERSION-windowsservercore-ltsc2019-build
+            docker manifest create mitmers/sbcl:$prefix mitmersamd64/sbcl:$VERSION-debian-buster-build mitmersarm64v8/sbcl:$VERSION-debian-buster-build mitmersarm32v7/sbcl:$VERSION-debian-buster-build mitmerswinamd64/sbcl:$VERSION-windowsservercore-ltsc2019-build
             docker manifest push -p mitmers/sbcl:$prefix
           done
           for prefix in $VERSION-fancy latest-fancy; do
-            docker manifest create mitmers/sbcl:$prefix mitmersamd64/sbcl:$VERSION-debian-buster-build mitmersarm64/sbcl:$VERSION-debian-buster-build mitmersarm32v7/sbcl:$VERSION-debian-buster-build
+            docker manifest create mitmers/sbcl:$prefix mitmersamd64/sbcl:$VERSION-debian-buster-build mitmersarm64v8/sbcl:$VERSION-debian-buster-build mitmersarm32v7/sbcl:$VERSION-debian-buster-build
             docker manifest push -p mitmers/sbcl:$prefix
           done
