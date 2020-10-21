@@ -32,7 +32,7 @@ _nightly: &nightly
     - cd tmp
     - git clone https://github.com/sbcl/sbcl.git
     - cd sbcl
-    - export $IMAGE_BUILDARGS="--build-arg ref=$(git rev-parse HEAD)"
+    - export IMAGE_BUILDARGS="--build-arg ref=$(git rev-parse HEAD)"
     - cd ../..
     - rm -rf tmp
 
