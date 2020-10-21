@@ -18,6 +18,9 @@ before_script:
   - sudo service docker restart
   - docker info
 
+_nocron: &nocron
+  if: NOT (type = cron)
+
 _nonfancy_job: &nonfancy_job
   script:
     # Pull the previous images
@@ -79,7 +82,7 @@ jobs:
         OS_VERSION: "3.12"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -89,7 +92,7 @@ jobs:
         OS_VERSION: "3.12"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -99,7 +102,7 @@ jobs:
         OS_VERSION: "3.12"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     # Alpine 3.11
     - arch: amd64
       env:
@@ -109,7 +112,7 @@ jobs:
         OS_VERSION: "3.11"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -118,7 +121,7 @@ jobs:
         OS_VERSION: "3.11"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -127,7 +130,7 @@ jobs:
         OS_VERSION: "3.11"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     # Debian Buster
     - arch: amd64
       env:
@@ -138,7 +141,7 @@ jobs:
         OS_VERSION: "buster"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -148,7 +151,7 @@ jobs:
         OS_VERSION: "buster"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -158,7 +161,7 @@ jobs:
         OS_VERSION: "buster"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     # Debian Stretch
     - arch: amd64
       env:
@@ -168,7 +171,7 @@ jobs:
         OS_VERSION: "stretch"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     - arch: arm64
       before_install:
         - unset DOCKER_BUILDKIT
@@ -185,7 +188,7 @@ jobs:
         OS_VERSION: "stretch"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -194,7 +197,7 @@ jobs:
         OS_VERSION: "stretch"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     # Ubuntu Focal
     - arch: amd64
       env:
@@ -205,7 +208,7 @@ jobs:
         OS_VERSION: "focal"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -215,7 +218,7 @@ jobs:
         OS_VERSION: "focal"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     - arch: arm64
       before_install:
         - unset DOCKER_BUILDKIT
@@ -232,7 +235,7 @@ jobs:
         OS_VERSION: "focal"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     # Ubuntu Bionic
     - arch: amd64
       env:
@@ -242,7 +245,7 @@ jobs:
         OS_VERSION: "bionic"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -251,7 +254,7 @@ jobs:
         OS_VERSION: "bionic"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -260,7 +263,7 @@ jobs:
         OS_VERSION: "bionic"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: *nonfancy_job
+      <<: [*nonfancy_job, *nocron]
 
     # Fancy images
     # Alpine 3.12
@@ -273,7 +276,7 @@ jobs:
         OS_VERSION: "3.12"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -283,7 +286,7 @@ jobs:
         OS_VERSION: "3.12"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -293,7 +296,7 @@ jobs:
         OS_VERSION: "3.12"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     # Alpine 3.11
     - arch: amd64
       env:
@@ -303,7 +306,7 @@ jobs:
         OS_VERSION: "3.11"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -312,7 +315,7 @@ jobs:
         OS_VERSION: "3.11"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -321,7 +324,7 @@ jobs:
         OS_VERSION: "3.11"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     # Debian Buster
     - arch: amd64
       env:
@@ -332,7 +335,7 @@ jobs:
         OS_VERSION: "buster"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -342,7 +345,7 @@ jobs:
         OS_VERSION: "buster"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -352,7 +355,7 @@ jobs:
         OS_VERSION: "buster"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     # Debian Stretch
     - arch: amd64
       env:
@@ -362,7 +365,7 @@ jobs:
         OS_VERSION: "stretch"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     - arch: arm64
       before_install:
         - unset DOCKER_BUILDKIT
@@ -379,7 +382,7 @@ jobs:
         OS_VERSION: "stretch"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -388,7 +391,7 @@ jobs:
         OS_VERSION: "stretch"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     # Ubuntu Focal
     - arch: amd64
       env:
@@ -399,7 +402,7 @@ jobs:
         OS_VERSION: "focal"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -409,7 +412,7 @@ jobs:
         OS_VERSION: "focal"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     - arch: arm64
       before_install:
         - unset DOCKER_BUILDKIT
@@ -426,7 +429,7 @@ jobs:
         OS_VERSION: "focal"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     # Ubuntu Bionic
     - arch: amd64
       env:
@@ -436,7 +439,7 @@ jobs:
         OS_VERSION: "bionic"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -445,7 +448,7 @@ jobs:
         OS_VERSION: "bionic"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -454,4 +457,4 @@ jobs:
         OS_VERSION: "bionic"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: *fancy_job
+      <<: [*fancy_job, *nocron]
