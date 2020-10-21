@@ -25,7 +25,7 @@ jobs:
         run: docker pull mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019-build
         continue-on-error: true
       - name: Build base image
-        run: docker build -t mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 --pull --cache-from mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 images/windowsservercore/ltsc2019/windows-amd64
+        run: docker build -t mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 --cache-from mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 images/windowsservercore/ltsc2019/windows-amd64
       - name: Tag image
         run: docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswin/sbcl:2.0.9-windowsservercore-ltsc2019
       - name: Build build image
