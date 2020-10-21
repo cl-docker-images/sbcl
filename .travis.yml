@@ -21,18 +21,35 @@ before_script:
 _nocron: &nocron
   if: NOT (type = cron)
 
+_nightly: &nightly
+  allow_failures:
+    if: NOT (type = cron)
+  env:
+    VERSION: "nightly"
+  before_script:
+    - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
+    - sudo service docker restart
+    - docker info
+    - mkdir tmp
+    - cd tmp
+    - git clone https://github.com/sbcl/sbcl.git
+    - cd sbcl
+    - export $IMAGE_BUILDARGS="--build-arg ref=$(git rev-parse HEAD)"
+    - cd ../..
+    - rm -rf tmp
+
 _nonfancy_job: &nonfancy_job
   script:
     # Pull the previous images
     - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" || true
     - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" || true
     # Build the stock image
-    - docker build --platform "$DOCKER_PLATFORM" --pull -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" --build-arg BUILDKIT_INLINE_CACHE=1 "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH"
+    - docker build --platform "$DOCKER_PLATFORM" --pull $IMAGE_BUILDARGS -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" --build-arg BUILDKIT_INLINE_CACHE=1 "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH"
     # Tag this image as the build image refers to it by its non-arch specific
     # name
     - docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" "$IMAGE_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION"
     # Build the build variant of the image
-    - docker build --platform "$DOCKER_PLATFORM" -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH/Dockerfile.build" "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH"
+    - docker build --platform "$DOCKER_PLATFORM" $IMAGE_BUILDARGS -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH/Dockerfile.build" "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH"
     # Tag the images with their various arch specific aliases.
     - docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION"
     - '[ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME"'
@@ -59,7 +76,7 @@ _fancy_job: &fancy_job
     - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" || true
     - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" || true
     # Build the fancy image
-    - docker build --platform "$DOCKER_PLATFORM" --pull -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH/Dockerfile.fancy" "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH"
+    - docker build --platform "$DOCKER_PLATFORM" --pull $IMAGE_BUILDARGS -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH/Dockerfile.fancy" "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH"
     # Tag the image with its arch specific aliases
     - docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy"
     - '[ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME-fancy"'
@@ -462,3 +479,26 @@ jobs:
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
       <<: [*fancy_job, *nocron]
+
+    # Nightly jobs
+    # Debian Buster
+    - arch: amd64
+      env:
+        DOCKER_PLATFORM: linux/amd64
+        IMAGE_ARCH_NAMESPACE: mitmersamd64
+        OS_LATEST: "yes"
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        OS_VERSION_SEP: "-"
+        SIMPLE_ARCH: amd64
+      <<: [*nonfancy_job, *nightly]
+    - arch: amd64
+      env:
+        DOCKER_PLATFORM: linux/amd64
+        IMAGE_ARCH_NAMESPACE: mitmersamd64
+        OS_LATEST: "yes"
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        OS_VERSION_SEP: "-"
+        SIMPLE_ARCH: amd64
+      <<: [*fancy_job, *nightly]
