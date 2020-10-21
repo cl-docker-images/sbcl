@@ -18,7 +18,7 @@ jobs:
       - name: Release Linux Images
         run: |
           create_manifest_for_all_linux_archs () {
-            docker manifest create mitmers/sbcl:$1 mitmersamd64:$1 mitmersarm64v8:$1 mitmersarm32v7:$1
+            docker manifest create mitmers/sbcl:$1 mitmersamd64/sbcl:$1 mitmersarm64v8/sbcl:$1 mitmersarm32v7/sbcl:$1
             docker manifest push -p mitmers/sbcl:$1
           }
           for variant in "" -fancy -build; do
