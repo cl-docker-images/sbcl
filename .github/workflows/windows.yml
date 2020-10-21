@@ -9,6 +9,8 @@ jobs:
   push_ltsc2019:
     name: Push LTSC2019 Image
     runs-on: windows-2019
+    env:
+      VERSION: "2.0.9"
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -18,34 +20,34 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: echo "$env:DOCKER_PASSWORD" | docker login -u "$env:DOCKER_USERNAME" --password-stdin
       - name: Pull existing image
-        run: docker pull mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019
+        run: docker pull mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019
         continue-on-error: true
       - name: Pull existing build image
-        run: docker pull mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019-build
+        run: docker pull mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019-build
         continue-on-error: true
       - name: Build base image
-        run: docker build -t mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 --cache-from mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 images/windowsservercore/ltsc2019/windows-amd64
+        run: docker build -t mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 --cache-from mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 $env:VERSION/windowsservercore/ltsc2019/windows-amd64
       - name: Tag image
-        run: docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswin/sbcl:2.0.9-windowsservercore-ltsc2019
+        run: docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswin/sbcl:$env:VERSION-windowsservercore-ltsc2019
       - name: Build build image
-        run: docker build -t mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019-build --cache-from mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019-build -f images/windowsservercore/ltsc2019/windows-amd64/Dockerfile.build images/windowsservercore/ltsc2019/windows-amd64
+        run: docker build -t mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019-build --cache-from mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019-build -f $env:VERSION/windowsservercore/ltsc2019/windows-amd64/Dockerfile.build $env:VERSION/windowsservercore/ltsc2019/windows-amd64
       - name: Tag images
         run: |
-          docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:2.0.9-windowsservercore
-          docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore-ltsc2019
-          docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore
-          docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:2.0.9-windowsservercore-build
-          docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore-ltsc2019-build
-          docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore-build
+          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:$env:VERSION-windowsservercore
+          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore-ltsc2019
+          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore
+          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-build
+          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore-ltsc2019-build
+          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore-build
       - name: Push nonbuild image
         run: |
-          docker push mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019
+          docker push mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019
           docker push mitmerswinamd64/sbcl:windowsservercore-ltsc2019
-          docker push mitmerswinamd64/sbcl:2.0.9-windowsservercore
+          docker push mitmerswinamd64/sbcl:$env:VERSION-windowsservercore
           docker push mitmerswinamd64/sbcl:windowsservercore
       - name: Push build image
         run: |
-          docker push mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019-build
+          docker push mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019-build
           docker push mitmerswinamd64/sbcl:windowsservercore-ltsc2019-build
-          docker push mitmerswinamd64/sbcl:2.0.9-windowsservercore-build
+          docker push mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-build
           docker push mitmerswinamd64/sbcl:windowsservercore-build
