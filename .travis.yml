@@ -24,8 +24,6 @@ _nocron: &nocron
 _nightly: &nightly
   allow_failures:
     if: NOT (type = cron)
-  env:
-    VERSION: "nightly"
   before_script:
     - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
     - sudo service docker restart
@@ -491,6 +489,7 @@ jobs:
         OS_VERSION: "buster"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
+        VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     - arch: amd64
       env:
@@ -501,4 +500,5 @@ jobs:
         OS_VERSION: "buster"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
+        VERSION: nightly
       <<: [*fancy_job, *nightly]
