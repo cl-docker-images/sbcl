@@ -30,7 +30,23 @@ jobs:
         run: docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswin/sbcl:2.0.9-windowsservercore-ltsc2019
       - name: Build build image
         run: docker build -t mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019-build --cache-from mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019-build -f images/windowsservercore/ltsc2019/windows-amd64/Dockerfile.build images/windowsservercore/ltsc2019/windows-amd64
+      - name: Tag images
+        run: |
+          docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:2.0.9-windowsservercore
+          docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore-ltsc2019
+          docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore
+          docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:2.0.9-windowsservercore-build
+          docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore-ltsc2019-build
+          docker tag mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore-build
       - name: Push nonbuild image
-        run: docker push mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019
+        run: |
+          docker push mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019
+          docker push mitmerswinamd64/sbcl:windowsservercore-ltsc2019
+          docker push mitmerswinamd64/sbcl:2.0.9-windowsservercore
+          docker push mitmerswinamd64/sbcl:windowsservercore
       - name: Push build image
-        run: docker push mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019-build
+        run: |
+          docker push mitmerswinamd64/sbcl:2.0.9-windowsservercore-ltsc2019-build
+          docker push mitmerswinamd64/sbcl:windowsservercore-ltsc2019-build
+          docker push mitmerswinamd64/sbcl:2.0.9-windowsservercore-build
+          docker push mitmerswinamd64/sbcl:windowsservercore-build
