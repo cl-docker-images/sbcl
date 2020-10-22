@@ -19,7 +19,7 @@ RUN set -x \
          && cd /usr/local/src; \
        } \
     && apk add --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers \
-                          gmp-dev g++ libffi-dev zlib-dev patch \
+                          gmp-dev g++ libffi-dev zlib-dev patch git \
     && apk add --no-cache sbcl --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
     && git clone https://github.com/sbcl/sbcl.git /usr/local/src/sbcl \
     && build_and_install_source "sbcl" \
@@ -27,7 +27,7 @@ RUN set -x \
     && rm -rf ./* \
     && mv /tmp/sbcl-patches . \
     && apk del --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers \
-                          gmp-dev g++ libffi-dev patch sbcl \
+                          gmp-dev g++ libffi-dev patch git sbcl \
     && sbcl --version
 
 WORKDIR /

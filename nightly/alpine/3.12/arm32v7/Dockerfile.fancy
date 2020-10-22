@@ -24,7 +24,7 @@ RUN set -x \
          && cd /usr/local/src; \
        } \
     && apk add --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers \
-                          gmp-dev g++ libffi-dev zlib-dev patch \
+                          gmp-dev g++ libffi-dev zlib-dev patch git \
     && git clone https://github.com/sbcl/sbcl.git /usr/local/src/sbcl \
     && build_and_install_source "sbcl" \
     && mv sbcl-patches /tmp \
@@ -32,7 +32,7 @@ RUN set -x \
     && mv /tmp/sbcl-patches . \
     && rm -rf /usr/bin/sbcl /usr/lib/sbcl \
     && apk del --no-cache ca-certificates curl openssl make gcc musl-dev linux-headers \
-                          gmp-dev g++ libffi-dev patch \
+                          gmp-dev g++ libffi-dev patch git \
     && sbcl --version
 
 WORKDIR /
