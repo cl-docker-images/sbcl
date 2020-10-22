@@ -1,0 +1,18 @@
+FROM mitmers/sbcl:nightly-alpine3.12
+
+LABEL maintainer="etimmons@mit.edu"
+
+WORKDIR /usr/local/src/
+
+RUN set -x \
+    && apk add --no-cache ca-certificates openssl make gcc linux-headers musl-dev zlib-dev patch git \
+    && git clone https://github.com/sbcl/sbcl.git sbcl-tmp \
+    && (cd sbcl-tmp && git archive --prefix=sbcl/ "$SBCL_REF" | tar x -C .. ) \
+    && VERSION="$(sbcl --version | cut -d ' ' -f 2)" \
+    && (cd sbcl && echo "\"$VERSION\"" > version.lisp-expr) \
+    && rm -rf sbcl-tmp \
+    && apk del --no-cache openssl git
+
+WORKDIR /
+
+COPY rebuild-sbcl /usr/local/bin/rebuild-sbcl
