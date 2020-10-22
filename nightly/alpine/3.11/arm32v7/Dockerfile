@@ -7,7 +7,7 @@ LABEL maintainer="etimmons@mit.edu"
 COPY patches/ /usr/local/src/sbcl-patches/
 ARG ref=master
 ENV SBCL_REF=$ref
-ENV SBCL_ARCH=x86-64
+ENV SBCL_ARCH=arm
 
 WORKDIR /usr/local/src/
 
