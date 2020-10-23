@@ -11,6 +11,7 @@ env:
     DOCKER_CLI_EXPERIMENTAL: "enabled"
     IMAGE_NAME: sbcl
     IMAGE_NAMESPACE: mitmers
+    LATEST_VERSION: "2.0.9"
     UBUNTU_LATEST: "focal"
     VERSION: "2.0.9"
 
@@ -784,69 +785,8 @@ jobs:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         # First, download all the nightly builds, retag them, and push them to
         # the arch specific repos
-        - |
-          pull_retag_and_push_archs() {
-            for variant in "" -fancy -build; do
-              for arch in amd64 arm32v7 arm64v8; do
-                docker pull ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant-tmp-master
-                docker tag ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant-tmp-master ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant
-                docker push ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant
-              done
-            done
-          }
-          # Alpine
-          for os_version in 3.12 3.11; do
-            pull_retag_and_push_archs alpine $os_version
-          done
-          for variant in "" -fancy -build; do
-            for arch in amd64 arm32v7 arm64v8; do
-              docker tag ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-alpine$ALPINE_LATEST$variant ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-alpine$variant
-              docker push ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-alpine$variant
-            done
-          done
-          # Debian
-          for os_version in -buster -stretch; do
-            pull_retag_and_push_archs debian $os_version
-          done
-          for variant in "" -fancy -build; do
-            for arch in amd64 arm32v7 arm64v8; do
-              docker tag ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian-$DEBIAN_LATEST$variant ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian$variant
-              docker push ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian$variant
-              docker tag ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian-$DEBIAN_LATEST$variant ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION$variant
-            done
-          done
-          # Ubuntu
-          for os_version in -focal -bionic; do
-            pull_retag_and_push_archs ubuntu $os_version
-          done
-          for variant in "" -fancy -build; do
-            for arch in amd64 arm32v7 arm64v8; do
-              docker tag ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-ubuntu-$UBUNTU_LATEST$variant ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-ubuntu$variant
-              docker push ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-ubuntu$variant
-            done
-          done
-        # Next, create and push all the manifests!
-        - |
-          create_manifest_for_all_linux_archs () {
-            docker manifest create "$IMAGE_NAMESPACE/$IMAGE_NAME:$1" ${IMAGE_NAMESPACE}amd64/$IMAGE_NAME:$1 ${IMAGE_NAMESPACE}arm64v8/$IMAGE_NAME:$1 ${IMAGE_NAMESPACE}arm32v7/$IMAGE_NAME:$1
-            docker manifest push -p "$IMAGE_NAMESPACE/$IMAGE_NAME:$1"
-          }
-        - |
-          for variant in "" -fancy -build; do
-            # Alpine
-            for os_version in 3.12 3.11; do
-              create_manifest_for_all_linux_archs $VERSION-alpine$os_version$variant
-            done
-            create_manifest_for_all_linux_archs $VERSION-alpine$variant
-            # Debian
-            for os_version in buster stretch; do
-              create_manifest_for_all_linux_archs $VERSION-debian-$os_version$variant
-            done
-            create_manifest_for_all_linux_archs $VERSION-debian$variant
-            create_manifest_for_all_linux_archs $VERSION$variant
-            # Ubuntu
-            for os_version in focal bionic; do
-              create_manifest_for_all_linux_archs $VERSION-ubuntu-$os_version$variant
-            done
-            create_manifest_for_all_linux_archs $VERSION-ubuntu$variant
-          done
+        - ./scripts/retag-tmp-master-images
+        # Next, create and push all the linux manifests
+        - ./scripts/release-linux-manifests
+        # Last, release shared manifests
+        - ./scripts/release-shared-manifests

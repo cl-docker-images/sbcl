@@ -1,0 +1,45 @@
+#!/bin/bash
+
+set -x
+
+create_manifest_for_all_linux_archs () {
+  docker manifest create "$IMAGE_NAMESPACE/$IMAGE_NAME:$1" "${IMAGE_NAMESPACE}amd64/$IMAGE_NAME:$1" "${IMAGE_NAMESPACE}arm64v8/$IMAGE_NAME:$1" "${IMAGE_NAMESPACE}arm32v7/$IMAGE_NAME:$1"
+  docker manifest push -p "$IMAGE_NAMESPACE/$IMAGE_NAME:$1"
+}
+
+for variant in "" -fancy -build; do
+  # Alpine
+  for os_version in 3.12 3.11; do
+    create_manifest_for_all_linux_archs "$VERSION-alpine$os_version$variant"
+    if [ "$VERSION" = "$LATEST_VERSION" ]; then
+      create_manifest_for_all_linux_archs "alpine$os_version$variant"
+    fi
+  done
+  create_manifest_for_all_linux_archs "$VERSION-alpine$variant"
+  if [ "$VERSION" = "$LATEST_VERSION" ]; then
+    create_manifest_for_all_linux_archs "alpine$variant"
+  fi
+  # Debian
+  for os_version in buster stretch; do
+    create_manifest_for_all_linux_archs "$VERSION-debian-$os_version$variant"
+    if [ "$VERSION" = "$LATEST_VERSION" ]; then
+      create_manifest_for_all_linux_archs "debian-$os_version$variant"
+    fi
+  done
+  create_manifest_for_all_linux_archs "$VERSION-debian$variant"
+  if [ "$VERSION" = "$LATEST_VERSION" ]; then
+    create_manifest_for_all_linux_archs "debian$variant"
+  fi
+
+  # Ubuntu
+  for os_version in focal bionic; do
+    create_manifest_for_all_linux_archs "$VERSION-ubuntu-$os_version$variant"
+    if [ "$VERSION" = "$LATEST_VERSION" ]; then
+      create_manifest_for_all_linux_archs "ubuntu-$os_version$variant"
+    fi
+  done
+  create_manifest_for_all_linux_archs "$VERSION-ubuntu$variant"
+  if [ "$VERSION" = "$LATEST_VERSION" ]; then
+    create_manifest_for_all_linux_archs "ubuntu$variant"
+  fi
+done

@@ -36,18 +36,31 @@ jobs:
           docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:$env:VERSION-windowsservercore
           docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore-ltsc2019
           docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore
-          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-build
-          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore-ltsc2019-build
-          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:windowsservercore-build
+          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:latest-windowsservercore
+          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:latest
+          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 mitmerswinamd64/sbcl:$env:VERSION
+
+          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019-build mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-build
+          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019-build mitmerswinamd64/sbcl:windowsservercore-ltsc2019-build
+          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019-build mitmerswinamd64/sbcl:windowsservercore-build
+          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019-build mitmerswinamd64/sbcl:latest-windowsservercore-build
+          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019-build mitmerswinamd64/sbcl:latest-build
+          docker tag mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019-build mitmerswinamd64/sbcl:$env:VERSION-build
       - name: Push nonbuild image
         run: |
           docker push mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019
           docker push mitmerswinamd64/sbcl:windowsservercore-ltsc2019
           docker push mitmerswinamd64/sbcl:$env:VERSION-windowsservercore
           docker push mitmerswinamd64/sbcl:windowsservercore
+          docker push mitmerswinamd64/sbcl:latest-windowsservercore
+          docker push mitmerswinamd64/sbcl:latest
+          docker push mitmerswinamd64/sbcl:$env:VERSION
       - name: Push build image
         run: |
           docker push mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019-build
           docker push mitmerswinamd64/sbcl:windowsservercore-ltsc2019-build
           docker push mitmerswinamd64/sbcl:$env:VERSION-windowsservercore-build
           docker push mitmerswinamd64/sbcl:windowsservercore-build
+          docker push mitmerswinamd64/sbcl:latest-windowsservercore-build
+          docker push mitmerswinamd64/sbcl:latest-build
+          docker push mitmerswinamd64/sbcl:$env:VERSION-build

@@ -7,43 +7,27 @@ jobs:
     name: Release images
     runs-on: ubuntu-20.04
     env:
+      ALPINE_LATEST: "3.12"
+      DEBIAN_LATEST: "buster"
       DOCKER_CLI_EXPERIMENTAL: "enabled"
+      IMAGE_NAME: sbcl
+      IMAGE_NAMESPACE: mitmers
+      INCLUDE_WINDOWS_IN_MANIFEST: "yes"
+      LATEST_VERSION: "2.0.9"
+      UBUNTU_LATEST: focal
       VERSION: "2.0.9"
     steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
       - name: Login to Dockerhub
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - name: Retag all -tmp-master suffixes for Linux
+        run: ./scripts/retag-tmp-master-images
       - name: Release Linux Images
-        run: |
-          create_manifest_for_all_linux_archs () {
-            docker manifest create mitmers/sbcl:$1 mitmersamd64/sbcl:$1 mitmersarm64v8/sbcl:$1 mitmersarm32v7/sbcl:$1
-            docker manifest push -p mitmers/sbcl:$1
-          }
-          for variant in "" -fancy -build; do
-            # Alpine
-            for os_version in 3.12 3.11; do
-              create_manifest_for_all_linux_archs $VERSION-alpine$os_version$variant
-              create_manifest_for_all_linux_archs alpine$os_version$variant
-            done
-            create_manifest_for_all_linux_archs $VERSION-alpine$variant
-            create_manifest_for_all_linux_archs alpine$variant
-            # Debian
-            for os_version in buster stretch; do
-              create_manifest_for_all_linux_archs $VERSION-debian-$os_version$variant
-              create_manifest_for_all_linux_archs debian-$os_version$variant
-            done
-            create_manifest_for_all_linux_archs $VERSION-debian$variant
-            create_manifest_for_all_linux_archs debian$variant
-            # Ubuntu
-            for os_version in focal bionic; do
-              create_manifest_for_all_linux_archs $VERSION-ubuntu-$os_version$variant
-              create_manifest_for_all_linux_archs ubuntu-$os_version$variant
-            done
-            create_manifest_for_all_linux_archs $VERSION-ubuntu$variant
-            create_manifest_for_all_linux_archs ubuntu$variant
-          done
+        run: ./scripts/release-linux-manifests
       - name: Release Windows Images
         run: |
           create_manifest_for_windows () {
@@ -54,11 +38,17 @@ jobs:
           create_manifest_for_windows windowsservercore-ltsc2019
           create_manifest_for_windows $VERSION-windowsservercore
           create_manifest_for_windows windowsservercore
+          create_manifest_for_windows latest-windowsservercore
+          create_manifest_for_windows latest
+          create_manifest_for_windows $VERSION
 
           create_manifest_for_windows $VERSION-windowsservercore-ltsc2019-build
           create_manifest_for_windows windowsservercore-ltsc2019-build
           create_manifest_for_windows $VERSION-windowsservercore-build
           create_manifest_for_windows windowsservercore-build
+          create_manifest_for_windows latest-windowsservercore-build
+          create_manifest_for_windows latest-build
+          create_manifest_for_windows $VERSION-build
       - name: Release Shared Tags
         run: |
           for prefix in $VERSION latest; do
