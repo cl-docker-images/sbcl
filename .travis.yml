@@ -18,7 +18,7 @@ stages:
 services:
   - docker
 
-before_script:
+before_install:
   - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
   - sudo service docker restart
   - docker info
@@ -37,16 +37,6 @@ _nightly: &nightly
   allow_failures:
     if: NOT (type = cron)
   before_script:
-    - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
-    - sudo service docker restart
-    - docker info
-    - |
-      if [ "$TRAVIS_BRANCH" = "master"]; then
-        TAG_SUFFIX="-tmp-master"
-      else
-        TAG_SUFFIX="-tmp"
-      fi
-      export TAG_SUFFIX
     - mkdir tmp
     - cd tmp
     - git clone https://github.com/sbcl/sbcl.git
@@ -268,7 +258,7 @@ jobs:
         SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
-      before_install:
+      install:
         - unset DOCKER_BUILDKIT
         - sudo apt-get remove -y docker docker.io containerd runc
         - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -315,7 +305,7 @@ jobs:
         SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
-      before_install:
+      install:
         - unset DOCKER_BUILDKIT
         - sudo apt-get remove -y docker docker.io containerd runc
         - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -462,7 +452,7 @@ jobs:
         SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
-      before_install:
+      install:
         - unset DOCKER_BUILDKIT
         - sudo apt-get remove -y docker docker.io containerd runc
         - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -509,7 +499,7 @@ jobs:
         SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
-      before_install:
+      install:
         - unset DOCKER_BUILDKIT
         - sudo apt-get remove -y docker docker.io containerd runc
         - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -666,7 +656,7 @@ jobs:
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
-      before_install:
+      install:
         - unset DOCKER_BUILDKIT
         - sudo apt-get remove -y docker docker.io containerd runc
         - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -717,7 +707,7 @@ jobs:
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
-      before_install:
+      install:
         - unset DOCKER_BUILDKIT
         - sudo apt-get remove -y docker docker.io containerd runc
         - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -878,7 +868,7 @@ jobs:
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     - arch: arm64
-      before_install:
+      install:
         - unset DOCKER_BUILDKIT
         - sudo apt-get remove -y docker docker.io containerd runc
         - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -929,7 +919,7 @@ jobs:
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     - arch: arm64
-      before_install:
+      install:
         - unset DOCKER_BUILDKIT
         - sudo apt-get remove -y docker docker.io containerd runc
         - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
