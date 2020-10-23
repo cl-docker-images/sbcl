@@ -22,72 +22,72 @@ stages:
 services:
   - docker
 
+_var_compute_script: &var_detect_script |
+  if [ "$TRAVIS_BRANCH" = "master" ]; then
+    TAG_SUFFIX="-tmp-master"
+  else
+    TAG_SUFFIX="-tmp"
+  fi
+  export TAG_SUFFIX
+
+  # Compute OS_VERSION_SEP
+  if [ "$OS_NAME" = "alpine" ]; then
+    OS_VERSION_SEP=""
+  else
+    OS_VERSION_SEP="-"
+  fi
+  export OS_VERSION_SEP
+
+  #Compute OS_LATEST
+  case "$OS_NAME" in
+    alpine)
+      if [ "$OS_VERSION" = "$ALPINE_LATEST" ]; then
+        OS_LATEST="yes"
+        export OS_LATEST
+      fi
+      ;;
+    debian)
+      if [ "$OS_VERSION" = "$DEBIAN_LATEST" ]; then
+        OS_LATEST="yes"
+        export OS_LATEST
+      fi
+      ;;
+    ubuntu)
+      if [ "$OS_VERSION" = "$UBUNTU_LATEST" ]; then
+        OS_LATEST="yes"
+        export OS_LATEST
+      fi
+      ;;
+    *)
+      exit 1
+      ;;
+  esac
+  # Compute DOCKER_PLATFORM and IMAGE_ARCH_NAMESPACE
+  case "$SIMPLE_ARCH" in
+    amd64)
+      DOCKER_PLATFORM="linux/amd64"
+      IMAGE_ARCH_NAMESPACE="${IMAGE_NAMESPACE}amd64"
+      ;;
+    arm32v7)
+      DOCKER_PLATFORM="linux/arm/v7"
+      IMAGE_ARCH_NAMESPACE="${IMAGE_NAMESPACE}arm32v7"
+      ;;
+    arm64)
+      DOCKER_PLATFORM="linux/arm64/v8"
+      IMAGE_ARCH_NAMESPACE="${IMAGE_NAMESPACE}arm64v8"
+      ;;
+    *)
+      exit 1
+      ;;
+  esac
+  export DOCKER_PLATFORM
+  export IMAGE_ARCH_NAMESPACE
+
+
 before_install:
   - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
   - sudo service docker restart
   - docker info
-  - |
-    if [ "$TRAVIS_BRANCH" = "master" ]; then
-      TAG_SUFFIX="-tmp-master"
-    else
-      TAG_SUFFIX="-tmp"
-    fi
-    export TAG_SUFFIX
-  # Compute OS_VERSION_SEP
-  - |
-    if [ "$OS_NAME" = "alpine" ]; then
-      OS_VERSION_SEP=""
-    else
-      OS_VERSION_SEP="-"
-    fi
-    export OS_VERSION_SEP
-  # Compute OS_LATEST
-  - |
-    case "$OS_NAME" in
-      alpine)
-        if [ "$OS_VERSION" = "$ALPINE_LATEST" ]; then
-          OS_LATEST="yes"
-          export OS_LATEST
-        fi
-        ;;
-      debian)
-        if [ "$OS_VERSION" = "$DEBIAN_LATEST" ]; then
-          OS_LATEST="yes"
-          export OS_LATEST
-        fi
-        ;;
-      ubuntu)
-        if [ "$OS_VERSION" = "$UBUNTU_LATEST" ]; then
-          OS_LATEST="yes"
-          export OS_LATEST
-        fi
-        ;;
-      *)
-        exit 1
-        ;;
-    esac
-  # Compute DOCKER_PLATFORM and IMAGE_ARCH_NAMESPACE
-  - |
-    case "$SIMPLE_ARCH" in
-      amd64)
-        DOCKER_PLATFORM="linux/amd64"
-        IMAGE_ARCH_NAMESPACE="${IMAGE_NAMESPACE}amd64"
-        ;;
-      arm32v7)
-        DOCKER_PLATFORM="linux/arm/v7"
-        IMAGE_ARCH_NAMESPACE="${IMAGE_NAMESPACE}arm32v7"
-        ;;
-      arm64)
-        DOCKER_PLATFORM="linux/arm64/v8"
-        IMAGE_ARCH_NAMESPACE="${IMAGE_NAMESPACE}arm64v8"
-        ;;
-      *)
-        exit 1
-        ;;
-    esac
-    export DOCKER_PLATFORM
-    export IMAGE_ARCH_NAMESPACE
-
 
 _nonnightly: &nonnightly
   if: (NOT (type = cron) AND NOT (branch =~ ^nightly-.*$))
@@ -107,6 +107,7 @@ _nightly: &nightly
 _nonfancy_job: &nonfancy_job
   stage: build
   script:
+    - *var_detect_script
     # Pull the previous images
     - >-
       docker pull
@@ -178,6 +179,7 @@ _nonfancy_job: &nonfancy_job
 _fancy_job: &fancy_job
   stage: build
   script:
+    - *var_detect_script
     # Pull the previous images
     - >-
       docker pull
