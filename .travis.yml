@@ -12,8 +12,8 @@ env:
 
 stages:
   - name: build
-  - name: deploy
-    if: branch = master
+  # - name: deploy
+  #   if: branch = master
 
 services:
   - docker
@@ -22,9 +22,16 @@ before_script:
   - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
   - sudo service docker restart
   - docker info
+  - |
+    if [ "$TRAVIS_BRANCH" = "master"]; then
+      TAG_SUFFIX="-tmp-master"
+    else
+      TAG_SUFFIX="-tmp"
+    fi
+    export TAG_SUFFIX
 
-_nocron: &nocron
-  if: NOT (type = cron)
+_nonnightly: &nonnightly
+  if: (NOT (type = cron) AND NOT (branch =~ ^nightly-.*$))
 
 _nightly: &nightly
   allow_failures:
@@ -33,6 +40,13 @@ _nightly: &nightly
     - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
     - sudo service docker restart
     - docker info
+    - |
+      if [ "$TRAVIS_BRANCH" = "master"]; then
+        TAG_SUFFIX="-tmp-master"
+      else
+        TAG_SUFFIX="-tmp"
+      fi
+      export TAG_SUFFIX
     - mkdir tmp
     - cd tmp
     - git clone https://github.com/sbcl/sbcl.git
@@ -45,54 +59,109 @@ _nonfancy_job: &nonfancy_job
   stage: build
   script:
     # Pull the previous images
-    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" || true
-    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" || true
+    - >-
+      docker pull
+      --platform "$DOCKER_PLATFORM"
+      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION"
+      || true
+    - >-
+      docker pull
+      --platform "$DOCKER_PLATFORM"
+      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-tmp"
+      || true
+    - >-
+      docker pull
+      --platform "$DOCKER_PLATFORM"
+      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-tmp-master"
+      || true
+    - >-
+      docker pull
+      --platform "$DOCKER_PLATFORM"
+      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build"
+      || true
+    - >-
+      docker pull
+      --platform "$DOCKER_PLATFORM"
+      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build-tmp"
+      || true
+    - >-
+      docker pull
+      --platform "$DOCKER_PLATFORM"
+      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build-tmp-master"
+      || true
     # Build the stock image
-    - docker build --platform "$DOCKER_PLATFORM" --pull $IMAGE_BUILDARGS -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" --build-arg BUILDKIT_INLINE_CACHE=1 "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH"
+    - >-
+      docker build
+      --platform "$DOCKER_PLATFORM"
+      --pull
+      -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION$TAG_SUFFIX"
+      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION"
+      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-tmp"
+      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-tmp-master"
+      --build-arg BUILDKIT_INLINE_CACHE=1
+      $IMAGE_BUILDARGS
+      "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH"
     # Tag this image as the build image refers to it by its non-arch specific
     # name
-    - docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" "$IMAGE_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION"
+    - >-
+      docker tag
+      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION$TAG_SUFFIX"
+      "$IMAGE_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION"
     # Build the build variant of the image
-    - docker build --platform "$DOCKER_PLATFORM" $IMAGE_BUILDARGS -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH/Dockerfile.build" "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH"
-    # Tag the images with their various arch specific aliases.
-    - docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION"
-    - '[ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME"'
-    - '[ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME"'
-    - docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION-build"
-    - '[ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME-build"'
-    - '[ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME-build"'
+    - >-
+      docker build
+      --platform "$DOCKER_PLATFORM"
+      -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build$TAG_SUFFIX"
+      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build"
+      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build-tmp"
+      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build-tmp-master"
+      --build-arg BUILDKIT_INLINE_CACHE=1
+      $IMAGE_BUILDARGS
+      -f "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH/Dockerfile.build"
+      "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH"
   after_success: |
     if [ -n "$DOCKER_PASSWORD" ]; then
       docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION"
-      docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION"
-      [ -z "$OS_LATEST" ] || docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME"
-      [ -z "$OS_LATEST" ] || docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME"
-      docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build"
-      docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION-build"
-      [ -z "$OS_LATEST" ] || docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME-build"
-      [ -z "$OS_LATEST" ] || docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME-build"
+      docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION$TAG_SUFFIX"
+      docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build$TAG_SUFFIX"
     fi
 
 _fancy_job: &fancy_job
   stage: build
   script:
     # Pull the previous images
-    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" || true
-    - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" || true
+    - >-
+      docker pull
+      --platform "$DOCKER_PLATFORM"
+      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy"
+      || true
+    - >-
+      docker pull
+      --platform "$DOCKER_PLATFORM"
+      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy-tmp"
+      || true
+    - >-
+      docker pull
+      --platform "$DOCKER_PLATFORM"
+      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy-tmp-master"
+      || true
     # Build the fancy image
-    - docker build --platform "$DOCKER_PLATFORM" --pull $IMAGE_BUILDARGS -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" --build-arg BUILDKIT_INLINE_CACHE=1 -f "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH/Dockerfile.fancy" "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH"
-    # Tag the image with its arch specific aliases
-    - docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy"
-    - '[ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME-fancy"'
-    - '[ -z "$OS_LATEST" ] || docker tag "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME-fancy"'
+    - >-
+      docker build
+      --platform "$DOCKER_PLATFORM"
+      --pull
+      -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy$TAG_SUFFIX"
+      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy"
+      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy-tmp"
+      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy-tmp-master"
+      --build-arg BUILDKIT_INLINE_CACHE=1
+      $IMAGE_BUILDARGS
+      -f "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH/Dockerfile.fancy"
+      "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH"
   after_success: |
     if [ -n "$DOCKER_PASSWORD" ]; then
       docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy"
-      docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy"
-      [ -z "$OS_LATEST" ] || docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME-fancy"
-      [ -z "$OS_LATEST" ] || docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$OS_NAME-fancy"
+      docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy$TAG_SUFFIX"
     fi
 
 jobs:
@@ -108,7 +177,7 @@ jobs:
         OS_VERSION: "3.12"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -118,7 +187,7 @@ jobs:
         OS_VERSION: "3.12"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -128,7 +197,7 @@ jobs:
         OS_VERSION: "3.12"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     # Alpine 3.11
     - arch: amd64
       env:
@@ -138,7 +207,7 @@ jobs:
         OS_VERSION: "3.11"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -147,7 +216,7 @@ jobs:
         OS_VERSION: "3.11"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -156,7 +225,7 @@ jobs:
         OS_VERSION: "3.11"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     # Debian Buster
     - arch: amd64
       env:
@@ -167,7 +236,7 @@ jobs:
         OS_VERSION: "buster"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -177,7 +246,7 @@ jobs:
         OS_VERSION: "buster"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -187,7 +256,7 @@ jobs:
         OS_VERSION: "buster"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     # Debian Stretch
     - arch: amd64
       env:
@@ -197,7 +266,7 @@ jobs:
         OS_VERSION: "stretch"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       before_install:
         - unset DOCKER_BUILDKIT
@@ -214,7 +283,7 @@ jobs:
         OS_VERSION: "stretch"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -223,7 +292,7 @@ jobs:
         OS_VERSION: "stretch"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     # Ubuntu Focal
     - arch: amd64
       env:
@@ -234,7 +303,7 @@ jobs:
         OS_VERSION: "focal"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -244,7 +313,7 @@ jobs:
         OS_VERSION: "focal"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       before_install:
         - unset DOCKER_BUILDKIT
@@ -261,7 +330,7 @@ jobs:
         OS_VERSION: "focal"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     # Ubuntu Bionic
     - arch: amd64
       env:
@@ -271,7 +340,7 @@ jobs:
         OS_VERSION: "bionic"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -280,7 +349,7 @@ jobs:
         OS_VERSION: "bionic"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -289,7 +358,7 @@ jobs:
         OS_VERSION: "bionic"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: [*nonfancy_job, *nocron]
+      <<: [*nonfancy_job, *nonnightly]
 
     # Fancy images
     # Alpine 3.12
@@ -302,7 +371,7 @@ jobs:
         OS_VERSION: "3.12"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -312,7 +381,7 @@ jobs:
         OS_VERSION: "3.12"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -322,7 +391,7 @@ jobs:
         OS_VERSION: "3.12"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     # Alpine 3.11
     - arch: amd64
       env:
@@ -332,7 +401,7 @@ jobs:
         OS_VERSION: "3.11"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -341,7 +410,7 @@ jobs:
         OS_VERSION: "3.11"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -350,7 +419,7 @@ jobs:
         OS_VERSION: "3.11"
         OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     # Debian Buster
     - arch: amd64
       env:
@@ -361,7 +430,7 @@ jobs:
         OS_VERSION: "buster"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -371,7 +440,7 @@ jobs:
         OS_VERSION: "buster"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -381,7 +450,7 @@ jobs:
         OS_VERSION: "buster"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     # Debian Stretch
     - arch: amd64
       env:
@@ -391,7 +460,7 @@ jobs:
         OS_VERSION: "stretch"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     - arch: arm64
       before_install:
         - unset DOCKER_BUILDKIT
@@ -408,7 +477,7 @@ jobs:
         OS_VERSION: "stretch"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -417,7 +486,7 @@ jobs:
         OS_VERSION: "stretch"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     # Ubuntu Focal
     - arch: amd64
       env:
@@ -428,7 +497,7 @@ jobs:
         OS_VERSION: "focal"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -438,7 +507,7 @@ jobs:
         OS_VERSION: "focal"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     - arch: arm64
       before_install:
         - unset DOCKER_BUILDKIT
@@ -455,7 +524,7 @@ jobs:
         OS_VERSION: "focal"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     # Ubuntu Bionic
     - arch: amd64
       env:
@@ -465,7 +534,7 @@ jobs:
         OS_VERSION: "bionic"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
@@ -474,7 +543,7 @@ jobs:
         OS_VERSION: "bionic"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
@@ -483,7 +552,7 @@ jobs:
         OS_VERSION: "bionic"
         OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
-      <<: [*fancy_job, *nocron]
+      <<: [*fancy_job, *nonnightly]
 
     # Nightly jobs
     # Alpine 3.12
@@ -908,32 +977,32 @@ jobs:
         SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*fancy_job, *nightly]
-    - arch: amd64
-      stage: deploy
-      env:
-        VERSION: nightly
-      script:
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - |
-          create_manifest_for_all_linux_archs () {
-            docker manifest create "$IMAGE_NAMESPACE/sbcl:$1" mitmersamd64/sbcl:$1 mitmersarm64v8/sbcl:$1 mitmersarm32v7/sbcl:$1
-            docker manifest push -p "$IMAGE_NAMESPACE/sbcl:$1"
-          }
-        - |
-          for variant in "" -fancy -build; do
-            # Alpine
-            for os_version in 3.12 3.11; do
-              create_manifest_for_all_linux_archs $VERSION-alpine$os_version$variant
-            done
-            create_manifest_for_all_linux_archs $VERSION-alpine$variant
-            # Debian
-            for os_version in buster stretch; do
-              create_manifest_for_all_linux_archs $VERSION-debian-$os_version$variant
-            done
-            create_manifest_for_all_linux_archs $VERSION-debian$variant
-            # Ubuntu
-            for os_version in focal bionic; do
-              create_manifest_for_all_linux_archs $VERSION-ubuntu-$os_version$variant
-            done
-            create_manifest_for_all_linux_archs $VERSION-ubuntu$variant
-          done
+    # - arch: amd64
+    #   stage: deploy
+    #   env:
+    #     VERSION: nightly
+    #   script:
+    #     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    #     - |
+    #       create_manifest_for_all_linux_archs () {
+    #         docker manifest create "$IMAGE_NAMESPACE/sbcl:$1" mitmersamd64/sbcl:$1 mitmersarm64v8/sbcl:$1 mitmersarm32v7/sbcl:$1
+    #         docker manifest push -p "$IMAGE_NAMESPACE/sbcl:$1"
+    #       }
+    #     - |
+    #       for variant in "" -fancy -build; do
+    #         # Alpine
+    #         for os_version in 3.12 3.11; do
+    #           create_manifest_for_all_linux_archs $VERSION-alpine$os_version$variant
+    #         done
+    #         create_manifest_for_all_linux_archs $VERSION-alpine$variant
+    #         # Debian
+    #         for os_version in buster stretch; do
+    #           create_manifest_for_all_linux_archs $VERSION-debian-$os_version$variant
+    #         done
+    #         create_manifest_for_all_linux_archs $VERSION-debian$variant
+    #         # Ubuntu
+    #         for os_version in focal bionic; do
+    #           create_manifest_for_all_linux_archs $VERSION-ubuntu-$os_version$variant
+    #         done
+    #         create_manifest_for_all_linux_archs $VERSION-ubuntu$variant
+    #       done
