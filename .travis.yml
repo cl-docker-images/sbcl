@@ -10,6 +10,11 @@ env:
     IMAGE_NAMESPACE: mitmers
     VERSION: "2.0.9"
 
+stages:
+  - name: build
+  - name: deploy
+    if: branch = master
+
 services:
   - docker
 
@@ -37,6 +42,7 @@ _nightly: &nightly
     - rm -rf tmp
 
 _nonfancy_job: &nonfancy_job
+  stage: build
   script:
     # Pull the previous images
     - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" || true
@@ -69,6 +75,7 @@ _nonfancy_job: &nonfancy_job
     fi
 
 _fancy_job: &fancy_job
+  stage: build
   script:
     # Pull the previous images
     - docker pull --platform "$DOCKER_PLATFORM" "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION" || true
@@ -901,3 +908,32 @@ jobs:
         SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*fancy_job, *nightly]
+    - arch: amd64
+      stage: deploy
+      env:
+        VERSION: nightly
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - |
+          create_manifest_for_all_linux_archs () {
+            docker manifest create "$IMAGE_NAMESPACE/sbcl:$1" mitmersamd64/sbcl:$1 mitmersarm64v8/sbcl:$1 mitmersarm32v7/sbcl:$1
+            docker manifest push -p "$IMAGE_NAMESPACE/sbcl:$1"
+          }
+        - |
+          for variant in "" -fancy -build; do
+            # Alpine
+            for os_version in 3.12 3.11; do
+              create_manifest_for_all_linux_archs $VERSION-alpine$os_version$variant
+            done
+            create_manifest_for_all_linux_archs $VERSION-alpine$variant
+            # Debian
+            for os_version in buster stretch; do
+              create_manifest_for_all_linux_archs $VERSION-debian-$os_version$variant
+            done
+            create_manifest_for_all_linux_archs $VERSION-debian$variant
+            # Ubuntu
+            for os_version in focal bionic; do
+              create_manifest_for_all_linux_archs $VERSION-ubuntu-$os_version$variant
+            done
+            create_manifest_for_all_linux_archs $VERSION-ubuntu$variant
+          done
