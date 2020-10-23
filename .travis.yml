@@ -217,565 +217,565 @@ _fancy_job: &fancy_job
 
 jobs:
   include:
-    # # Regular images
-    # # Alpine 3.12
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.12"
-    #     SIMPLE_ARCH: amd64
-    #   <<: [*nonfancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.12"
-    #     SIMPLE_ARCH: arm64
-    #   <<: [*nonfancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.12"
-    #     SIMPLE_ARCH: arm32v7
-    #   <<: [*nonfancy_job, *nonnightly]
-    # # Alpine 3.11
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.11"
-    #     SIMPLE_ARCH: amd64
-    #   <<: [*nonfancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.11"
-    #     SIMPLE_ARCH: arm64
-    #   <<: [*nonfancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.11"
-    #     SIMPLE_ARCH: arm32v7
-    #   <<: [*nonfancy_job, *nonnightly]
-    # # Debian Buster
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "buster"
-    #     SIMPLE_ARCH: amd64
-    #   <<: [*nonfancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "buster"
-    #     SIMPLE_ARCH: arm64
-    #   <<: [*nonfancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "buster"
-    #     SIMPLE_ARCH: arm32v7
-    #   <<: [*nonfancy_job, *nonnightly]
-    # # Debian Stretch
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "stretch"
-    #     SIMPLE_ARCH: amd64
-    #   <<: [*nonfancy_job, *nonnightly]
-    # - arch: arm64
-    #   install:
-    #     - unset DOCKER_BUILDKIT
-    #     - sudo apt-get remove -y docker docker.io containerd runc
-    #     - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    #     - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    #     - sudo apt-get update
-    #     - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-    #     - sudo apt-get upgrade -y
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "stretch"
-    #     SIMPLE_ARCH: arm64
-    #   <<: [*nonfancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "stretch"
-    #     SIMPLE_ARCH: arm32v7
-    #   <<: [*nonfancy_job, *nonnightly]
-    # # Ubuntu Focal
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "focal"
-    #     SIMPLE_ARCH: amd64
-    #   <<: [*nonfancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "focal"
-    #     SIMPLE_ARCH: arm64
-    #   <<: [*nonfancy_job, *nonnightly]
-    # - arch: arm64
-    #   install:
-    #     - unset DOCKER_BUILDKIT
-    #     - sudo apt-get remove -y docker docker.io containerd runc
-    #     - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    #     - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    #     - sudo apt-get update
-    #     - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "focal"
-    #     SIMPLE_ARCH: arm32v7
-    #   <<: [*nonfancy_job, *nonnightly]
-    # # Ubuntu Bionic
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "bionic"
-    #     SIMPLE_ARCH: amd64
-    #   <<: [*nonfancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "bionic"
-    #     SIMPLE_ARCH: arm64
-    #   <<: [*nonfancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "bionic"
-    #     SIMPLE_ARCH: arm32v7
-    #   <<: [*nonfancy_job, *nonnightly]
+    # Regular images
+    # Alpine 3.12
+    - arch: amd64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        SIMPLE_ARCH: amd64
+      <<: [*nonfancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        SIMPLE_ARCH: arm64
+      <<: [*nonfancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        SIMPLE_ARCH: arm32v7
+      <<: [*nonfancy_job, *nonnightly]
+    # Alpine 3.11
+    - arch: amd64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        SIMPLE_ARCH: amd64
+      <<: [*nonfancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        SIMPLE_ARCH: arm64
+      <<: [*nonfancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        SIMPLE_ARCH: arm32v7
+      <<: [*nonfancy_job, *nonnightly]
+    # Debian Buster
+    - arch: amd64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        SIMPLE_ARCH: amd64
+      <<: [*nonfancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        SIMPLE_ARCH: arm64
+      <<: [*nonfancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        SIMPLE_ARCH: arm32v7
+      <<: [*nonfancy_job, *nonnightly]
+    # Debian Stretch
+    - arch: amd64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        SIMPLE_ARCH: amd64
+      <<: [*nonfancy_job, *nonnightly]
+    - arch: arm64
+      install:
+        - unset DOCKER_BUILDKIT
+        - sudo apt-get remove -y docker docker.io containerd runc
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+        - sudo apt-get upgrade -y
+      env:
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        SIMPLE_ARCH: arm64
+      <<: [*nonfancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        SIMPLE_ARCH: arm32v7
+      <<: [*nonfancy_job, *nonnightly]
+    # Ubuntu Focal
+    - arch: amd64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        SIMPLE_ARCH: amd64
+      <<: [*nonfancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        SIMPLE_ARCH: arm64
+      <<: [*nonfancy_job, *nonnightly]
+    - arch: arm64
+      install:
+        - unset DOCKER_BUILDKIT
+        - sudo apt-get remove -y docker docker.io containerd runc
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        SIMPLE_ARCH: arm32v7
+      <<: [*nonfancy_job, *nonnightly]
+    # Ubuntu Bionic
+    - arch: amd64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        SIMPLE_ARCH: amd64
+      <<: [*nonfancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        SIMPLE_ARCH: arm64
+      <<: [*nonfancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        SIMPLE_ARCH: arm32v7
+      <<: [*nonfancy_job, *nonnightly]
 
-    # # Fancy images
-    # # Alpine 3.12
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.12"
-    #     SIMPLE_ARCH: amd64
-    #   <<: [*fancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.12"
-    #     SIMPLE_ARCH: arm64
-    #   <<: [*fancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.12"
-    #     SIMPLE_ARCH: arm32v7
-    #   <<: [*fancy_job, *nonnightly]
-    # # Alpine 3.11
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.11"
-    #     SIMPLE_ARCH: amd64
-    #   <<: [*fancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.11"
-    #     SIMPLE_ARCH: arm64
-    #   <<: [*fancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.11"
-    #     SIMPLE_ARCH: arm32v7
-    #   <<: [*fancy_job, *nonnightly]
-    # # Debian Buster
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "buster"
-    #     SIMPLE_ARCH: amd64
-    #   <<: [*fancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "buster"
-    #     SIMPLE_ARCH: arm64
-    #   <<: [*fancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "buster"
-    #     SIMPLE_ARCH: arm32v7
-    #   <<: [*fancy_job, *nonnightly]
-    # # Debian Stretch
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "stretch"
-    #     SIMPLE_ARCH: amd64
-    #   <<: [*fancy_job, *nonnightly]
-    # - arch: arm64
-    #   install:
-    #     - unset DOCKER_BUILDKIT
-    #     - sudo apt-get remove -y docker docker.io containerd runc
-    #     - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    #     - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    #     - sudo apt-get update
-    #     - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-    #     - sudo apt-get upgrade -y
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "stretch"
-    #     SIMPLE_ARCH: arm64
-    #   <<: [*fancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "stretch"
-    #     SIMPLE_ARCH: arm32v7
-    #   <<: [*fancy_job, *nonnightly]
-    # # Ubuntu Focal
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "focal"
-    #     SIMPLE_ARCH: amd64
-    #   <<: [*fancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "focal"
-    #     SIMPLE_ARCH: arm64
-    #   <<: [*fancy_job, *nonnightly]
-    # - arch: arm64
-    #   install:
-    #     - unset DOCKER_BUILDKIT
-    #     - sudo apt-get remove -y docker docker.io containerd runc
-    #     - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    #     - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    #     - sudo apt-get update
-    #     - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "focal"
-    #     SIMPLE_ARCH: arm32v7
-    #   <<: [*fancy_job, *nonnightly]
-    # # Ubuntu Bionic
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "bionic"
-    #     SIMPLE_ARCH: amd64
-    #   <<: [*fancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "bionic"
-    #     SIMPLE_ARCH: arm64
-    #   <<: [*fancy_job, *nonnightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "bionic"
-    #     SIMPLE_ARCH: arm32v7
-    #   <<: [*fancy_job, *nonnightly]
+    # Fancy images
+    # Alpine 3.12
+    - arch: amd64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        SIMPLE_ARCH: amd64
+      <<: [*fancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        SIMPLE_ARCH: arm64
+      <<: [*fancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        SIMPLE_ARCH: arm32v7
+      <<: [*fancy_job, *nonnightly]
+    # Alpine 3.11
+    - arch: amd64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        SIMPLE_ARCH: amd64
+      <<: [*fancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        SIMPLE_ARCH: arm64
+      <<: [*fancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        SIMPLE_ARCH: arm32v7
+      <<: [*fancy_job, *nonnightly]
+    # Debian Buster
+    - arch: amd64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        SIMPLE_ARCH: amd64
+      <<: [*fancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        SIMPLE_ARCH: arm64
+      <<: [*fancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        SIMPLE_ARCH: arm32v7
+      <<: [*fancy_job, *nonnightly]
+    # Debian Stretch
+    - arch: amd64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        SIMPLE_ARCH: amd64
+      <<: [*fancy_job, *nonnightly]
+    - arch: arm64
+      install:
+        - unset DOCKER_BUILDKIT
+        - sudo apt-get remove -y docker docker.io containerd runc
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+        - sudo apt-get upgrade -y
+      env:
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        SIMPLE_ARCH: arm64
+      <<: [*fancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        SIMPLE_ARCH: arm32v7
+      <<: [*fancy_job, *nonnightly]
+    # Ubuntu Focal
+    - arch: amd64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        SIMPLE_ARCH: amd64
+      <<: [*fancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        SIMPLE_ARCH: arm64
+      <<: [*fancy_job, *nonnightly]
+    - arch: arm64
+      install:
+        - unset DOCKER_BUILDKIT
+        - sudo apt-get remove -y docker docker.io containerd runc
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        SIMPLE_ARCH: arm32v7
+      <<: [*fancy_job, *nonnightly]
+    # Ubuntu Bionic
+    - arch: amd64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        SIMPLE_ARCH: amd64
+      <<: [*fancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        SIMPLE_ARCH: arm64
+      <<: [*fancy_job, *nonnightly]
+    - arch: arm64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        SIMPLE_ARCH: arm32v7
+      <<: [*fancy_job, *nonnightly]
 
-    # # Nightly jobs
-    # # Alpine 3.12
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.12"
-    #     SIMPLE_ARCH: amd64
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.12"
-    #     SIMPLE_ARCH: arm64
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.12"
-    #     SIMPLE_ARCH: arm32v7
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # # Alpine 3.11
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.11"
-    #     SIMPLE_ARCH: amd64
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.11"
-    #     SIMPLE_ARCH: arm64
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.11"
-    #     SIMPLE_ARCH: arm32v7
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # # Debian Buster
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "buster"
-    #     SIMPLE_ARCH: amd64
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "buster"
-    #     SIMPLE_ARCH: arm64
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "buster"
-    #     SIMPLE_ARCH: arm32v7
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # # Debian Stretch
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "stretch"
-    #     SIMPLE_ARCH: amd64
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # - arch: arm64
-    #   install:
-    #     - unset DOCKER_BUILDKIT
-    #     - sudo apt-get remove -y docker docker.io containerd runc
-    #     - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    #     - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    #     - sudo apt-get update
-    #     - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-    #     - sudo apt-get upgrade -y
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "stretch"
-    #     SIMPLE_ARCH: arm64
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "stretch"
-    #     SIMPLE_ARCH: arm32v7
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # # Ubuntu Focal
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "focal"
-    #     SIMPLE_ARCH: amd64
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "focal"
-    #     SIMPLE_ARCH: arm64
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # - arch: arm64
-    #   install:
-    #     - unset DOCKER_BUILDKIT
-    #     - sudo apt-get remove -y docker docker.io containerd runc
-    #     - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    #     - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    #     - sudo apt-get update
-    #     - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "focal"
-    #     SIMPLE_ARCH: arm32v7
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # # Ubuntu Bionic
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "bionic"
-    #     SIMPLE_ARCH: amd64
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "bionic"
-    #     SIMPLE_ARCH: arm64
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "bionic"
-    #     SIMPLE_ARCH: arm32v7
-    #     VERSION: nightly
-    #   <<: [*nonfancy_job, *nightly]
+    # Nightly jobs
+    # Alpine 3.12
+    - arch: amd64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        SIMPLE_ARCH: amd64
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        SIMPLE_ARCH: arm64
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        SIMPLE_ARCH: arm32v7
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    # Alpine 3.11
+    - arch: amd64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        SIMPLE_ARCH: amd64
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        SIMPLE_ARCH: arm64
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        SIMPLE_ARCH: arm32v7
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    # Debian Buster
+    - arch: amd64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        SIMPLE_ARCH: amd64
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        SIMPLE_ARCH: arm64
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        SIMPLE_ARCH: arm32v7
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    # Debian Stretch
+    - arch: amd64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        SIMPLE_ARCH: amd64
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    - arch: arm64
+      install:
+        - unset DOCKER_BUILDKIT
+        - sudo apt-get remove -y docker docker.io containerd runc
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+        - sudo apt-get upgrade -y
+      env:
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        SIMPLE_ARCH: arm64
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        SIMPLE_ARCH: arm32v7
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    # Ubuntu Focal
+    - arch: amd64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        SIMPLE_ARCH: amd64
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        SIMPLE_ARCH: arm64
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    - arch: arm64
+      install:
+        - unset DOCKER_BUILDKIT
+        - sudo apt-get remove -y docker docker.io containerd runc
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        SIMPLE_ARCH: arm32v7
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    # Ubuntu Bionic
+    - arch: amd64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        SIMPLE_ARCH: amd64
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        SIMPLE_ARCH: arm64
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        SIMPLE_ARCH: arm32v7
+        VERSION: nightly
+      <<: [*nonfancy_job, *nightly]
 
-    # # Fancy images
-    # # Alpine 3.12
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.12"
-    #     SIMPLE_ARCH: amd64
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.12"
-    #     SIMPLE_ARCH: arm64
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.12"
-    #     SIMPLE_ARCH: arm32v7
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # # Alpine 3.11
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.11"
-    #     SIMPLE_ARCH: amd64
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.11"
-    #     SIMPLE_ARCH: arm64
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: alpine
-    #     OS_VERSION: "3.11"
-    #     SIMPLE_ARCH: arm32v7
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # # Debian Buster
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "buster"
-    #     SIMPLE_ARCH: amd64
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "buster"
-    #     SIMPLE_ARCH: arm64
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "buster"
-    #     SIMPLE_ARCH: arm32v7
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # # Debian Stretch
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "stretch"
-    #     SIMPLE_ARCH: amd64
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # - arch: arm64
-    #   install:
-    #     - unset DOCKER_BUILDKIT
-    #     - sudo apt-get remove -y docker docker.io containerd runc
-    #     - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    #     - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    #     - sudo apt-get update
-    #     - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-    #     - sudo apt-get upgrade -y
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "stretch"
-    #     SIMPLE_ARCH: arm64
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: debian
-    #     OS_VERSION: "stretch"
-    #     SIMPLE_ARCH: arm32v7
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # # Ubuntu Focal
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "focal"
-    #     SIMPLE_ARCH: amd64
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "focal"
-    #     SIMPLE_ARCH: arm64
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # - arch: arm64
-    #   install:
-    #     - unset DOCKER_BUILDKIT
-    #     - sudo apt-get remove -y docker docker.io containerd runc
-    #     - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    #     - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    #     - sudo apt-get update
-    #     - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "focal"
-    #     SIMPLE_ARCH: arm32v7
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # # Ubuntu Bionic
-    # - arch: amd64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "bionic"
-    #     SIMPLE_ARCH: amd64
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "bionic"
-    #     SIMPLE_ARCH: arm64
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
-    # - arch: arm64
-    #   env:
-    #     OS_NAME: ubuntu
-    #     OS_VERSION: "bionic"
-    #     SIMPLE_ARCH: arm32v7
-    #     VERSION: nightly
-    #   <<: [*fancy_job, *nightly]
+    # Fancy images
+    # Alpine 3.12
+    - arch: amd64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        SIMPLE_ARCH: amd64
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        SIMPLE_ARCH: arm64
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.12"
+        SIMPLE_ARCH: arm32v7
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    # Alpine 3.11
+    - arch: amd64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        SIMPLE_ARCH: amd64
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        SIMPLE_ARCH: arm64
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: alpine
+        OS_VERSION: "3.11"
+        SIMPLE_ARCH: arm32v7
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    # Debian Buster
+    - arch: amd64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        SIMPLE_ARCH: amd64
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        SIMPLE_ARCH: arm64
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "buster"
+        SIMPLE_ARCH: arm32v7
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    # Debian Stretch
+    - arch: amd64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        SIMPLE_ARCH: amd64
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    - arch: arm64
+      install:
+        - unset DOCKER_BUILDKIT
+        - sudo apt-get remove -y docker docker.io containerd runc
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+        - sudo apt-get upgrade -y
+      env:
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        SIMPLE_ARCH: arm64
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: debian
+        OS_VERSION: "stretch"
+        SIMPLE_ARCH: arm32v7
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    # Ubuntu Focal
+    - arch: amd64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        SIMPLE_ARCH: amd64
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        SIMPLE_ARCH: arm64
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    - arch: arm64
+      install:
+        - unset DOCKER_BUILDKIT
+        - sudo apt-get remove -y docker docker.io containerd runc
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "focal"
+        SIMPLE_ARCH: arm32v7
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    # Ubuntu Bionic
+    - arch: amd64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        SIMPLE_ARCH: amd64
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        SIMPLE_ARCH: arm64
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
+    - arch: arm64
+      env:
+        OS_NAME: ubuntu
+        OS_VERSION: "bionic"
+        SIMPLE_ARCH: arm32v7
+        VERSION: nightly
+      <<: [*fancy_job, *nightly]
     - arch: amd64
       stage: deploy
       env:
