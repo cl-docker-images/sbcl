@@ -812,6 +812,7 @@ jobs:
             for arch in amd64 arm32v7 arm64v8; do
               docker tag ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian-$DEBIAN_LATEST$variant ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian$variant
               docker push ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian$variant
+              docker tag ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian-$DEBIAN_LATEST$variant ${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION$variant
             done
           done
           # Ubuntu
@@ -842,6 +843,7 @@ jobs:
               create_manifest_for_all_linux_archs $VERSION-debian-$os_version$variant
             done
             create_manifest_for_all_linux_archs $VERSION-debian$variant
+            create_manifest_for_all_linux_archs $VERSION$variant
             # Ubuntu
             for os_version in focal bionic; do
               create_manifest_for_all_linux_archs $VERSION-ubuntu-$os_version$variant
