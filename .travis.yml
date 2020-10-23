@@ -66,6 +66,27 @@ before_install:
         exit 1
         ;;
     esac
+  # Compute DOCKER_PLATFORM and IMAGE_ARCH_NAMESPACE
+  - |
+    case "$SIMPLE_ARCH" in
+      amd64)
+        DOCKER_PLATFORM="linux/amd64"
+        IMAGE_ARCH_NAMESPACE="${IMAGE_NAMESPACE}amd64"
+        ;;
+      arm32v7)
+        DOCKER_PLATFORM="linux/arm/v7"
+        IMAGE_ARCH_NAMESPACE="${IMAGE_NAMESPACE}arm32v7"
+        ;;
+      arm64)
+        DOCKER_PLATFORM="linux/arm64/v8"
+        IMAGE_ARCH_NAMESPACE="${IMAGE_NAMESPACE}arm64v8"
+        ;;
+      *)
+        exit 1
+        ;;
+    esac
+    export DOCKER_PLATFORM
+    export IMAGE_ARCH_NAMESPACE
 
 
 _nonnightly: &nonnightly
@@ -198,24 +219,18 @@ jobs:
     # Alpine 3.12
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: alpine
         OS_VERSION: "3.12"
         SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: alpine
         OS_VERSION: "3.12"
         SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: alpine
         OS_VERSION: "3.12"
         SIMPLE_ARCH: arm32v7
@@ -223,24 +238,18 @@ jobs:
     # Alpine 3.11
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: alpine
         OS_VERSION: "3.11"
         SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: alpine
         OS_VERSION: "3.11"
         SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: alpine
         OS_VERSION: "3.11"
         SIMPLE_ARCH: arm32v7
@@ -248,24 +257,18 @@ jobs:
     # Debian Buster
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: debian
         OS_VERSION: "buster"
         SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: debian
         OS_VERSION: "buster"
         SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: debian
         OS_VERSION: "buster"
         SIMPLE_ARCH: arm32v7
@@ -273,8 +276,6 @@ jobs:
     # Debian Stretch
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: debian
         OS_VERSION: "stretch"
         SIMPLE_ARCH: amd64
@@ -289,16 +290,12 @@ jobs:
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
         - sudo apt-get upgrade -y
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: debian
         OS_VERSION: "stretch"
         SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: debian
         OS_VERSION: "stretch"
         SIMPLE_ARCH: arm32v7
@@ -306,16 +303,12 @@ jobs:
     # Ubuntu Focal
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: ubuntu
         OS_VERSION: "focal"
         SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: ubuntu
         OS_VERSION: "focal"
         SIMPLE_ARCH: arm64
@@ -329,8 +322,6 @@ jobs:
         - sudo apt-get update
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: ubuntu
         OS_VERSION: "focal"
         SIMPLE_ARCH: arm32v7
@@ -338,24 +329,18 @@ jobs:
     # Ubuntu Bionic
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
         SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
         SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
         SIMPLE_ARCH: arm32v7
@@ -365,24 +350,18 @@ jobs:
     # Alpine 3.12
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: alpine
         OS_VERSION: "3.12"
         SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: alpine
         OS_VERSION: "3.12"
         SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: alpine
         OS_VERSION: "3.12"
         SIMPLE_ARCH: arm32v7
@@ -390,24 +369,18 @@ jobs:
     # Alpine 3.11
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: alpine
         OS_VERSION: "3.11"
         SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: alpine
         OS_VERSION: "3.11"
         SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: alpine
         OS_VERSION: "3.11"
         SIMPLE_ARCH: arm32v7
@@ -415,24 +388,18 @@ jobs:
     # Debian Buster
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: debian
         OS_VERSION: "buster"
         SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: debian
         OS_VERSION: "buster"
         SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: debian
         OS_VERSION: "buster"
         SIMPLE_ARCH: arm32v7
@@ -440,8 +407,6 @@ jobs:
     # Debian Stretch
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: debian
         OS_VERSION: "stretch"
         SIMPLE_ARCH: amd64
@@ -456,16 +421,12 @@ jobs:
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
         - sudo apt-get upgrade -y
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: debian
         OS_VERSION: "stretch"
         SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: debian
         OS_VERSION: "stretch"
         SIMPLE_ARCH: arm32v7
@@ -473,16 +434,12 @@ jobs:
     # Ubuntu Focal
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: ubuntu
         OS_VERSION: "focal"
         SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: ubuntu
         OS_VERSION: "focal"
         SIMPLE_ARCH: arm64
@@ -496,8 +453,6 @@ jobs:
         - sudo apt-get update
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: ubuntu
         OS_VERSION: "focal"
         SIMPLE_ARCH: arm32v7
@@ -505,24 +460,18 @@ jobs:
     # Ubuntu Bionic
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
         SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
         SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
         SIMPLE_ARCH: arm32v7
@@ -532,8 +481,6 @@ jobs:
     # Alpine 3.12
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: alpine
         OS_VERSION: "3.12"
         SIMPLE_ARCH: amd64
@@ -541,8 +488,6 @@ jobs:
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: alpine
         OS_VERSION: "3.12"
         SIMPLE_ARCH: arm64
@@ -550,8 +495,6 @@ jobs:
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: alpine
         OS_VERSION: "3.12"
         SIMPLE_ARCH: arm32v7
@@ -560,8 +503,6 @@ jobs:
     # Alpine 3.11
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: alpine
         OS_VERSION: "3.11"
         SIMPLE_ARCH: amd64
@@ -569,8 +510,6 @@ jobs:
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: alpine
         OS_VERSION: "3.11"
         SIMPLE_ARCH: arm64
@@ -578,8 +517,6 @@ jobs:
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: alpine
         OS_VERSION: "3.11"
         SIMPLE_ARCH: arm32v7
@@ -588,8 +525,6 @@ jobs:
     # Debian Buster
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: debian
         OS_VERSION: "buster"
         SIMPLE_ARCH: amd64
@@ -597,8 +532,6 @@ jobs:
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: debian
         OS_VERSION: "buster"
         SIMPLE_ARCH: arm64
@@ -606,8 +539,6 @@ jobs:
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: debian
         OS_VERSION: "buster"
         SIMPLE_ARCH: arm32v7
@@ -616,8 +547,6 @@ jobs:
     # Debian Stretch
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: debian
         OS_VERSION: "stretch"
         SIMPLE_ARCH: amd64
@@ -633,8 +562,6 @@ jobs:
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
         - sudo apt-get upgrade -y
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: debian
         OS_VERSION: "stretch"
         SIMPLE_ARCH: arm64
@@ -642,8 +569,6 @@ jobs:
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: debian
         OS_VERSION: "stretch"
         SIMPLE_ARCH: arm32v7
@@ -652,8 +577,6 @@ jobs:
     # Ubuntu Focal
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: ubuntu
         OS_VERSION: "focal"
         SIMPLE_ARCH: amd64
@@ -661,8 +584,6 @@ jobs:
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: ubuntu
         OS_VERSION: "focal"
         SIMPLE_ARCH: arm64
@@ -677,8 +598,6 @@ jobs:
         - sudo apt-get update
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: ubuntu
         OS_VERSION: "focal"
         SIMPLE_ARCH: arm32v7
@@ -687,8 +606,6 @@ jobs:
     # Ubuntu Bionic
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
         SIMPLE_ARCH: amd64
@@ -696,8 +613,6 @@ jobs:
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
         SIMPLE_ARCH: arm64
@@ -705,8 +620,6 @@ jobs:
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
         SIMPLE_ARCH: arm32v7
@@ -717,8 +630,6 @@ jobs:
     # Alpine 3.12
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: alpine
         OS_VERSION: "3.12"
         SIMPLE_ARCH: amd64
@@ -726,8 +637,6 @@ jobs:
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: alpine
         OS_VERSION: "3.12"
         SIMPLE_ARCH: arm64
@@ -735,8 +644,6 @@ jobs:
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: alpine
         OS_VERSION: "3.12"
         SIMPLE_ARCH: arm32v7
@@ -745,8 +652,6 @@ jobs:
     # Alpine 3.11
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: alpine
         OS_VERSION: "3.11"
         SIMPLE_ARCH: amd64
@@ -754,8 +659,6 @@ jobs:
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: alpine
         OS_VERSION: "3.11"
         SIMPLE_ARCH: arm64
@@ -763,8 +666,6 @@ jobs:
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: alpine
         OS_VERSION: "3.11"
         SIMPLE_ARCH: arm32v7
@@ -773,8 +674,6 @@ jobs:
     # Debian Buster
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: debian
         OS_VERSION: "buster"
         SIMPLE_ARCH: amd64
@@ -782,8 +681,6 @@ jobs:
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: debian
         OS_VERSION: "buster"
         SIMPLE_ARCH: arm64
@@ -791,8 +688,6 @@ jobs:
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: debian
         OS_VERSION: "buster"
         SIMPLE_ARCH: arm32v7
@@ -801,8 +696,6 @@ jobs:
     # Debian Stretch
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: debian
         OS_VERSION: "stretch"
         SIMPLE_ARCH: amd64
@@ -818,8 +711,6 @@ jobs:
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
         - sudo apt-get upgrade -y
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: debian
         OS_VERSION: "stretch"
         SIMPLE_ARCH: arm64
@@ -827,8 +718,6 @@ jobs:
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: debian
         OS_VERSION: "stretch"
         SIMPLE_ARCH: arm32v7
@@ -837,8 +726,6 @@ jobs:
     # Ubuntu Focal
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: ubuntu
         OS_VERSION: "focal"
         SIMPLE_ARCH: amd64
@@ -846,8 +733,6 @@ jobs:
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: ubuntu
         OS_VERSION: "focal"
         SIMPLE_ARCH: arm64
@@ -862,8 +747,6 @@ jobs:
         - sudo apt-get update
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: ubuntu
         OS_VERSION: "focal"
         SIMPLE_ARCH: arm32v7
@@ -872,8 +755,6 @@ jobs:
     # Ubuntu Bionic
     - arch: amd64
       env:
-        DOCKER_PLATFORM: linux/amd64
-        IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
         SIMPLE_ARCH: amd64
@@ -881,8 +762,6 @@ jobs:
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm64/v8
-        IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
         SIMPLE_ARCH: arm64
@@ -890,8 +769,6 @@ jobs:
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
-        DOCKER_PLATFORM: linux/arm/v7
-        IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
         SIMPLE_ARCH: arm32v7
