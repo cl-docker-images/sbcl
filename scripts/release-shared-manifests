@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 create_shared_tag () {
   if [ "$2" = "yes" ]; then
     docker manifest create "$IMAGE_NAMESPACE/$IMAGE_NAME:$1" "${IMAGE_NAMESPACE}amd64/$IMAGE_NAME:$1" "${IMAGE_NAMESPACE}arm32v7/$IMAGE_NAME:$1" "${IMAGE_NAMESPACE}arm64v8/$IMAGE_NAME:$1" "${IMAGE_NAMESPACE}winamd64/$IMAGE_NAME:$1"
@@ -11,7 +13,12 @@ create_shared_tag () {
 
 for variant in "" -build; do
   create_shared_tag "$VERSION$variant" "$INCLUDE_WINDOWS_IN_MANIFEST"
-  create_shared_tag "latest-$variant" "$INCLUDE_WINDOWS_IN_MANIFEST"
+  if [ "$VERSION" = "$LATEST_VERSION" ]; then
+    create_shared_tag "latest$variant" "$INCLUDE_WINDOWS_IN_MANIFEST"
+  fi
 done
+
 create_shared_tag "$VERSION-fancy" "no"
-create_shared_tag "latest-fancy" "no"
+if [ "$VERSION" = "$LATEST_VERSION" ]; then
+  create_shared_tag "latest-fancy" "no"
+fi
