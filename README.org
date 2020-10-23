@@ -40,8 +40,7 @@
 * Quick Reference
 
   + SBCL Home Page :: [[http://sbcl.org][http://sbcl.org]]
-  + Where to file Docker image related issues :: [[https://gitlab.com/mit-mers/docker/sbcl]]
-  + Where to file issues for build infrastructure :: [[https://gitlab.com/mit-mers/docker/library]]
+  + Where to file Docker image related issues :: [[https://github.com/cl-docker-images/sbcl]]
   + Where to file issues for SBCL itself :: [[https://bugs.launchpad.net/sbcl][https://bugs.launchpad.net/sbcl]]
   + Maintained by :: [[https://github.com/daewok][Eric Timmons]] and the [[https://mers.csail.mit.edu/][MIT MERS Group]] (i.e., this is not an official SBCL image)
   + Supported platforms :: =linux/amd64=, =linux/arm64=, =linux/arm/v7=, =windows/amd64=
