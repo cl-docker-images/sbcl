@@ -22,9 +22,8 @@ before_script:
   - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
   - sudo service docker restart
   - docker info
-  - echo "$TRAVIS_BRANCH"
   - |
-    if [ "$TRAVIS_BRANCH" = "master"]; then
+    if [ "$TRAVIS_BRANCH" = "master" ]; then
       TAG_SUFFIX="-tmp-master"
     else
       TAG_SUFFIX="-tmp"
