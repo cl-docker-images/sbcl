@@ -1,13 +1,17 @@
 os: linux
 dist: focal
-language: minimal
+language: shell
+
 
 env:
   global:
+    ALPINE_LATEST: "3.12"
+    DEBIAN_LATEST: "buster"
     DOCKER_BUILDKIT: "1"
     DOCKER_CLI_EXPERIMENTAL: "enabled"
     IMAGE_NAME: sbcl
     IMAGE_NAMESPACE: mitmers
+    UBUNTU_LATEST: "focal"
     VERSION: "2.0.9"
 
 stages:
@@ -29,6 +33,40 @@ before_install:
       TAG_SUFFIX="-tmp"
     fi
     export TAG_SUFFIX
+  # Compute OS_VERSION_SEP
+  - |
+    if [ "$OS_NAME" = "alpine" ]; then
+      OS_VERSION_SEP=""
+    else
+      OS_VERSION_SEP="-"
+    fi
+    export OS_VERSION_SEP
+  # Compute OS_LATEST
+  - |
+    case "$OS_NAME" in
+      alpine)
+        if [ "$OS_VERSION" = "$ALPINE_LATEST" ]; then
+          OS_LATEST="yes"
+          export OS_LATEST
+        fi
+        ;;
+      debian)
+        if [ "$OS_VERSION" = "$DEBIAN_LATEST" ]; then
+          OS_LATEST="yes"
+          export OS_LATEST
+        fi
+        ;;
+      ubuntu)
+        if [ "$OS_VERSION" = "$UBUNTU_LATEST" ]; then
+          OS_LATEST="yes"
+          export OS_LATEST
+        fi
+        ;;
+      *)
+        exit 1
+        ;;
+    esac
+
 
 _nonnightly: &nonnightly
   if: (NOT (type = cron) AND NOT (branch =~ ^nightly-.*$))
@@ -162,30 +200,24 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/amd64
         IMAGE_ARCH_NAMESPACE: mitmersamd64
-        OS_LATEST: "yes"
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
-        OS_LATEST: "yes"
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
-        OS_LATEST: "yes"
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
       <<: [*nonfancy_job, *nonnightly]
     # Alpine 3.11
@@ -195,7 +227,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
@@ -204,7 +235,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
@@ -213,7 +243,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
       <<: [*nonfancy_job, *nonnightly]
     # Debian Buster
@@ -221,30 +250,24 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/amd64
         IMAGE_ARCH_NAMESPACE: mitmersamd64
-        OS_LATEST: "yes"
         OS_NAME: debian
         OS_VERSION: "buster"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
-        OS_LATEST: "yes"
         OS_NAME: debian
         OS_VERSION: "buster"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
-        OS_LATEST: "yes"
         OS_NAME: debian
         OS_VERSION: "buster"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
       <<: [*nonfancy_job, *nonnightly]
     # Debian Stretch
@@ -254,7 +277,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: debian
         OS_VERSION: "stretch"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
@@ -271,7 +293,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: debian
         OS_VERSION: "stretch"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
@@ -280,7 +301,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: debian
         OS_VERSION: "stretch"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
       <<: [*nonfancy_job, *nonnightly]
     # Ubuntu Focal
@@ -288,20 +308,16 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/amd64
         IMAGE_ARCH_NAMESPACE: mitmersamd64
-        OS_LATEST: "yes"
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
-        OS_LATEST: "yes"
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
@@ -315,10 +331,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
-        OS_LATEST: "yes"
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
       <<: [*nonfancy_job, *nonnightly]
     # Ubuntu Bionic
@@ -328,7 +342,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
@@ -337,7 +350,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
@@ -346,7 +358,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
       <<: [*nonfancy_job, *nonnightly]
 
@@ -356,30 +367,24 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/amd64
         IMAGE_ARCH_NAMESPACE: mitmersamd64
-        OS_LATEST: "yes"
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
-        OS_LATEST: "yes"
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
-        OS_LATEST: "yes"
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
       <<: [*fancy_job, *nonnightly]
     # Alpine 3.11
@@ -389,7 +394,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
@@ -398,7 +402,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
@@ -407,7 +410,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
       <<: [*fancy_job, *nonnightly]
     # Debian Buster
@@ -415,30 +417,24 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/amd64
         IMAGE_ARCH_NAMESPACE: mitmersamd64
-        OS_LATEST: "yes"
         OS_NAME: debian
         OS_VERSION: "buster"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
-        OS_LATEST: "yes"
         OS_NAME: debian
         OS_VERSION: "buster"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
-        OS_LATEST: "yes"
         OS_NAME: debian
         OS_VERSION: "buster"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
       <<: [*fancy_job, *nonnightly]
     # Debian Stretch
@@ -448,7 +444,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: debian
         OS_VERSION: "stretch"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
@@ -465,7 +460,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: debian
         OS_VERSION: "stretch"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
@@ -474,7 +468,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: debian
         OS_VERSION: "stretch"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
       <<: [*fancy_job, *nonnightly]
     # Ubuntu Focal
@@ -482,20 +475,16 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/amd64
         IMAGE_ARCH_NAMESPACE: mitmersamd64
-        OS_LATEST: "yes"
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
-        OS_LATEST: "yes"
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
@@ -509,10 +498,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
-        OS_LATEST: "yes"
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
       <<: [*fancy_job, *nonnightly]
     # Ubuntu Bionic
@@ -522,7 +509,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
@@ -531,7 +517,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
@@ -540,7 +525,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
       <<: [*fancy_job, *nonnightly]
 
@@ -550,10 +534,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/amd64
         IMAGE_ARCH_NAMESPACE: mitmersamd64
-        OS_LATEST: "yes"
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -561,10 +543,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
-        OS_LATEST: "yes"
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -572,10 +552,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
-        OS_LATEST: "yes"
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -586,7 +564,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -596,7 +573,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -606,7 +582,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -615,10 +590,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/amd64
         IMAGE_ARCH_NAMESPACE: mitmersamd64
-        OS_LATEST: "yes"
         OS_NAME: debian
         OS_VERSION: "buster"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -626,10 +599,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
-        OS_LATEST: "yes"
         OS_NAME: debian
         OS_VERSION: "buster"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -637,10 +608,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
-        OS_LATEST: "yes"
         OS_NAME: debian
         OS_VERSION: "buster"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -651,7 +620,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: debian
         OS_VERSION: "stretch"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -669,7 +637,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: debian
         OS_VERSION: "stretch"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -679,7 +646,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: debian
         OS_VERSION: "stretch"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -688,10 +654,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/amd64
         IMAGE_ARCH_NAMESPACE: mitmersamd64
-        OS_LATEST: "yes"
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -699,10 +663,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
-        OS_LATEST: "yes"
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -717,10 +679,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
-        OS_LATEST: "yes"
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -731,7 +691,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -741,7 +700,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -751,7 +709,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
@@ -762,10 +719,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/amd64
         IMAGE_ARCH_NAMESPACE: mitmersamd64
-        OS_LATEST: "yes"
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -773,10 +728,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
-        OS_LATEST: "yes"
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -784,10 +737,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
-        OS_LATEST: "yes"
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -798,7 +749,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -808,7 +758,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -818,7 +767,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        OS_VERSION_SEP: ""
         SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -827,10 +775,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/amd64
         IMAGE_ARCH_NAMESPACE: mitmersamd64
-        OS_LATEST: "yes"
         OS_NAME: debian
         OS_VERSION: "buster"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -838,10 +784,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
-        OS_LATEST: "yes"
         OS_NAME: debian
         OS_VERSION: "buster"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -849,10 +793,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
-        OS_LATEST: "yes"
         OS_NAME: debian
         OS_VERSION: "buster"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -863,7 +805,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: debian
         OS_VERSION: "stretch"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -881,7 +822,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: debian
         OS_VERSION: "stretch"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -891,7 +831,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: debian
         OS_VERSION: "stretch"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -900,10 +839,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/amd64
         IMAGE_ARCH_NAMESPACE: mitmersamd64
-        OS_LATEST: "yes"
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -911,10 +848,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/arm64/v8
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
-        OS_LATEST: "yes"
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -929,10 +864,8 @@ jobs:
       env:
         DOCKER_PLATFORM: linux/arm/v7
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
-        OS_LATEST: "yes"
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -943,7 +876,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersamd64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -953,7 +885,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm64v8
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
@@ -963,7 +894,6 @@ jobs:
         IMAGE_ARCH_NAMESPACE: mitmersarm32v7
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        OS_VERSION_SEP: "-"
         SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*fancy_job, *nightly]
