@@ -23,22 +23,18 @@
    + =2.0.9-ubuntu-bionic=, =ubuntu-bionic=
    + =2.0.9-ubuntu-bionic-fancy=, =ubuntu-bionic-fancy=
    + =2.0.9-ubuntu-bionic-build=, =ubuntu-bionic-build=
-   + =2.0.9-windowsservercore-1909=, =2.0.9-windowsservercore=, =windowsservercore-1909=, =windowsservercore=
-   + =2.0.9-windowsservercore-1909-build=, =2.0.9-windowsservercore-build=, =windowsservercore-1909-build=, =windowsservercore-build=
-   + =2.0.9-windowsservercore-ltsc2019=, =windowsservercore-ltsc2019=
-   + =2.0.9-windowsservercore-ltsc2019-build=, =windowsservercore-ltsc2019-build=
+   + =2.0.9-windowsservercore-ltsc2019=, =2.0.9-windowsservercore=, =windowsservercore-ltsc2019=, =windowsservercore=
+   + =2.0.9-windowsservercore-ltsc2019-build=, =2.0.9-windowsservercore-build=, =windowsservercore-ltsc2019-build=, =windowsservercore-build=
 
 ** Shared Tags
 
    + =2.0.9=, =latest=
      + =2.0.9-debian-buster=
-     + =2.0.9-windowsservercore-1909=
      + =2.0.9-windowsservercore-ltsc2019=
    + =2.0.9-fancy=, =latest-fancy=
      + =2.0.9-debian-buster-fancy=
    + =2.0.9-build=, =latest-build=
      + =2.0.9-debian-buster-build=
-     + =2.0.9-windowsservercore-1909-build=
      + =2.0.9-windowsservercore-ltsc2019-build=
 
 * Quick Reference
