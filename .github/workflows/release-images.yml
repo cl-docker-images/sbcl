@@ -63,16 +63,12 @@ jobs:
           create_manifest_for_windows $VERSION-windowsservercore
           create_manifest_for_windows windowsservercore
           create_manifest_for_windows latest-windowsservercore
-          create_manifest_for_windows latest
-          create_manifest_for_windows $VERSION
 
           create_manifest_for_windows $VERSION-windowsservercore-ltsc2019-build
           create_manifest_for_windows windowsservercore-ltsc2019-build
           create_manifest_for_windows $VERSION-windowsservercore-build
           create_manifest_for_windows windowsservercore-build
           create_manifest_for_windows latest-windowsservercore-build
-          create_manifest_for_windows latest-build
-          create_manifest_for_windows $VERSION-build
   release_shared:
     name: Release shared tags
     runs-on: ubuntu-20.04
