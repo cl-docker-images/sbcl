@@ -2,20 +2,21 @@ name: Release all images
 
 on: workflow_dispatch
 
+env:
+  ALPINE_LATEST: "3.12"
+  DEBIAN_LATEST: "buster"
+  DOCKER_CLI_EXPERIMENTAL: "enabled"
+  IMAGE_NAME: sbcl
+  IMAGE_NAMESPACE: mitmers
+  INCLUDE_WINDOWS_IN_MANIFEST: "yes"
+  LATEST_VERSION: "2.0.9"
+  UBUNTU_LATEST: focal
+  VERSION: "2.0.9"
+
 jobs:
-  release_images:
-    name: Release images
+  retag_linux:
+    name: Retag all -tmp-master suffixes for Linux
     runs-on: ubuntu-20.04
-    env:
-      ALPINE_LATEST: "3.12"
-      DEBIAN_LATEST: "buster"
-      DOCKER_CLI_EXPERIMENTAL: "enabled"
-      IMAGE_NAME: sbcl
-      IMAGE_NAMESPACE: mitmers
-      INCLUDE_WINDOWS_IN_MANIFEST: "yes"
-      LATEST_VERSION: "2.0.9"
-      UBUNTU_LATEST: focal
-      VERSION: "2.0.9"
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -26,8 +27,31 @@ jobs:
         run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - name: Retag all -tmp-master suffixes for Linux
         run: ./scripts/retag-tmp-master-images
+  release_linux:
+    name: Release Linux images
+    runs-on: ubuntu-20.04
+    needs: retag_linux
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Login to Dockerhub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - name: Release Linux Images
         run: ./scripts/release-linux-manifests
+  release_windows:
+    name: Release Windows images
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Login to Dockerhub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - name: Release Windows Images
         run: |
           create_manifest_for_windows () {
@@ -49,6 +73,20 @@ jobs:
           create_manifest_for_windows latest-windowsservercore-build
           create_manifest_for_windows latest-build
           create_manifest_for_windows $VERSION-build
+  release_shared:
+    name: Release shared tags
+    runs-on: ubuntu-20.04
+    needs:
+      - release_linux
+      - release_windows
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Login to Dockerhub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - name: Release Shared Tags
         run: |
           for prefix in $VERSION latest; do
