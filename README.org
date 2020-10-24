@@ -1,151 +1,51 @@
 #+TITLE: SBCL Docker Images
-#+AUTHOR: Eric Timmons
 
-* Supported Tags
+This project contains Dockerfiles for a variety of stock SBCL images as well as
+CI infrastructure to automatically build and push them.
 
-** Simple Tags
+See [[file:hub-description.org]] for a more detailed description of the images.
 
-   + =2.0.9-alpine3.12=, =2.0.9-alpine=, =alpine3.12=, =alpine=
-   + =2.0.9-alpine3.12-fancy=, =2.0.9-alpine-fancy= =alpine3.12-fancy=, =alpine-fancy=
-   + =2.0.9-alpine3.12-build=, =2.0.9-alpine-build=, =alpine3.12-build=, =alpine-build=
-   + =2.0.9-alpine3.11=, =alpine3.11=
-   + =2.0.9-alpine3.11-fancy= =alpine3.11-fancy=
-   + =2.0.9-alpine3.11-build=, =alpine3.11-build=
-   + =2.0.9-debian-buster=, =2.0.9-debian=, =debian-buster=, =debian=
-   + =2.0.9-debian-buster-fancy=, =2.0.9-debian-fancy=, =debian-buster-fancy=, =debian-fancy=
-   + =2.0.9-debian-buster-build=, =2.0.9-debian-build=, =debian-buster-build=, =debian-build=
-   + =2.0.9-debian-stretch=, =debian-stretch=
-   + =2.0.9-debian-stretch-fancy=, =debian-stretch-fancy=
-   + =2.0.9-debian-stretch-build=, =debian-stretch-build=
-   + =2.0.9-ubuntu-focal=, =2.0.9-ubuntu=, =ubuntu-focal=, =ubuntu=
-   + =2.0.9-ubuntu-focal-fancy=, =2.0.9-ubuntu-fancy=, =ubuntu-focal-fancy=, =ubuntu-fancy=
-   + =2.0.9-ubuntu-focal-build=, =2.0.9-ubuntu-build=, =ubuntu-focal-build=, =ubuntu-build=
-   + =2.0.9-ubuntu-bionic=, =ubuntu-bionic=
-   + =2.0.9-ubuntu-bionic-fancy=, =ubuntu-bionic-fancy=
-   + =2.0.9-ubuntu-bionic-build=, =ubuntu-bionic-build=
-   + =2.0.9-windowsservercore-ltsc2019=, =2.0.9-windowsservercore=, =windowsservercore-ltsc2019=, =windowsservercore=
-   + =2.0.9-windowsservercore-ltsc2019-build=, =2.0.9-windowsservercore-build=, =windowsservercore-ltsc2019-build=, =windowsservercore-build=
+* Image Repos
 
-** Shared Tags
+  The end goal is to get these images accepted into Docker's official image
+  program. This drives the current layout of the repo as the official images
+  program does not allow images to be customized via build args.
 
-   + =2.0.9=, =latest=
-     + =2.0.9-debian-buster=
-     + =2.0.9-windowsservercore-ltsc2019=
-   + =2.0.9-fancy=, =latest-fancy=
-     + =2.0.9-debian-buster-fancy=
-   + =2.0.9-build=, =latest-build=
-     + =2.0.9-debian-buster-build=
-     + =2.0.9-windowsservercore-ltsc2019-build=
+  Again, similar to the official images program, images are pushed to an arch
+  specific organization and then pushed to a common organization using Docker
+  manifests.
 
-* Quick Reference
+* CI
 
-  + SBCL Home Page :: [[http://sbcl.org][http://sbcl.org]]
-  + Where to file Docker image related issues :: [[https://github.com/cl-docker-images/sbcl]]
-  + Where to file issues for SBCL itself :: [[https://bugs.launchpad.net/sbcl][https://bugs.launchpad.net/sbcl]]
-  + Maintained by :: [[https://github.com/daewok][Eric Timmons]] and the [[https://mers.csail.mit.edu/][MIT MERS Group]] (i.e., this is not an official SBCL image)
-  + Supported platforms :: =linux/amd64=, =linux/arm64=, =linux/arm/v7=, =windows/amd64=
-  + Previously known as :: =daewok/sbcl=
+  We use a mixture of Travis CI and GitHub Actions to build the images. Travis
+  is responsible for building all Linux based images and GitHub Actions builds
+  the Windows based images. The reason for this split is primarily because
+  Travis provides hosted Arm instances, whereas GitHub currently does not.
 
-* What is SBCL?
+  Building the images can take a *long* time and can occasionally fail due to
+  transient conditions outside our control. Given that there are a large number
+  of images, we want to cache images between builds so we can reuse as much
+  work as possible. Additionally, we don't want to waste time rebuilding images
+  that have already been released if the goal is to test changes to the nightly
+  images. Therefore, the CI jobs follow the following rules:
 
-  From [[http://sbcl.org][SBCL's Home Page]]:
+  For jobs run on master, all images are built and pushed to the arch specific
+  repos with tags ending in =-tmp-master=. Nightly images are then retagged
+  without the suffix and pushed to the common org using manifests. When a
+  manual release job is triggered, all non-nightly images are retagged without
+  the suffix and pushed to the common org using manifests.
 
-  #+begin_quote
-  Steel Bank Common Lisp (SBCL) is a high performance Common Lisp compiler. It
-  is open source / free software, with a permissive license. In addition to the
-  compiler and runtime system for ANSI Common Lisp, it provides an interactive
-  environment including a debugger, a statistical profiler, a code coverage
-  tool, and many other extensions.
-  #+end_quote
+  For jobs run on a branch starting with =nightly-= only the nightly images are
+  built and are pushed (if possible) to the arch specific repos with the tag
+  suffix =-tmp=. These tags are used as potential cache sources when building
+  on any branch (including master).
 
-* What's in the image?
+  For jobs run on any other branch, all images are built and pushed (if
+  possible) to the arch specific repos with the tag suffix =-tmp=. These tags
+  are used as potential cache sources when building on any branch (including
+  master).
 
-  This image contains SBCL binaries built from the latest source code released
-  by the SBCL devs for a variety of OSes and architectures.
-
-  The general policy for OS support is that images will be built for two
-  versions of supported OSes: either the two most recent versions or the latest
-  LTS and most recent version, as applicable.
-
-** Patches
-   The goal is to track upstream as closely as possible. Thus, patches are kept
-   to a minimum (and ideally kept for only as long as it takes for them to be
-   upstreamed). The only exception is trivial patches to things like test
-   timeouts (as the stock timeouts can frequently be too short when
-   cross-building images with QEMU).
-
-   In addition to the trivial patches, the following patches are applied when
-   building specific tags.
-
-*** Build with no-pie on Alpine arm64 and arm32v7
-
-    Building pie code on arm64 and arm32v7 on Alpine fails. This is being
-    investigate more before being reported upstream.
-
-*** Removal of =-Wimplicit-fallthrough=
-
-    The version of gcc distributed in Debian Stretch does not recognize this
-    option. Remove if on the only affected configuration (Debian Stretch,
-    amd64).
-
-*** Removal of =-march=armv5=
-
-    GCC version 9 removed the =armv5= architecture target used by SBCL's build
-    configuration for armhf. The affected images (Alpine 3.11+ and Ubuntu Focal
-    for arm32v7) have had the target architecture changed to =armv7-a=. This
-    issue has been [[https://bugs.launchpad.net/sbcl/+bug/1839783][reported upstream]].
-
-*** Fix CPUID Checking
-
-    Backported from SBCL 2.0.10.
-
-** =-fancy= images
-
-   The tags with a =-fancy= suffix have SBCL built by passing =--fancy= to
-   SBCL's =make.sh=. This results in an image that has additional features
-   added, such as core compression and internal xrefs.
-
-** =-build= images
-
-   While the build configuration follows upstream's default set of build
-   features, SBCL is very configurable at build time and it would be a shame to
-   not expose this somehow. Therfore, in addition to the standard images, a set
-   of "build" images (tags with the =-build= suffix) are provided.
-
-   These build images have SBCL already installed in them and include the SBCL
-   source code and any packages needed to build SBCL from scratch. This allows
-   a customized SBCL to be easily built. To customize the feature set, place a
-   file at =/usr/local/src/sbcl-$SBCL_VERSION/customize-target-features.lisp=
-   or =C:\sbcl-$SBCL_VERSION\customize-target-features.lisp=. See the SBCL
-   build instructions for more details on what this file should contain. To
-   patch SBCL, place any number of patch files (ending in ".patch") in
-   =/usr/local/src/sbcl-${SBCL_VERSION}/patches/= or
-   =C:\sbcl-$SBCL_VERSION\patches\=. To build and install SBCL, execute
-   ~rebuild-sbcl~. This script will apply the patches, build, install, and
-   remove the previous copy of SBCL.
-
-   While these build images give a lot of flexibility, it results in the images
-   being much larger than the non-build images. Therefore, it is recommended
-   that you use them in [[https://docs.docker.com/develop/develop-images/multistage-build/][multi-stage builds]].
-
-   Note that the Windows build images do not ship with the full toolchain
-   needed to build SBCL as I have not yet finished my due diligence to
-   understand all the licenses for the tools used (I'm not a Windows developer
-   and don't spend much time on that OS). Until then, the Windows builds will
-   download and install the toolchain as part of the rebuild process.
-
-* License
-
-  SBCL is licensed using a mix of BSD-style and public domain licenses. See
-  SBCL's [[http://sbcl.git.sourceforge.net/git/gitweb.cgi?p=sbcl/sbcl.git;a=blob_plain;f=COPYING;hb=HEAD][COPYING]] file for more info.
-
-  The Dockerfiles used to build the images are licensed under BSD-2-Clause.
-
-  As with all Docker images, these likely also contain other software which may
-  be under other licenses (such as Bash, etc from the base distribution, along
-  with any direct or indirect dependencies of the primary software being
-  contained).
-
-  As for any pre-built image usage, it is the image user's responsibility to
-  ensure that any use of this image complies with any relevant licenses for all
-  software contained within.
+  This tagging scheme means that multiple non-master branches being developed
+  on in parallel will stomp on each other's caches. However, for now, that
+  seems like an acceptable tradeoff when compared to coming up with a more
+  robust tagging scheme.
