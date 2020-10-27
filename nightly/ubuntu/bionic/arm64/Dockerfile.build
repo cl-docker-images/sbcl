@@ -1,4 +1,4 @@
-FROM mitmers/sbcl:nightly-ubuntu-bionic
+FROM daewok/sbcl:nightly-ubuntu-bionic
 
 WORKDIR /usr/local/src/
 

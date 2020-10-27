@@ -1,4 +1,4 @@
-FROM mitmers/sbcl:2.0.9-ubuntu-bionic
+FROM daewok/sbcl:2.0.9-ubuntu-bionic
 
 WORKDIR /usr/local/src/
 

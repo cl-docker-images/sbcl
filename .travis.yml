@@ -10,7 +10,7 @@ env:
     DOCKER_BUILDKIT: "1"
     DOCKER_CLI_EXPERIMENTAL: "enabled"
     IMAGE_NAME: sbcl
-    IMAGE_NAMESPACE: mitmers
+    IMAGE_NAMESPACE: daewok
     LATEST_VERSION: "2.0.9"
     UBUNTU_LATEST: "focal"
     VERSION: "2.0.9"

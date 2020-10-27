@@ -1,4 +1,4 @@
-FROM mitmers/sbcl:nightly-debian-stretch
+FROM daewok/sbcl:nightly-debian-stretch
 
 WORKDIR /usr/local/src/
 

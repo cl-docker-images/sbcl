@@ -1,4 +1,4 @@
-FROM mitmers/sbcl:nightly-ubuntu-focal
+FROM daewok/sbcl:nightly-ubuntu-focal
 
 WORKDIR /usr/local/src/
 
