@@ -28,7 +28,7 @@ jobs:
       - name: Build base image
         run: docker build -t daewokwinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 --cache-from daewokwinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 $env:VERSION/windowsservercore/ltsc2019/windows-amd64
       - name: Tag image
-        run: docker tag daewokwinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 daewokwin/sbcl:$env:VERSION-windowsservercore-ltsc2019
+        run: docker tag daewokwinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019 daewok/sbcl:$env:VERSION-windowsservercore-ltsc2019
       - name: Build build image
         run: docker build -t daewokwinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019-build --cache-from daewokwinamd64/sbcl:$env:VERSION-windowsservercore-ltsc2019-build -f $env:VERSION/windowsservercore/ltsc2019/windows-amd64/Dockerfile.build $env:VERSION/windowsservercore/ltsc2019/windows-amd64
       - name: Tag images
