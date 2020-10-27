@@ -8,7 +8,7 @@ RUN $sbclurl = ('https://downloads.sourceforge.net/project/sbcl/sbcl/{0}/sbcl-{0
     Write-Host ('Downloading {0}' -f $sbclurl); \
     Invoke-WebRequest -Uri $sbclurl -OutFile sbcl-source.tar.bz2 -UserAgent "NativeHost"; \
     \
-    $sha256 = 'C4F700350C113FE003EE93A9922146209D6FA50B63C6ACCC4ABF90FB38CB9B9F'; \
+    $sha256 = '51754110B6C54DCD3857A213D6113628A89B4D43348CFD38C1FAC373927A0557'; \
     Write-Host ('Verifying sha256 ({0})' -f $sha256); \
     if ((Get-FileHash sbcl-source.tar.bz2 -Algorithm sha256).Hash -ne $sha256) { \
         Write-Host 'SHA256 check FAILED!'; \

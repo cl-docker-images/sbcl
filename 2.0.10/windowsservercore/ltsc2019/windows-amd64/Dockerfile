@@ -47,7 +47,7 @@ RUN echo 'Saving original machine PATH'; `
     echo 'Downloading SBCL source'; `
     $sbclurl = ('https://downloads.sourceforge.net/project/sbcl/sbcl/{0}/sbcl-{0}-source.tar.bz2' -f $env:SBCL_VERSION); `
     Invoke-WebRequest -Uri $sbclurl -OutFile sbcl-source.tar.bz2 -UserAgent "NativeHost"; `
-    $expectedsha256 = 'C4F700350C113FE003EE93A9922146209D6FA50B63C6ACCC4ABF90FB38CB9B9F'; `
+    $expectedsha256 = '51754110B6C54DCD3857A213D6113628A89B4D43348CFD38C1FAC373927A0557'; `
     $actualsha256 = (Get-FileHash sbcl-source.tar.bz2 -Algorithm sha256).Hash; `
     Write-Host ('Verifying sha256 {0} (expected: {1})' -f $actualsha256, $expectedsha256); `
     if ($actualsha256 -ne $expectedsha256) { `
