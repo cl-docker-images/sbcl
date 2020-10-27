@@ -9,9 +9,9 @@ env:
   IMAGE_NAME: sbcl
   IMAGE_NAMESPACE: daewok
   INCLUDE_WINDOWS_IN_MANIFEST: "yes"
-  LATEST_VERSION: "2.0.9"
+  LATEST_VERSION: "2.0.10"
   UBUNTU_LATEST: focal
-  VERSION: "2.0.9"
+  VERSION: "2.0.10"
 
 jobs:
   retag_linux:

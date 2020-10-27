@@ -10,7 +10,7 @@ jobs:
     name: Push LTSC2019 Image
     runs-on: windows-2019
     env:
-      VERSION: "2.0.9"
+      VERSION: "2.0.10"
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2

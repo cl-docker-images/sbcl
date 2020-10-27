@@ -13,7 +13,7 @@ WORKDIR /usr/local/src/
 RUN set -x \
     && SBCL_BINARY_ARCH_CODE="x86-64" \
     && export SBCL_BINARY_ARCH_CODE \
-    && SBCL_BINARY_VERSION="2.0.9" \
+    && SBCL_BINARY_VERSION="2.0.10" \
     && export SBCL_BINARY_VERSION \
     && download_and_validate_hashes() { \
          curl -L "https://downloads.sourceforge.net/project/sbcl/sbcl/${1}/sbcl-${1}-crhodes.asc" > "sbcl-${1}-crhodes.asc" \
