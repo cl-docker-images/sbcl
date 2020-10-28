@@ -1,6 +1,12 @@
 name: Release all images
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      namespace:
+        description: "The namespace into which the images are released"
+        required: true
+        default: daewok
 
 env:
   ALPINE_LATEST: "3.12"
@@ -55,8 +61,8 @@ jobs:
       - name: Release Windows Images
         run: |
           create_manifest_for_windows () {
-            docker manifest create ${IMAGE_NAMESPACE}/sbcl:$1 ${IMAGE_NAMESPACE}winamd64/sbcl:$1
-            docker manifest push -p ${IMAGE_NAMESPACE}/sbcl:$1
+            docker manifest create ${{ github.event.inputs.namespace }}/sbcl:$1 ${IMAGE_NAMESPACE}winamd64/sbcl:$1
+            docker manifest push -p ${{ github.event.inputs.namespace }}/sbcl:$1
           }
           create_manifest_for_windows $VERSION-windowsservercore-ltsc2019
           create_manifest_for_windows windowsservercore-ltsc2019
@@ -86,14 +92,14 @@ jobs:
       - name: Release Shared Tags
         run: |
           for prefix in $VERSION latest; do
-            docker manifest create ${IMAGE_NAMESPACE}/sbcl:$prefix ${IMAGE_NAMESPACE}amd64/sbcl:$VERSION-debian-buster ${IMAGE_NAMESPACE}arm64v8/sbcl:$VERSION-debian-buster ${IMAGE_NAMESPACE}arm32v7/sbcl:$VERSION-debian-buster ${IMAGE_NAMESPACE}winamd64/sbcl:$VERSION-windowsservercore-ltsc2019
-            docker manifest push -p ${IMAGE_NAMESPACE}/sbcl:$prefix
+            docker manifest create ${{ github.event.inputs.namespace }}/sbcl:$prefix ${IMAGE_NAMESPACE}amd64/sbcl:$VERSION-debian-buster ${IMAGE_NAMESPACE}arm64v8/sbcl:$VERSION-debian-buster ${IMAGE_NAMESPACE}arm32v7/sbcl:$VERSION-debian-buster ${IMAGE_NAMESPACE}winamd64/sbcl:$VERSION-windowsservercore-ltsc2019
+            docker manifest push -p ${{ github.event.inputs.namespace }}/sbcl:$prefix
           done
           for prefix in $VERSION-build latest-build; do
-            docker manifest create ${IMAGE_NAMESPACE}/sbcl:$prefix ${IMAGE_NAMESPACE}amd64/sbcl:$VERSION-debian-buster-build ${IMAGE_NAMESPACE}arm64v8/sbcl:$VERSION-debian-buster-build ${IMAGE_NAMESPACE}arm32v7/sbcl:$VERSION-debian-buster-build ${IMAGE_NAMESPACE}winamd64/sbcl:$VERSION-windowsservercore-ltsc2019-build
-            docker manifest push -p ${IMAGE_NAMESPACE}/sbcl:$prefix
+            docker manifest create ${{ github.event.inputs.namespace }}/sbcl:$prefix ${IMAGE_NAMESPACE}amd64/sbcl:$VERSION-debian-buster-build ${IMAGE_NAMESPACE}arm64v8/sbcl:$VERSION-debian-buster-build ${IMAGE_NAMESPACE}arm32v7/sbcl:$VERSION-debian-buster-build ${IMAGE_NAMESPACE}winamd64/sbcl:$VERSION-windowsservercore-ltsc2019-build
+            docker manifest push -p ${{ github.event.inputs.namespace }}/sbcl:$prefix
           done
           for prefix in $VERSION-fancy latest-fancy; do
-            docker manifest create ${IMAGE_NAMESPACE}/sbcl:$prefix ${IMAGE_NAMESPACE}amd64/sbcl:$VERSION-debian-buster-build ${IMAGE_NAMESPACE}arm64v8/sbcl:$VERSION-debian-buster-build ${IMAGE_NAMESPACE}arm32v7/sbcl:$VERSION-debian-buster-build
-            docker manifest push -p ${IMAGE_NAMESPACE}/sbcl:$prefix
+            docker manifest create ${{ github.event.inputs.namespace }}/sbcl:$prefix ${IMAGE_NAMESPACE}amd64/sbcl:$VERSION-debian-buster-build ${IMAGE_NAMESPACE}arm64v8/sbcl:$VERSION-debian-buster-build ${IMAGE_NAMESPACE}arm32v7/sbcl:$VERSION-debian-buster-build
+            docker manifest push -p ${{ github.event.inputs.namespace }}/sbcl:$prefix
           done
