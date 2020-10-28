@@ -8,6 +8,12 @@ pull_retag_and_push_archs() {
       docker pull "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant-tmp-master"
       docker tag "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant-tmp-master" "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant"
       docker push "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant"
+      if [ "$VERSION" = "$LATEST_VERSION" ]; then
+        docker tag "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant" "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:latest-$1$2$variant"
+        docker push "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:latest-$1$2$variant"
+        docker tag "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant" "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$1$2$variant"
+        docker push "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$1$2$variant"
+      fi
     done
   done
 }
