@@ -10,7 +10,8 @@ env:
     DOCKER_BUILDKIT: "1"
     DOCKER_CLI_EXPERIMENTAL: "enabled"
     IMAGE_NAME: sbcl
-    IMAGE_NAMESPACE: daewok
+    IMAGE_BUILD_NAMESPACE: daewok
+    IMAGE_TARGET_NAMESPACE: daewok
     LATEST_VERSION: "2.0.10"
     UBUNTU_LATEST: "focal"
     VERSION: "2.0.10"
@@ -67,15 +68,15 @@ _var_compute_script: &var_detect_script |
   case "$SIMPLE_ARCH" in
     amd64)
       DOCKER_PLATFORM="linux/amd64"
-      IMAGE_ARCH_NAMESPACE="${IMAGE_NAMESPACE}amd64"
+      IMAGE_ARCH_NAMESPACE="${IMAGE_BUILD_NAMESPACE}amd64"
       ;;
     arm32v7)
       DOCKER_PLATFORM="linux/arm/v7"
-      IMAGE_ARCH_NAMESPACE="${IMAGE_NAMESPACE}arm32v7"
+      IMAGE_ARCH_NAMESPACE="${IMAGE_BUILD_NAMESPACE}arm32v7"
       ;;
     arm64)
       DOCKER_PLATFORM="linux/arm64/v8"
-      IMAGE_ARCH_NAMESPACE="${IMAGE_NAMESPACE}arm64v8"
+      IMAGE_ARCH_NAMESPACE="${IMAGE_BUILD_NAMESPACE}arm64v8"
       ;;
     *)
       exit 1
@@ -157,7 +158,7 @@ _nonfancy_job: &nonfancy_job
     - >-
       docker tag
       "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION$TAG_SUFFIX"
-      "$IMAGE_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION"
+      "$IMAGE_TARGET_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION"
     # Build the build variant of the image
     - >-
       docker build

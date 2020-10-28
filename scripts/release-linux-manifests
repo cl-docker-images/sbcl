@@ -3,8 +3,8 @@
 set -x
 
 create_manifest_for_all_linux_archs () {
-  docker manifest create "$IMAGE_NAMESPACE/$IMAGE_NAME:$1" "${IMAGE_NAMESPACE}amd64/$IMAGE_NAME:$1" "${IMAGE_NAMESPACE}arm64v8/$IMAGE_NAME:$1" "${IMAGE_NAMESPACE}arm32v7/$IMAGE_NAME:$1"
-  docker manifest push -p "$IMAGE_NAMESPACE/$IMAGE_NAME:$1"
+  docker manifest create "$IMAGE_TARGET_NAMESPACE/$IMAGE_NAME:$1" "${IMAGE_BUILD_NAMESPACE}amd64/$IMAGE_NAME:$1" "${IMAGE_BUILD_NAMESPACE}arm64v8/$IMAGE_NAME:$1" "${IMAGE_BUILD_NAMESPACE}arm32v7/$IMAGE_NAME:$1"
+  docker manifest push -p "$IMAGE_TARGET_NAMESPACE/$IMAGE_NAME:$1"
 }
 
 for variant in "" -fancy -build; do

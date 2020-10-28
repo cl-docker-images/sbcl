@@ -5,9 +5,9 @@ set -x
 pull_retag_and_push_archs() {
   for variant in "" -fancy -build; do
     for arch in amd64 arm32v7 arm64v8; do
-      docker pull "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant-tmp-master"
-      docker tag "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant-tmp-master" "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant"
-      docker push "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant"
+      docker pull "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant-tmp-master"
+      docker tag "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant-tmp-master" "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant"
+      docker push "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-$1$2$variant"
     done
   done
 }
@@ -18,13 +18,13 @@ for os_version in 3.12 3.11; do
 done
 for variant in "" -fancy -build; do
   for arch in amd64 arm32v7 arm64v8; do
-    docker tag "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-alpine$ALPINE_LATEST$variant" "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-alpine$variant"
-    docker push "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-alpine$variant"
+    docker tag "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-alpine$ALPINE_LATEST$variant" "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-alpine$variant"
+    docker push "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-alpine$variant"
     if [ "$VERSION" = "$LATEST_VERSION" ]; then
-      docker tag "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-alpine$ALPINE_LATEST$variant" "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:latest-alpine$variant"
-      docker push "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:latest-alpine$variant"
-      docker tag "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-alpine$ALPINE_LATEST$variant" "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:alpine$variant"
-      docker push "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:alpine$variant"
+      docker tag "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-alpine$ALPINE_LATEST$variant" "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:latest-alpine$variant"
+      docker push "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:latest-alpine$variant"
+      docker tag "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-alpine$ALPINE_LATEST$variant" "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:alpine$variant"
+      docker push "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:alpine$variant"
     fi
   done
 done
@@ -35,15 +35,15 @@ for os_version in -buster -stretch; do
 done
 for variant in "" -fancy -build; do
   for arch in amd64 arm32v7 arm64v8; do
-    docker tag "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian-$DEBIAN_LATEST$variant" "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian$variant"
-    docker push "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian$variant"
-    docker tag "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian-$DEBIAN_LATEST$variant" "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION$variant"
-    docker push "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION$variant"
+    docker tag "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian-$DEBIAN_LATEST$variant" "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian$variant"
+    docker push "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian$variant"
+    docker tag "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian-$DEBIAN_LATEST$variant" "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION$variant"
+    docker push "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION$variant"
     if [ "$VERSION" = "$LATEST_VERSION" ]; then
-      docker tag "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian-$DEBIAN_LATEST$variant" "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:latest-debian$variant"
-      docker push "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:latest-debian$variant"
-      docker tag "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian-$DEBIAN_LATEST$variant" "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:debian$variant"
-      docker push "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:debian$variant"
+      docker tag "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian-$DEBIAN_LATEST$variant" "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:latest-debian$variant"
+      docker push "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:latest-debian$variant"
+      docker tag "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-debian-$DEBIAN_LATEST$variant" "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:debian$variant"
+      docker push "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:debian$variant"
     fi
   done
 done
@@ -54,13 +54,13 @@ for os_version in -focal -bionic; do
 done
 for variant in "" -fancy -build; do
   for arch in amd64 arm32v7 arm64v8; do
-    docker tag "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-ubuntu-$UBUNTU_LATEST$variant" "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-ubuntu$variant"
-    docker push "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-ubuntu$variant"
+    docker tag "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-ubuntu-$UBUNTU_LATEST$variant" "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-ubuntu$variant"
+    docker push "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-ubuntu$variant"
     if [ "$VERSION" = "$LATEST_VERSION" ]; then
-      docker tag "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-ubuntu-$UBUNTU_LATEST$variant" "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:latest-ubuntu$variant"
-      docker push "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:latest-ubuntu$variant"
-      docker tag "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-ubuntu-$UBUNTU_LATEST$variant" "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:ubuntu$variant"
-      docker push "${IMAGE_NAMESPACE}$arch/$IMAGE_NAME:ubuntu$variant"
+      docker tag "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-ubuntu-$UBUNTU_LATEST$variant" "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:latest-ubuntu$variant"
+      docker push "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:latest-ubuntu$variant"
+      docker tag "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:$VERSION-ubuntu-$UBUNTU_LATEST$variant" "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:ubuntu$variant"
+      docker push "${IMAGE_BUILD_NAMESPACE}$arch/$IMAGE_NAME:ubuntu$variant"
     fi
   done
 done
