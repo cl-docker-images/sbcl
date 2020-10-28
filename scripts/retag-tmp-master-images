@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+set -xe
 
 pull_retag_and_push_archs() {
   for variant in "" -fancy -build; do
