@@ -218,8 +218,77 @@ pull_retag_and_push_linux_arch_images() {
               docker tag "$build_image_name" "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:$os$variant_tag"
               docker push "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:$os$variant_tag"
             fi
+            if [ "$os" = "$DEFAULT_LINUX_OS" ]; then
+              docker tag "$build_image_name" "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:$VERSION$variant_tag"
+              docker push "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:$VERSION$variant_tag"
+              if [ "$VERSION" = "$LATEST_VERSION" ]; then
+                docker tag "$build_image_name" "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:latest$variant_tag"
+                docker push "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:latest$variant_tag"
+              fi
+            fi
           fi
         done
+      done
+    done
+  done
+}
+
+create_manifest_for_arches() {
+  local tag
+  local valid_images
+  tag="$1"
+  shift
+  valid_images=()
+  for arch_suffix in "$@"; do
+    valid_images+=("$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:$tag")
+  done
+  docker manifest create "$IMAGE_TARGET_NAMESPACE/$IMAGE_NAME:$tag" "${valid_images[@]}"
+  docker manifest push -p "$IMAGE_TARGET_NAMESPACE/$IMAGE_NAME:$tag"
+}
+
+release_linux_manifests() {
+  local os_sep
+  local os_latest_version
+  local arch_suffix
+  local valid_arches
+
+  for os in ${OSES[@]}; do
+    if [ "$os" = "windowsservercore" ]; then
+      continue
+    fi
+    os_sep="$(os_version_sep "$os")"
+    os_latest_version="$(os_latest_version "$os")"
+
+    for os_version in $(os_versions "$os"); do
+      for variant in "" ${VARIANTS[@]}; do
+        if [ -n "$variant" ]; then
+          variant_tag="-$variant"
+        else
+          variant_tag=""
+        fi
+        valid_arches=()
+        for arch in "${ARCHES[@]}"; do
+          if ! tuple_valid "$os" "$os_version" "$variant" "$arch"; then
+            continue
+          fi
+
+          arch_suffix="$(docker_namespace_suffix "$arch")"
+          valid_arches+=("$arch_suffix")
+        done
+
+        create_manifest_for_arches "$VERSION-$os$os_sep$os_version$variant_tag" "${valid_arches[@]}"
+
+        if [ "$VERSION" = "$LATEST_VERSION" ]; then
+          create_manifest_for_arches "latest-$os$os_sep$os_version$variant_tag" "${valid_arches[@]}"
+          create_manifest_for_arches "$os$os_sep$os_version$variant_tag" "${valid_arches[@]}"
+        fi
+        if [ "$os_version" = "$os_latest_version" ]; then
+          create_manifest_for_arches "$VERSION-$os$variant_tag" "${valid_arches[@]}"
+          if [ "$VERSION" = "$LATEST_VERSION" ]; then
+            create_manifest_for_arches "latest-$os$variant_tag" "${valid_arches[@]}"
+            create_manifest_for_arches "$os$variant_tag" "${valid_arches[@]}"
+          fi
+        fi
       done
     done
   done
@@ -257,7 +326,7 @@ case "$1" in
   build|pull|push_build_image|tag_for_next_variant)
     OS_VERSION_SEP="$(os_version_sep "$OS_NAME")"
     ;&
-  pull_retag_and_push_linux_arch_images)
+  pull_retag_and_push_linux_arch_images|release_linux_manifests)
     $1
     ;;
   *)

@@ -652,6 +652,6 @@ jobs:
         # the arch specific repos
         - $BUILD_SCRIPT pull_retag_and_push_linux_arch_images
         # Next, create and push all the linux manifests
-        - ./scripts/release-linux-manifests
+        - $BUILD_SCRIPT release_linux_manifests
         # Last, release shared manifests
         - ./scripts/release-shared-manifests
