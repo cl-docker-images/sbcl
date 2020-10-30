@@ -5,16 +5,9 @@ language: shell
 
 env:
   global:
-    ALPINE_LATEST: "3.12"
-    DEBIAN_LATEST: "buster"
+    BUILD_SCRIPT: cl-docker-images-build/cl-docker-images-build
     DOCKER_BUILDKIT: "1"
     DOCKER_CLI_EXPERIMENTAL: "enabled"
-    IMAGE_NAME: sbcl
-    IMAGE_BUILD_NAMESPACE: daewok
-    IMAGE_TARGET_NAMESPACE: daewok
-    LATEST_VERSION: "2.0.10"
-    UBUNTU_LATEST: "focal"
-    VERSION: "2.0.10"
 
 stages:
   - name: build
@@ -24,72 +17,23 @@ stages:
 services:
   - docker
 
-_var_compute_script: &var_detect_script |
-  if [ "$TRAVIS_BRANCH" = "master" ]; then
-    TAG_SUFFIX="-tmp-master"
-  else
-    TAG_SUFFIX="-tmp"
-  fi
-  export TAG_SUFFIX
-
-  # Compute OS_VERSION_SEP
-  if [ "$OS_NAME" = "alpine" ]; then
-    OS_VERSION_SEP=""
-  else
-    OS_VERSION_SEP="-"
-  fi
-  export OS_VERSION_SEP
-
-  #Compute OS_LATEST
-  case "$OS_NAME" in
-    alpine)
-      if [ "$OS_VERSION" = "$ALPINE_LATEST" ]; then
-        OS_LATEST="yes"
-        export OS_LATEST
-      fi
-      ;;
-    debian)
-      if [ "$OS_VERSION" = "$DEBIAN_LATEST" ]; then
-        OS_LATEST="yes"
-        export OS_LATEST
-      fi
-      ;;
-    ubuntu)
-      if [ "$OS_VERSION" = "$UBUNTU_LATEST" ]; then
-        OS_LATEST="yes"
-        export OS_LATEST
-      fi
-      ;;
-    *)
-      exit 1
-      ;;
-  esac
-  # Compute DOCKER_PLATFORM and IMAGE_ARCH_NAMESPACE
-  case "$SIMPLE_ARCH" in
-    amd64)
-      DOCKER_PLATFORM="linux/amd64"
-      IMAGE_ARCH_NAMESPACE="${IMAGE_BUILD_NAMESPACE}amd64"
-      ;;
-    arm32v7)
-      DOCKER_PLATFORM="linux/arm/v7"
-      IMAGE_ARCH_NAMESPACE="${IMAGE_BUILD_NAMESPACE}arm32v7"
-      ;;
-    arm64)
-      DOCKER_PLATFORM="linux/arm64/v8"
-      IMAGE_ARCH_NAMESPACE="${IMAGE_BUILD_NAMESPACE}arm64v8"
-      ;;
-    *)
-      exit 1
-      ;;
-  esac
-  export DOCKER_PLATFORM
-  export IMAGE_ARCH_NAMESPACE
-
-
 before_install:
   - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
   - sudo service docker restart
   - docker info
+  - |
+    # Log in earlier, to hopefully avoid running into Docker Hub's new pull
+    # limits.
+    if [ -n "$DOCKER_PASSWORD" ]; then
+      docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    fi
+  - |
+    if [ "$TRAVIS_BRANCH" = "master" ]; then
+      BUILD_TAG_SUFFIX="-tmp-master"
+    else
+      BUILD_TAG_SUFFIX="-tmp"
+    fi
+    export BUILD_TAG_SUFFIX
 
 _nonnightly: &nonnightly
   if: (NOT (type = cron) AND NOT (branch =~ ^nightly-.*$))
@@ -102,119 +46,39 @@ _nightly: &nightly
     - cd tmp
     - git clone https://github.com/sbcl/sbcl.git
     - cd sbcl
-    - export IMAGE_BUILDARGS="--build-arg ref=$(git rev-parse HEAD)"
+    - export EXTRA_BUILDARGS="--build-arg ref=$(git rev-parse HEAD)"
     - cd ../..
     - rm -rf tmp
 
 _nonfancy_job: &nonfancy_job
   stage: build
   script:
-    - *var_detect_script
     # Pull the previous images
-    - >-
-      docker pull
-      --platform "$DOCKER_PLATFORM"
-      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION"
-      || true
-    - >-
-      docker pull
-      --platform "$DOCKER_PLATFORM"
-      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-tmp"
-      || true
-    - >-
-      docker pull
-      --platform "$DOCKER_PLATFORM"
-      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-tmp-master"
-      || true
-    - >-
-      docker pull
-      --platform "$DOCKER_PLATFORM"
-      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build"
-      || true
-    - >-
-      docker pull
-      --platform "$DOCKER_PLATFORM"
-      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build-tmp"
-      || true
-    - >-
-      docker pull
-      --platform "$DOCKER_PLATFORM"
-      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build-tmp-master"
-      || true
+    - $BUILD_SCRIPT pull
+    - $BUILD_SCRIPT -t build pull
     # Build the stock image
-    - >-
-      docker build
-      --platform "$DOCKER_PLATFORM"
-      --pull
-      -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION$TAG_SUFFIX"
-      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION"
-      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-tmp"
-      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-tmp-master"
-      --build-arg BUILDKIT_INLINE_CACHE=1
-      $IMAGE_BUILDARGS
-      "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH"
+    - $BUILD_SCRIPT build
     # Tag this image as the build image refers to it by its non-arch specific
     # name
-    - >-
-      docker tag
-      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION$TAG_SUFFIX"
-      "$IMAGE_TARGET_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION"
+    - $BUILD_SCRIPT tag_for_next_variant
     # Build the build variant of the image
-    - >-
-      docker build
-      --platform "$DOCKER_PLATFORM"
-      -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build$TAG_SUFFIX"
-      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build"
-      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build-tmp"
-      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build-tmp-master"
-      --build-arg BUILDKIT_INLINE_CACHE=1
-      $IMAGE_BUILDARGS
-      -f "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH/Dockerfile.build"
-      "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH"
+    - $BUILD_SCRIPT -t build build
   after_success: |
     if [ -n "$DOCKER_PASSWORD" ]; then
-      docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION$TAG_SUFFIX"
-      docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-build$TAG_SUFFIX"
+      $BUILD_SCRIPT push_build_image
+      $BUILD_SCRIPT -t build push_build_image
     fi
 
 _fancy_job: &fancy_job
   stage: build
   script:
-    - *var_detect_script
     # Pull the previous images
-    - >-
-      docker pull
-      --platform "$DOCKER_PLATFORM"
-      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy"
-      || true
-    - >-
-      docker pull
-      --platform "$DOCKER_PLATFORM"
-      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy-tmp"
-      || true
-    - >-
-      docker pull
-      --platform "$DOCKER_PLATFORM"
-      "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy-tmp-master"
-      || true
+    - $BUILD_SCRIPT -t fancy pull
     # Build the fancy image
-    - >-
-      docker build
-      --platform "$DOCKER_PLATFORM"
-      --pull
-      -t "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy$TAG_SUFFIX"
-      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy"
-      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy-tmp"
-      --cache-from "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy-tmp-master"
-      --build-arg BUILDKIT_INLINE_CACHE=1
-      $IMAGE_BUILDARGS
-      -f "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH/Dockerfile.fancy"
-      "$VERSION/$OS_NAME/$OS_VERSION/$SIMPLE_ARCH"
+    - $BUILD_SCRIPT -t fancy build
   after_success: |
     if [ -n "$DOCKER_PASSWORD" ]; then
-      docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      docker push "$IMAGE_ARCH_NAMESPACE/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION-fancy$TAG_SUFFIX"
+      $BUILD_SCRIPT -t fancy push_build_image
     fi
 
 jobs:
@@ -223,66 +87,66 @@ jobs:
     # Alpine 3.12
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        SIMPLE_ARCH: arm32v7
       <<: [*nonfancy_job, *nonnightly]
     # Alpine 3.11
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        SIMPLE_ARCH: arm32v7
       <<: [*nonfancy_job, *nonnightly]
     # Debian Buster
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: debian
         OS_VERSION: "buster"
-        SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: debian
         OS_VERSION: "buster"
-        SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: debian
         OS_VERSION: "buster"
-        SIMPLE_ARCH: arm32v7
       <<: [*nonfancy_job, *nonnightly]
     # Debian Stretch
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: debian
         OS_VERSION: "stretch"
-        SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       install:
@@ -294,28 +158,28 @@ jobs:
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
         - sudo apt-get upgrade -y
       env:
+        ARCH: arm64
         OS_NAME: debian
         OS_VERSION: "stretch"
-        SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: debian
         OS_VERSION: "stretch"
-        SIMPLE_ARCH: arm32v7
       <<: [*nonfancy_job, *nonnightly]
     # Ubuntu Focal
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       install:
@@ -326,94 +190,94 @@ jobs:
         - sudo apt-get update
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
       env:
+        ARCH: arm32v7
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        SIMPLE_ARCH: arm32v7
       <<: [*nonfancy_job, *nonnightly]
     # Ubuntu Bionic
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        SIMPLE_ARCH: amd64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        SIMPLE_ARCH: arm64
       <<: [*nonfancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        SIMPLE_ARCH: arm32v7
       <<: [*nonfancy_job, *nonnightly]
 
     # Fancy images
     # Alpine 3.12
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        SIMPLE_ARCH: arm32v7
       <<: [*fancy_job, *nonnightly]
     # Alpine 3.11
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        SIMPLE_ARCH: arm32v7
       <<: [*fancy_job, *nonnightly]
     # Debian Buster
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: debian
         OS_VERSION: "buster"
-        SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: debian
         OS_VERSION: "buster"
-        SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: debian
         OS_VERSION: "buster"
-        SIMPLE_ARCH: arm32v7
       <<: [*fancy_job, *nonnightly]
     # Debian Stretch
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: debian
         OS_VERSION: "stretch"
-        SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       install:
@@ -425,28 +289,28 @@ jobs:
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
         - sudo apt-get upgrade -y
       env:
+        ARCH: arm64
         OS_NAME: debian
         OS_VERSION: "stretch"
-        SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: debian
         OS_VERSION: "stretch"
-        SIMPLE_ARCH: arm32v7
       <<: [*fancy_job, *nonnightly]
     # Ubuntu Focal
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       install:
@@ -457,103 +321,103 @@ jobs:
         - sudo apt-get update
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
       env:
+        ARCH: arm32v7
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        SIMPLE_ARCH: arm32v7
       <<: [*fancy_job, *nonnightly]
     # Ubuntu Bionic
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        SIMPLE_ARCH: amd64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        SIMPLE_ARCH: arm64
       <<: [*fancy_job, *nonnightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        SIMPLE_ARCH: arm32v7
       <<: [*fancy_job, *nonnightly]
 
     # Nightly jobs
     # Alpine 3.12
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     # Alpine 3.11
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     # Debian Buster
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: debian
         OS_VERSION: "buster"
-        SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: debian
         OS_VERSION: "buster"
-        SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: debian
         OS_VERSION: "buster"
-        SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     # Debian Stretch
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: debian
         OS_VERSION: "stretch"
-        SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
@@ -566,31 +430,31 @@ jobs:
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
         - sudo apt-get upgrade -y
       env:
+        ARCH: arm64
         OS_NAME: debian
         OS_VERSION: "stretch"
-        SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: debian
         OS_VERSION: "stretch"
-        SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     # Ubuntu Focal
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
@@ -602,31 +466,31 @@ jobs:
         - sudo apt-get update
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
       env:
+        ARCH: arm32v7
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     # Ubuntu Bionic
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*nonfancy_job, *nightly]
 
@@ -634,75 +498,75 @@ jobs:
     # Alpine 3.12
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: alpine
         OS_VERSION: "3.12"
-        SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     # Alpine 3.11
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: alpine
         OS_VERSION: "3.11"
-        SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     # Debian Buster
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: debian
         OS_VERSION: "buster"
-        SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: debian
         OS_VERSION: "buster"
-        SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: debian
         OS_VERSION: "buster"
-        SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     # Debian Stretch
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: debian
         OS_VERSION: "stretch"
-        SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     - arch: arm64
@@ -715,31 +579,31 @@ jobs:
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
         - sudo apt-get upgrade -y
       env:
+        ARCH: arm64
         OS_NAME: debian
         OS_VERSION: "stretch"
-        SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: debian
         OS_VERSION: "stretch"
-        SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     # Ubuntu Focal
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     - arch: arm64
@@ -751,31 +615,31 @@ jobs:
         - sudo apt-get update
         - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
       env:
+        ARCH: arm32v7
         OS_NAME: ubuntu
         OS_VERSION: "focal"
-        SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     # Ubuntu Bionic
     - arch: amd64
       env:
+        ARCH: amd64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        SIMPLE_ARCH: amd64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm64
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        SIMPLE_ARCH: arm64
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     - arch: arm64
       env:
+        ARCH: arm32v7
         OS_NAME: ubuntu
         OS_VERSION: "bionic"
-        SIMPLE_ARCH: arm32v7
         VERSION: nightly
       <<: [*fancy_job, *nightly]
     - arch: amd64

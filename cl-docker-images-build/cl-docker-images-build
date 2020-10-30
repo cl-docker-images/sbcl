@@ -1,0 +1,179 @@
+#!/bin/bash
+
+set -ex
+
+process_default_env() {
+  if [ -f default-values.env ]; then
+    local var_name
+    local var_value
+    while read -r line; do
+      var_name="${line%%=*}"
+      var_value="${line#*=}"
+      if [ -z "${!var_name}" ]; then
+        eval "$var_name=\$var_value"
+        export "${var_name?}"
+      fi
+    done < default-values.env
+  fi
+  if [ -z "$VERSION" ]; then
+    VERSION="$LATEST_VERSION"
+  fi
+}
+
+os_version_sep() {
+  if [ "$OS_NAME" = "alpine" ]; then
+    echo ""
+  else
+    echo "-"
+  fi
+}
+
+os_latest() {
+  case "$1" in
+    alpine)
+      if [ "$2" = "$ALPINE_LATEST" ]; then
+        echo "yes"
+      fi
+      ;;
+    debian)
+      if [ "$2" = "$DEBIAN_LATEST" ]; then
+        echo "yes"
+      fi
+      ;;
+    ubuntu)
+      if [ "$2" = "$UBUNTU_LATEST" ]; then
+        echo "yes"
+      fi
+      ;;
+    *)
+      exit 1
+      ;;
+  esac
+}
+
+docker_platform() {
+  case "$ARCH" in
+    amd64)
+      echo "linux/amd64"
+      ;;
+    arm32v7)
+      echo "linux/arm/v7"
+      ;;
+    arm64)
+      echo "linux/arm64/v8"
+      ;;
+    *)
+      exit 1
+      ;;
+  esac
+}
+
+docker_namespace_suffix() {
+  case "$1" in
+    amd64)
+      echo "amd64"
+      ;;
+    arm32v7)
+      echo "arm32v7"
+      ;;
+    arm64)
+      echo "arm64v8"
+      ;;
+    *)
+      exit 1
+      ;;
+  esac
+}
+
+build_image_name() {
+  echo "${IMAGE_BUILD_NAMESPACE}$(docker_namespace_suffix "$ARCH")/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION$VARIANT_TAG"
+}
+
+target_image_name() {
+  echo "${IMAGE_TARGET_NAMESPACE}/$IMAGE_NAME:$VERSION-$OS_NAME$OS_VERSION_SEP$OS_VERSION$VARIANT_TAG"
+}
+
+pull() {
+  local platform
+  local base_name
+  platform="$(docker_platform)"
+  base_name="$(build_image_name)"
+  docker pull --platform "$platform" "$base_name" || true
+  docker pull --platform "$platform" "$base_name-tmp" || true
+  docker pull --platform "$platform" "$base_name-tmp-master" || true
+}
+
+build() {
+  local platform
+  local base_name
+  platform="$(docker_platform)"
+  base_name="$(build_image_name)"
+  docker build --platform "$platform" \
+               -t "$base_name$BUILD_TAG_SUFFIX" \
+               --cache-from "$base_name" \
+               --cache-from "$base_name-tmp" \
+               --cache-from "$base_name-tmp-master" \
+               --build-arg BUILDKIT_INLINE_CACHE=1 \
+               $EXTRA_BUILDARGS \
+               -f "$VERSION/$OS_NAME/$OS_VERSION/$ARCH/Dockerfile$VARIANT_DOCKERFILE" \
+               "$VERSION/$OS_NAME/$OS_VERSION/$ARCH"
+}
+
+tag_for_next_variant() {
+  local build_base_name
+  local target_base_name
+  build_base_name="$(build_image_name)"
+  target_base_name="$(target_image_name)"
+
+  docker tag "$build_base_name$BUILD_TAG_SUFFIX" "$target_base_name"
+}
+
+push_build_image() {
+  local base_name
+  base_name="$(build_image_name)"
+
+  docker push "$base_name$BUILD_TAG_SUFFIX"
+}
+
+while getopts v:c:t:o:O:a: opt; do
+  case $opt in
+    v)
+      VERSION="$OPTARG"
+      ;;
+    c)
+      export DOCKER_CONTEXT="$OPTARG"
+      ;;
+    t)
+      VARIANT_TAG="-$OPTARG"
+      VARIANT_DOCKERFILE=".$OPTARG"
+      ;;
+    o)
+      OS_NAME="$OPTARG"
+      ;;
+    O)
+      OS_VERSION="$OPTARG"
+      ;;
+    a)
+      ARCH="$OPTARG"
+      ;;
+  esac
+done
+
+shift "$((OPTIND-1))"
+
+process_default_env
+
+case "$1" in
+  build|pull|push_build_image|tag_for_next_variant)
+    OS_VERSION_SEP="$(os_version_sep)"
+    $1
+    ;;
+  *)
+    echo "Unknown command" >&2
+    exit 1
+    ;;
+esac
+
+# Local Variables:
+# sh-basic-offset: 2
+# End:
