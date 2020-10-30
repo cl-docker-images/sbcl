@@ -294,6 +294,37 @@ release_linux_manifests() {
   done
 }
 
+release_shared_manifests() {
+  local variant_tag
+  local arch_suffixes
+
+  arch_suffixes=()
+  for arch in "${ARCHES[@]}"; do
+    arch_suffixes+=($(docker_namespace_suffix "$arch"))
+  done
+
+  for variant in "" "${VARIANTS[@]}"; do
+    if [ -n "$variant" ]; then
+      variant_tag="-$variant"
+    else
+      variant_tag=""
+    fi
+    if [ "$INCLUDE_WINDOWS_IN_MANIFEST" = "yes" ] && tuple_valid windowsservercore "$WINDOWSSERVERCORE_LATEST" "$variant" amd64; then
+      create_manifest_for_arches "$VERSION$variant_tag" winamd64 "${arch_suffixes[@]}"
+    else
+      create_manifest_for_arches "$VERSION$variant_tag" "${arch_suffixes[@]}"
+    fi
+    if [ "$VERSION" = "$LATEST_VERSION" ]; then
+      if [ "$INCLUDE_WINDOWS_IN_MANIFEST" = "yes" ] && tuple_valid windowsservercore "$WINDOWSSERVERCORE_LATEST" "$variant" amd64; then
+        create_manifest_for_arches "latest$variant_tag" winamd64 "${arch_suffixes[@]}"
+      else
+        create_manifest_for_arches "latest$variant_tag" "${arch_suffixes[@]}"
+      fi
+    fi
+  done
+
+}
+
 while getopts v:c:t:o:O:a: opt; do
   case $opt in
     v)
@@ -326,7 +357,7 @@ case "$1" in
   build|pull|push_build_image|tag_for_next_variant)
     OS_VERSION_SEP="$(os_version_sep "$OS_NAME")"
     ;&
-  pull_retag_and_push_linux_arch_images|release_linux_manifests)
+  pull_retag_and_push_linux_arch_images|release_linux_manifests|release_shared_manifests)
     $1
     ;;
   *)

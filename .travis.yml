@@ -645,6 +645,7 @@ jobs:
     - arch: amd64
       stage: deploy
       env:
+        INCLUDE_WINDOWS_IN_MANIFEST: "no"
         VERSION: nightly
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
@@ -654,4 +655,4 @@ jobs:
         # Next, create and push all the linux manifests
         - $BUILD_SCRIPT release_linux_manifests
         # Last, release shared manifests
-        - ./scripts/release-shared-manifests
+        - $BUILD_SCRIPT release_shared_manifests

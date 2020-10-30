@@ -91,16 +91,4 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - name: Release Shared Tags
-        run: |
-          for prefix in $VERSION latest; do
-            docker manifest create $IMAGE_TARGET_NAMESPACE/sbcl:$prefix ${IMAGE_BUILD_NAMESPACE}amd64/sbcl:$VERSION-debian-buster ${IMAGE_BUILD_NAMESPACE}arm64v8/sbcl:$VERSION-debian-buster ${IMAGE_BUILD_NAMESPACE}arm32v7/sbcl:$VERSION-debian-buster ${IMAGE_BUILD_NAMESPACE}winamd64/sbcl:$VERSION-windowsservercore-ltsc2019
-            docker manifest push -p $IMAGE_TARGET_NAMESPACE/sbcl:$prefix
-          done
-          for prefix in $VERSION-build latest-build; do
-            docker manifest create $IMAGE_TARGET_NAMESPACE/sbcl:$prefix ${IMAGE_BUILD_NAMESPACE}amd64/sbcl:$VERSION-debian-buster-build ${IMAGE_BUILD_NAMESPACE}arm64v8/sbcl:$VERSION-debian-buster-build ${IMAGE_BUILD_NAMESPACE}arm32v7/sbcl:$VERSION-debian-buster-build ${IMAGE_BUILD_NAMESPACE}winamd64/sbcl:$VERSION-windowsservercore-ltsc2019-build
-            docker manifest push -p $IMAGE_TARGET_NAMESPACE/sbcl:$prefix
-          done
-          for prefix in $VERSION-fancy latest-fancy; do
-            docker manifest create $IMAGE_TARGET_NAMESPACE/sbcl:$prefix ${IMAGE_BUILD_NAMESPACE}amd64/sbcl:$VERSION-debian-buster-build ${IMAGE_BUILD_NAMESPACE}arm64v8/sbcl:$VERSION-debian-buster-build ${IMAGE_BUILD_NAMESPACE}arm32v7/sbcl:$VERSION-debian-buster-build
-            docker manifest push -p $IMAGE_TARGET_NAMESPACE/sbcl:$prefix
-          done
+        run: ./cl-docker-images-build/cl-docker-images-build release_shared_manifests
