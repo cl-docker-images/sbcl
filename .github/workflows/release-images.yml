@@ -33,7 +33,7 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - name: Retag all -tmp-master suffixes for Linux
-        run: ./scripts/retag-tmp-master-images
+        run: ./cl-docker-images-build/cl-docker-images-build pull_retag_and_push_linux_arch_images
   release_linux:
     name: Release Linux images
     runs-on: ubuntu-20.04

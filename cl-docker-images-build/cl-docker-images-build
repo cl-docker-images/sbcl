@@ -1,6 +1,14 @@
 #!/bin/bash
 
 set -ex
+declare -a ARCHES
+declare -a OSES
+declare -a ALPINE_VERSIONS
+declare -a DEBIAN_VERSIONS
+declare -a INVALID_TUPLES
+declare -a UBUNTU_VERSIONS
+declare -a VARIANTS
+declare -a WINDOWSSERVERCORE_VERSIONS
 
 process_default_env() {
   if [ -f default-values.env ]; then
@@ -10,8 +18,12 @@ process_default_env() {
       var_name="${line%%=*}"
       var_value="${line#*=}"
       if [ -z "${!var_name}" ]; then
-        eval "$var_name=\$var_value"
-        export "${var_name?}"
+        if [ "$var_name" = "ARCHES" ] || [ "$var_name" = "OSES" ] || [ "$var_name" = "ALPINE_VERSIONS" ] || [ "$var_name" = "DEBIAN_VERSIONS" ] || [ "$var_name" = "INVALID_TUPLES" ] || [ "$var_name" = "UBUNTU_VERSIONS" ] || [ "$var_name" = "VARIANTS" ] || [ "$var_name" = "WINDOWSSERVERCORE_VERSIONS" ]; then
+          read -a "$var_name" <<< "$var_value"
+        else
+          eval "$var_name=\$var_value"
+          export "${var_name?}"
+        fi
       fi
     done < default-values.env
   fi
@@ -21,7 +33,7 @@ process_default_env() {
 }
 
 os_version_sep() {
-  if [ "$OS_NAME" = "alpine" ]; then
+  if [ "$1" = "alpine" ]; then
     echo ""
   else
     echo "-"
@@ -135,6 +147,84 @@ push_build_image() {
   docker push "$base_name$BUILD_TAG_SUFFIX"
 }
 
+os_latest_version() {
+  local var_name
+  var_name="${1^^}_LATEST"
+  echo "${!var_name}"
+}
+
+os_versions() {
+  local array_name
+  array_name="${1^^}_VERSIONS[@]"
+  echo "${!array_name}"
+}
+
+tuple_valid() {
+  local tuple
+  tuple="$1:$2:$3:$4"
+  if [ "$1" = "windowsservercore" ] && [ "$4" != "amd64" ]; then
+    return 1
+  fi
+  for invalid_tuple in "${INVALID_TUPLES[@]}"; do
+    if [[ "$tuple" =~ ^$invalid_tuple.* ]]; then
+      return 1
+    fi
+  done
+  return 0
+}
+
+pull_retag_and_push_linux_arch_images() {
+  local build_image_name
+  local os_sep
+  local os_latest_version
+  local arch_suffix
+
+  for os in ${OSES[@]}; do
+    if [ "$os" = "windowsservercore" ]; then
+      continue
+    fi
+    os_sep="$(os_version_sep "$os")"
+    os_latest_version="$(os_latest_version "$os")"
+
+    for os_version in $(os_versions "$os"); do
+      for variant in "" ${VARIANTS[@]}; do
+        for arch in "${ARCHES[@]}"; do
+          if ! tuple_valid "$os" "$os_version" "$variant" "$arch"; then
+            continue
+          fi
+          arch_suffix="$(docker_namespace_suffix "$arch")"
+          if [ -n "$variant" ]; then
+            variant_tag="-$variant"
+          else
+            variant_tag=""
+          fi
+          build_image_name="$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:$VERSION-$os$os_sep$os_version$variant_tag-tmp-master"
+          docker pull "$build_image_name"
+          docker tag "$build_image_name" "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:$VERSION-$os$os_sep$os_version$variant_tag"
+          docker push "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:$VERSION-$os$os_sep$os_version$variant_tag"
+          if [ "$VERSION" = "$LATEST_VERSION" ]; then
+            docker tag "$build_image_name" "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:latest-$os$os_sep$os_version$variant_tag"
+            docker push "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:latest-$os$os_sep$os_version$variant_tag"
+            docker tag "$build_image_name" "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:$os$os_sep$os_version$variant_tag"
+            docker push "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:$os$os_sep$os_version$variant_tag"
+          fi
+
+          if [ "$os_version" = "$os_latest_version" ]; then
+            docker tag "$build_image_name" "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:$VERSION-$os$variant_tag"
+            docker push "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:$VERSION-$os$variant_tag"
+            if [ "$VERSION" = "$LATEST_VERSION" ]; then
+              docker tag "$build_image_name" "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:latest-$os$variant_tag"
+              docker push "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:latest-$os$variant_tag"
+              docker tag "$build_image_name" "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:$os$variant_tag"
+              docker push "$IMAGE_BUILD_NAMESPACE$arch_suffix/$IMAGE_NAME:$os$variant_tag"
+            fi
+          fi
+        done
+      done
+    done
+  done
+}
+
 while getopts v:c:t:o:O:a: opt; do
   case $opt in
     v)
@@ -165,7 +255,9 @@ process_default_env
 
 case "$1" in
   build|pull|push_build_image|tag_for_next_variant)
-    OS_VERSION_SEP="$(os_version_sep)"
+    OS_VERSION_SEP="$(os_version_sep "$OS_NAME")"
+    ;&
+  pull_retag_and_push_linux_arch_images)
     $1
     ;;
   *)

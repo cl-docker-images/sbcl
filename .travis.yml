@@ -650,7 +650,7 @@ jobs:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         # First, download all the nightly builds, retag them, and push them to
         # the arch specific repos
-        - ./scripts/retag-tmp-master-images
+        - $BUILD_SCRIPT pull_retag_and_push_linux_arch_images
         # Next, create and push all the linux manifests
         - ./scripts/release-linux-manifests
         # Last, release shared manifests
