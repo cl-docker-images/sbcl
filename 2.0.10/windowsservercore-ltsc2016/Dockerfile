@@ -43,7 +43,7 @@ RUN echo 'Saving original machine PATH'; `
     $env:PATH = ('C:\tools\msys64\usr\bin;c:\tools\msys64\mingw64\bin;{0}' -f $env:PATH); `
     `
     echo 'Installing build tools'; `
-    pacman -S --noconfirm --needed mingw-w64-x86_64-gcc make diffutils patch; `
+    pacman -S --noconfirm --needed mingw-w64-x86_64-gcc make diffutils patch tar; `
     `
     echo 'Downloading SBCL source'; `
     $sbclurl = ('https://downloads.sourceforge.net/project/sbcl/sbcl/{0}/sbcl-{0}-source.tar.bz2' -f $env:SBCL_VERSION); `
