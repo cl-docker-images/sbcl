@@ -57,7 +57,7 @@ RUN echo 'Saving original machine PATH'; `
     }; `
     `
     echo 'Unpacking source'; `
-    tar -x -v -f sbcl-source.tar.bz2; `
+    sh -c 'tar -x -v -f sbcl-source.tar.bz2'; `
     rm sbcl-source.tar.bz2; `
     `
     echo 'Building SBCL'; `
