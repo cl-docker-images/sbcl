@@ -1,0 +1,30 @@
+#! /bin/sh
+
+set -e
+
+SBCL_SOURCE_LOCATION=/c/sbcl-${SBCL_VERSION}
+PATCHES_LOCATION=${SBCL_SOURCE_LOCATION}/patches
+
+cd "${SBCL_SOURCE_LOCATION}"
+
+# This will be removed once I'm certain the toolchain can be redistributed (and
+# it's easier to patch the source before pushing the image).
+if [ -d "/c/sbcl-patches" ]; then
+  for p in "/c/sbcl-patches"/*.patch; do
+    [ -e "$p" ] || continue
+    echo "Applying patch $p"
+    patch -p1 < "$p"
+  done
+fi
+
+if [ -d "${PATCHES_LOCATION}" ]; then
+  for p in "${PATCHES_LOCATION}"/*.patch; do
+    [ -e "$p" ] || continue
+    echo "Applying patch $p"
+    patch -p1 < "$p"
+  done
+fi
+
+sh ./make.sh
+export WIX="/c/wix"
+sh ./make-windows-installer.sh
