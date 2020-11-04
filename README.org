@@ -20,7 +20,6 @@
    + =2.0.10-windowsservercore-1809=, =windowsservercore-1809=
    + =2.0.10-windowsservercore-1809-build=, =windowsservercore-1809-build=
    + =2.0.10-windowsservercore-ltsc2016=, =windowsservercore-ltsc2016=
-   + =2.0.10-windowsservercore-ltsc2016-build=, =windowsservercore-ltsc2016-build=
 
 ** Shared Tags
 
@@ -39,7 +38,6 @@
      + =2.0.10-windowsservercore-ltsc2016=
    + =2.0.10-windowsservercore-build=, =windowsservercore-build=
      + =2.0.10-windowsservercore-1809-build=
-     + =2.0.10-windowsservercore-ltsc2016-build=
 
 * Quick Reference
 

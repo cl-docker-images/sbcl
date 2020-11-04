@@ -113,8 +113,8 @@ SharedTags: 2.0.10, latest, 2.0.10-windowsservercore, windowsservercore
 Architectures: windows-amd64
 Directory: 2.0.10/windowsservercore-ltsc2016
 
-Tags: 2.0.10-windowsservercore-ltsc2016-build, windowsservercore-ltsc2016-build
-SharedTags: 2.0.10-build, latest-build, 2.0.10-windowsservercore-build, windowsservercore-build
-Architectures: windows-amd64
-File: Dockerfile.build
-Directory: 2.0.10/windowsservercore-ltsc2016
+# Tags: 2.0.10-windowsservercore-ltsc2016-build, windowsservercore-ltsc2016-build
+# SharedTags: 2.0.10-build, latest-build, 2.0.10-windowsservercore-build, windowsservercore-build
+# Architectures: windows-amd64
+# File: Dockerfile.build
+# Directory: 2.0.10/windowsservercore-ltsc2016

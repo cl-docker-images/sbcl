@@ -1,24 +1,24 @@
-- [Supported Tags](#org5fa057f)
-  - [Simple Tags](#org1f4f086)
-  - [Shared Tags](#orga950f81)
-- [Quick Reference](#org541ace7)
-- [What is SBCL?](#orge514daf)
-- [What's in the image?](#org309f5bd)
-  - [Patches](#orgb585a67)
-    - [Removal of `-Wimplicit-fallthrough`](#org32c1c94)
-    - [Removal of `-march=armv5`](#org2afa434)
-  - [`-fancy` images](#org495e639)
-  - [`-build` images](#org6f9f665)
-- [License](#org51d0422)
+- [Supported Tags](#org317f682)
+  - [Simple Tags](#orgcbbee6f)
+  - [Shared Tags](#orgaeaa946)
+- [Quick Reference](#org4d8592d)
+- [What is SBCL?](#org07276a6)
+- [What's in the image?](#org386b700)
+  - [Patches](#orgaafe255)
+    - [Removal of `-Wimplicit-fallthrough`](#org18df56a)
+    - [Removal of `-march=armv5`](#orge7f3bb8)
+  - [`-fancy` images](#org44e4d7a)
+  - [`-build` images](#orgb4acb2f)
+- [License](#org9d59e77)
 
 
 
-<a id="org5fa057f"></a>
+<a id="org317f682"></a>
 
 # Supported Tags
 
 
-<a id="org1f4f086"></a>
+<a id="orgcbbee6f"></a>
 
 ## Simple Tags
 
@@ -37,10 +37,9 @@
 -   `2.0.10-windowsservercore-1809`, `windowsservercore-1809`
 -   `2.0.10-windowsservercore-1809-build`, `windowsservercore-1809-build`
 -   `2.0.10-windowsservercore-ltsc2016`, `windowsservercore-ltsc2016`
--   `2.0.10-windowsservercore-ltsc2016-build`, `windowsservercore-ltsc2016-build`
 
 
-<a id="orga950f81"></a>
+<a id="orgaeaa946"></a>
 
 ## Shared Tags
 
@@ -59,10 +58,9 @@
     -   `2.0.10-windowsservercore-ltsc2016`
 -   `2.0.10-windowsservercore-build`, `windowsservercore-build`
     -   `2.0.10-windowsservercore-1809-build`
-    -   `2.0.10-windowsservercore-ltsc2016-build`
 
 
-<a id="org541ace7"></a>
+<a id="org4d8592d"></a>
 
 # Quick Reference
 
@@ -73,7 +71,7 @@
 -   **Supported platforms:** `linux/amd64`, `linux/arm64`, `linux/arm/v7`, `windows/amd64`
 
 
-<a id="orge514daf"></a>
+<a id="org07276a6"></a>
 
 # What is SBCL?
 
@@ -82,14 +80,14 @@ From [SBCL's Home Page](http://sbcl.org):
 > Steel Bank Common Lisp (SBCL) is a high performance Common Lisp compiler. It is open source / free software, with a permissive license. In addition to the compiler and runtime system for ANSI Common Lisp, it provides an interactive environment including a debugger, a statistical profiler, a code coverage tool, and many other extensions.
 
 
-<a id="org309f5bd"></a>
+<a id="org386b700"></a>
 
 # What's in the image?
 
 This image contains SBCL binaries built from the latest source code released by the SBCL devs for a variety of OSes and architectures.
 
 
-<a id="orgb585a67"></a>
+<a id="orgaafe255"></a>
 
 ## Patches
 
@@ -98,28 +96,28 @@ The goal is to track upstream as closely as possible. Thus, patches are kept to 
 In addition to the trivial patches, the following patches are applied when building specific tags.
 
 
-<a id="org32c1c94"></a>
+<a id="org18df56a"></a>
 
 ### Removal of `-Wimplicit-fallthrough`
 
 The version of gcc distributed in Debian Stretch does not recognize this option. Remove if on the only affected configuration (Debian Stretch, amd64).
 
 
-<a id="org2afa434"></a>
+<a id="orge7f3bb8"></a>
 
 ### Removal of `-march=armv5`
 
 GCC version 9 removed the `armv5` architecture target used by SBCL's build configuration for armhf. The affected images (Alpine 3.11+ and Ubuntu Focal for arm32v7) have had the target architecture changed to `armv7-a`. This issue has been [reported upstream](https://bugs.launchpad.net/sbcl/+bug/1839783).
 
 
-<a id="org495e639"></a>
+<a id="org44e4d7a"></a>
 
 ## `-fancy` images
 
 The tags with a `-fancy` suffix have SBCL built by passing `--fancy` to SBCL's `make.sh`. This results in an image that has additional features added, such as core compression and internal xrefs.
 
 
-<a id="org6f9f665"></a>
+<a id="orgb4acb2f"></a>
 
 ## `-build` images
 
@@ -132,7 +130,7 @@ While these build images give a lot of flexibility, it results in the images bei
 Note that the Windows build images do not ship with the full toolchain needed to build SBCL as I have not yet finished my due diligence to understand all the licenses for the tools used (I'm not a Windows developer and don't spend much time on that OS). Until then, the Windows builds will download and install the toolchain as part of the rebuild process.
 
 
-<a id="org51d0422"></a>
+<a id="org9d59e77"></a>
 
 # License
 
