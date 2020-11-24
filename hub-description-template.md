@@ -1,77 +1,46 @@
-- [Supported Tags](#org317f682)
-  - [Simple Tags](#orgcbbee6f)
-  - [Shared Tags](#orgaeaa946)
-- [Quick Reference](#org4d8592d)
-- [What is SBCL?](#org07276a6)
-- [What's in the image?](#org386b700)
-  - [Patches](#orgaafe255)
-    - [Removal of `-Wimplicit-fallthrough`](#org18df56a)
-    - [Removal of `-march=armv5`](#orge7f3bb8)
-  - [`-fancy` images](#org44e4d7a)
-  - [`-build` images](#orgb4acb2f)
-- [License](#org9d59e77)
+- [Supported Tags](#org93d25ae)
+  - [Simple Tags](#org65189c6)
+  - [Shared Tags](#org9f5c5bc)
+- [Quick Reference](#orgf417aa1)
+- [What is SBCL?](#org09acba4)
+- [What's in the image?](#org15b30d5)
+  - [`-fancy` images](#org48f80eb)
+  - [`-build` images](#orgad04556)
+- [License](#org18b5f74)
 
 
 
-<a id="org317f682"></a>
+<a id="org93d25ae"></a>
 
 # Supported Tags
 
 
-<a id="orgcbbee6f"></a>
+<a id="org65189c6"></a>
 
 ## Simple Tags
 
--   `2.0.10-alpine3.12`, `2.0.10-alpine`, `alpine3.12`, `alpine`
--   `2.0.10-alpine3.12-fancy`, `2.0.10-alpine-fancy` `alpine3.12-fancy`, `alpine-fancy`
--   `2.0.10-alpine3.12-build`, `2.0.10-alpine-build`, `alpine3.12-build`, `alpine-build`
--   `2.0.10-alpine3.11`, `alpine3.11`
--   `2.0.10-alpine3.11-fancy` `alpine3.11-fancy`
--   `2.0.10-alpine3.11-build`, `alpine3.11-build`
--   `2.0.10-buster`, `buster`
--   `2.0.10-buster-fancy`, `buster-fancy`
--   `2.0.10-buster-build`, `buster-build`
--   `2.0.10-stretch`, `stretch`
--   `2.0.10-stretch-fancy`, `stretch-fancy`
--   `2.0.10-stretch-build`, `stretch-build`
--   `2.0.10-windowsservercore-1809`, `windowsservercore-1809`
--   `2.0.10-windowsservercore-1809-build`, `windowsservercore-1809-build`
--   `2.0.10-windowsservercore-ltsc2016`, `windowsservercore-ltsc2016`
+INSERT-SIMPLE-TAGS
 
 
-<a id="orgaeaa946"></a>
+<a id="org9f5c5bc"></a>
 
 ## Shared Tags
 
--   `2.0.10`, `latest`
-    -   `2.0.10-debian-buster`
-    -   `2.0.10-windowsservercore-1809`
-    -   `2.0.10-windowsservercore-ltsc2016`
--   `2.0.10-fancy`, `latest-fancy`
-    -   `2.0.10-debian-buster-fancy`
--   `2.0.10-build`, `latest-build`
-    -   `2.0.10-debian-buster-build`
-    -   `2.0.10-windowsservercore-1809-build`
-    -   `2.0.10-windowsservercore-ltsc2016-build`
--   `2.0.10-windowsservercore`, `windowsservercore`
-    -   `2.0.10-windowsservercore-1809`
-    -   `2.0.10-windowsservercore-ltsc2016`
--   `2.0.10-windowsservercore-build`, `windowsservercore-build`
-    -   `2.0.10-windowsservercore-1809-build`
+INSERT-SHARED-TAGS
 
 
-<a id="org4d8592d"></a>
+<a id="orgf417aa1"></a>
 
 # Quick Reference
 
 -   **SBCL Home Page:** [http://sbcl.org](http://sbcl.org)
 -   **Where to file Docker image related issues:** <https://gitlab.common-lisp.net/cl-docker-images/sbcl>
 -   **Where to file issues for SBCL itself:** [https://bugs.launchpad.net/sbcl](https://bugs.launchpad.net/sbcl)
--   **Maintained by:** [Eric Timmons](https://github.com/daewok) and the [MIT MERS Group](https://mers.csail.mit.edu/) (i.e., this is not an official SBCL image)
--   **Supported platforms:** `linux/amd64`, `linux/arm64`, `linux/arm/v7`, `windows/amd64`
+-   **Maintained by:** [Eric Timmons](https://github.com/daewok)
+-   **Supported platforms:** `linux/amd64`, `linux/arm64/v8`, `linux/arm/v7`, `windows/amd64`
 
 
-<a id="org07276a6"></a>
+<a id="org09acba4"></a>
 
 # What is SBCL?
 
@@ -80,44 +49,25 @@ From [SBCL's Home Page](http://sbcl.org):
 > Steel Bank Common Lisp (SBCL) is a high performance Common Lisp compiler. It is open source / free software, with a permissive license. In addition to the compiler and runtime system for ANSI Common Lisp, it provides an interactive environment including a debugger, a statistical profiler, a code coverage tool, and many other extensions.
 
 
-<a id="org386b700"></a>
+<a id="org15b30d5"></a>
 
 # What's in the image?
 
 This image contains SBCL binaries built from the latest source code released by the SBCL devs for a variety of OSes and architectures.
 
+The goal is to track upstream as closely as possible. Thus, patches are kept to a minimum (and ideally kept for only as long as it takes for them to be upstreamed).
 
-<a id="orgaafe255"></a>
-
-## Patches
-
-The goal is to track upstream as closely as possible. Thus, patches are kept to a minimum (and ideally kept for only as long as it takes for them to be upstreamed). The only exception is trivial patches to things like test timeouts (as the stock timeouts can frequently be too short when cross-building images with QEMU).
-
-In addition to the trivial patches, the following patches are applied when building specific tags.
+Currently, the only modification made to the SBCL source code when building is to remove `-march=armv5` from the `CFLAGS` on 32-bit ARM targets. This is done because recent gcc versions (like the ones in Alpine 3.11 and 3.12) no longer support this target and it can create suboptimal binaries for armv7 (which is the explicit target of these Docker images). If you would like to build an application with SBCL that is portable to earlier ARM revisions, use the `-build` images (and make sure to `rebuild-sbcl`) as the sources contained in those images are pristine. This issue has been [reported upstream](https://bugs.launchpad.net/sbcl/+bug/1839783).
 
 
-<a id="org18df56a"></a>
-
-### Removal of `-Wimplicit-fallthrough`
-
-The version of gcc distributed in Debian Stretch does not recognize this option. Remove if on the only affected configuration (Debian Stretch, amd64).
-
-
-<a id="orge7f3bb8"></a>
-
-### Removal of `-march=armv5`
-
-GCC version 9 removed the `armv5` architecture target used by SBCL's build configuration for armhf. The affected images (Alpine 3.11+ and Ubuntu Focal for arm32v7) have had the target architecture changed to `armv7-a`. This issue has been [reported upstream](https://bugs.launchpad.net/sbcl/+bug/1839783).
-
-
-<a id="org44e4d7a"></a>
+<a id="org48f80eb"></a>
 
 ## `-fancy` images
 
 The tags with a `-fancy` suffix have SBCL built by passing `--fancy` to SBCL's `make.sh`. This results in an image that has additional features added, such as core compression and internal xrefs.
 
 
-<a id="orgb4acb2f"></a>
+<a id="orgad04556"></a>
 
 ## `-build` images
 
@@ -130,7 +80,7 @@ While these build images give a lot of flexibility, it results in the images bei
 Note that the Windows build images do not ship with the full toolchain needed to build SBCL as I have not yet finished my due diligence to understand all the licenses for the tools used (I'm not a Windows developer and don't spend much time on that OS). Until then, the Windows builds will download and install the toolchain as part of the rebuild process.
 
 
-<a id="org9d59e77"></a>
+<a id="org18b5f74"></a>
 
 # License
 

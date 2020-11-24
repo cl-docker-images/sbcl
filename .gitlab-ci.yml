@@ -1,11 +1,26 @@
 include:
   - project: 'cl-docker-images/ci-helpers'
-    file: '/cl-docker-images-default-pipeline.yml'
+    file: '/cl-docker-images-default-pipeline-v2.yml'
 
 variables:
-  CANONICAL_NAMESPACE: daewok
   CL_DOCKER_IMAGES_AMD64: "1"
   CL_DOCKER_IMAGES_ARM64V8: "1"
   CL_DOCKER_IMAGES_ARM32V7: "1"
   CL_DOCKER_IMAGES_WINAMD64: "1"
-  WINDOWS_PARENT_IMAGES: "mcr.microsoft.com/windows/servercore:ltsc2016;mcr.microsoft.com/windows/servercore:1809"
+  NUM_RETRIES: "1"
+
+##############################################################################
+# Put shared
+
+put-shared clfoundation:
+  extends: Bashbrew put-shared
+  variables:
+    BASHBREW_NAMESPACE: clfoundation
+
+##############################################################################
+# Readme
+
+Pushrm clfoundation:
+  extends: Pushrm
+  variables:
+    README_NAMESPACE: clfoundation
