@@ -1,0 +1,20 @@
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "update.sh"
+#
+# PLEASE DO NOT EDIT IT DIRECTLY.
+#
+FROM daewok/sbcl:nightly-alpine3.12
+
+WORKDIR /usr/local/src/
+
+# hadolint ignore=DL3003,DL3008,SC2086
+RUN set -x \
+    && apk add --no-cache ca-certificates openssl make gcc linux-headers musl-dev zlib-dev patch curl \
+    && curl -fsSL "https://github.com/sbcl/sbcl/archive/$SBCL_COMMIT.tar.gz" > "sbcl-${SBCL_COMMIT}.tar.gz" \
+    && tar xf sbcl-${SBCL_COMMIT}.tar.gz \
+    && rm -rf sbcl-${SBCL_COMMIT}.tar.gz \
+    && apk del --no-cache openssl curl ca-certificates
+
+WORKDIR /
+
+COPY rebuild-sbcl /usr/local/bin/rebuild-sbcl

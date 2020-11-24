@@ -1,12 +1,16 @@
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "update.sh"
+#
+# PLEASE DO NOT EDIT IT DIRECTLY.
+#
 # escape=`
 
 FROM mcr.microsoft.com/windows/servercore:1809
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
 
-ENV SBCL_VERSION=2.0.10
-
-COPY patches/ C:/sbcl-patches
+ENV SBCL_VERSION 2.0.10
+ENV SBCL_SOURCE_SHA256 51754110b6c54dcd3857a213d6113628a89b4d43348cfd38c1fac373927a0557
 
 RUN echo 'Saving original machine PATH'; `
     $machineKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey('SYSTEM\ControlSet001\Control\Session Manager\Environment\'); `
@@ -43,27 +47,25 @@ RUN echo 'Saving original machine PATH'; `
     $env:PATH = ('C:\tools\msys64\usr\bin;c:\tools\msys64\mingw64\bin;{0}' -f $env:PATH); `
     `
     echo 'Installing build tools'; `
-    pacman -S --noconfirm --needed mingw-w64-x86_64-gcc make diffutils patch; `
+    pacman -S --noconfirm --needed mingw-w64-x86_64-gcc make diffutils tar; `
     `
     echo 'Downloading SBCL source'; `
     $sbclurl = ('https://downloads.sourceforge.net/project/sbcl/sbcl/{0}/sbcl-{0}-source.tar.bz2' -f $env:SBCL_VERSION); `
     Invoke-WebRequest -Uri $sbclurl -OutFile sbcl-source.tar.bz2 -UserAgent "NativeHost"; `
-    $expectedsha256 = '51754110B6C54DCD3857A213D6113628A89B4D43348CFD38C1FAC373927A0557'; `
     $actualsha256 = (Get-FileHash sbcl-source.tar.bz2 -Algorithm sha256).Hash; `
-    Write-Host ('Verifying sha256 {0} (expected: {1})' -f $actualsha256, $expectedsha256); `
-    if ($actualsha256 -ne $expectedsha256) { `
+    Write-Host ('Verifying sha256 {0} (expected: {1})' -f $actualsha256, $env:SBCL_SOURCE_SHA256); `
+    if ($actualsha256 -ne $env:SBCL_SOURCE_SHA256) { `
         Write-Host 'SHA256 check FAILED!'; `
         exit 1; `
     }; `
     `
     echo 'Unpacking source'; `
-    tar -x -v -f sbcl-source.tar.bz2; `
+    sh -c 'tar -x -v -f sbcl-source.tar.bz2'; `
     rm sbcl-source.tar.bz2; `
     `
     echo 'Building SBCL'; `
     $env:WIX = '/c/wix'; `
     cd sbcl-$env:SBCL_VERSION; `
-    sh -c 'for p in /c/sbcl-patches/*.patch; do [ -e "$p" ] || continue; patch -p1 < "$p" || exit 1; done'; `
     sh ./make.sh; `
     sh ./make-windows-installer.sh; `
     cd ..; `
@@ -95,7 +97,6 @@ RUN echo 'Saving original machine PATH'; `
     Start-Process msiexec.exe -Wait -ArgumentList '/I C:\sbcl-installer.msi'; `
     echo 'Removing SBCL Source'; `
     Remove-Item -Force -Recurse -Path C:\sbcl-$env:SBCL_VERSION; `
-    Remove-Item -Force -Recurse -Path C:\sbcl-patches; `
     Remove-Item -Force -Path C:\sbcl-installer.msi;
 
 CMD ["sbcl"]
