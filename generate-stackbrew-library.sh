@@ -98,6 +98,9 @@ for version in "${versions[@]}"; do
 
         if [ "$version" = "nightly" ] && [[ "$os" == "windowsservercore"* ]]; then
             continue
+        elif [ "$version" = "2.0.10" ] && [ "$os" = "stretch" ]; then
+            # AMD64 does not compile without patches
+            continue
         fi
 
         [ -f "$dir/Dockerfile" ] || continue
