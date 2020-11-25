@@ -18,11 +18,19 @@ EOH
 for version in "${versions[@]}"; do
 
     if [ "$version" = "nightly" ]; then
-        sbclGitSha="$(curl -fsSL https://api.github.com/repos/sbcl/sbcl/commits/master | jq -r .sha)"
+        gitDir="$(mktemp -d)"
+        git clone --shallow-since "2 months" "https://github.com/sbcl/sbcl.git" "$gitDir"
+        sbclGitSha="$(git -C "$gitDir" rev-parse HEAD)"
+        (cd "$gitDir" && ./generate-version.sh)
+        sbclGitVersion="$(tail -n 1 "$gitDir/version.lisp-expr" | tail -c +2 | head -c -2)"
+        rm -rf "$gitDir"
+
         unset sbclSourceUrl
         unset sbclSourceSha
     else
+        unset gitDir
         unset sbclGitSha
+        unset sbclGitVersion
         sbclSourceUrl="https://downloads.sourceforge.net/project/sbcl/sbcl/$version/sbcl-$version-source.tar.bz2"
         sbclSourceSha="$(curl -fsSL "$sbclSourceUrl" | sha256sum | cut -d' ' -f1)"
     fi
@@ -93,6 +101,7 @@ for version in "${versions[@]}"; do
         if [ "$version" = "nightly" ]; then
             sed -ri \
                 -e 's,^(FROM) .*,\1 '"$from"',' \
+                -e 's/^(ENV SBCL_VERSION) .*/\1 '"$sbclGitVersion"'/' \
                 -e 's/^(ENV SBCL_COMMIT) .*/\1 '"$sbclGitSha"'/' \
                 "$dir/Dockerfile"
         else

@@ -5,7 +5,8 @@
 #
 FROM debian:buster
 
-ENV SBCL_COMMIT 16e7b24a39c3e9edf424f541a5402566dff10a8e
+ENV SBCL_COMMIT 0ead38dd6f987ffd82d3f905cdd2590bc4df4fcd
+ENV SBCL_VERSION 2.0.10.121-0ead38d
 ENV SBCL_SIGNING_KEY D6839CA0A67F74D9DFB70922EBD595A9100D63CD
 
 WORKDIR /usr/local/src/
@@ -42,6 +43,7 @@ RUN set -x \
        } \
     && build_and_install_source() { \
          cd "sbcl-$1/" \
+         && echo "\"$SBCL_VERSION\"" > version.lisp-expr \
          # Remove the hardcoding of armv5 as target arch. Use the default
          # provided by the base image.
          && sed -i -e "s/CFLAGS += -marm -march=armv5/CFLAGS += -marm/" src/runtime/Config.arm-linux \

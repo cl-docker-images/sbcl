@@ -14,6 +14,7 @@ RUN set -x \
     && curl -fsSL "https://github.com/sbcl/sbcl/archive/$SBCL_COMMIT.tar.gz" > "sbcl-${SBCL_COMMIT}.tar.gz" \
     && tar xf sbcl-${SBCL_COMMIT}.tar.gz \
     && rm -rf sbcl-${SBCL_COMMIT}.tar.gz \
+    && echo "\"$SBCL_VERSION\"" > sbcl-$SBCL_COMMIT/version.lisp-expr \
     && apt-get remove -y curl ca-certificates \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*

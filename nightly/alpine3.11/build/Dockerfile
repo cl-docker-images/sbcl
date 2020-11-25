@@ -13,6 +13,7 @@ RUN set -x \
     && curl -fsSL "https://github.com/sbcl/sbcl/archive/$SBCL_COMMIT.tar.gz" > "sbcl-${SBCL_COMMIT}.tar.gz" \
     && tar xf sbcl-${SBCL_COMMIT}.tar.gz \
     && rm -rf sbcl-${SBCL_COMMIT}.tar.gz \
+    && echo "\"$SBCL_VERSION\"" > sbcl-$SBCL_COMMIT/version.lisp-expr \
     && apk del --no-cache openssl curl ca-certificates
 
 WORKDIR /
