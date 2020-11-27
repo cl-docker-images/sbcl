@@ -80,10 +80,10 @@ join() {
 for version in "${versions[@]}"; do
 
     for v in \
-        buster/{,fancy,build} \
-        stretch/{,fancy,build} \
-        alpine3.12/{,fancy,build} \
-        alpine3.11/{,fancy,build} \
+        buster/{,slim} \
+        stretch/{,slim} \
+        alpine3.12/{,slim} \
+        alpine3.11/{,slim} \
         windowsservercore-{1809,ltsc2016}/ \
     ; do
         os="${v%%/*}"
@@ -112,7 +112,7 @@ for version in "${versions[@]}"; do
             ${aliases[$version]:-}
         )
 
-        variantAliases=( "${versionAliases[@]/%/-$os$variantTag}" )
+        variantAliases=( "${versionAliases[@]/%/$variantTag-$os}" )
         variantAliases=( "${variantAliases[@]//latest-/}" )
 
         case "$os" in

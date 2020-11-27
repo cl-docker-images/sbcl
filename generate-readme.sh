@@ -61,4 +61,4 @@ for sharedTag in "${!sharedTags[@]}"; do
     done
 done
 
-awk -v r="$simpleTagSection" '{gsub(/INSERT-SIMPLE-TAGS/,r)}1' hub-description-template.md | awk -v r="$sharedTagSection" '{gsub(/INSERT-SHARED-TAGS/,r)}1'
+awk -v r="$simpleTagSection" '{gsub(/INSERT-SIMPLE-TAGS/,r)}1' hub-description-template.md | awk -v r="$sharedTagSection" '{gsub(/INSERT-SHARED-TAGS/,r)}1' | sed -e "s,%%IMAGE%%,$1,g"

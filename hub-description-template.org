@@ -31,59 +31,123 @@
   tool, and many other extensions.
   #+end_quote
 
+* How to use this iamge
+
+** Create a =Dockerfile= in your SBCL project
+
+   #+begin_src dockerfile
+     FROM %%IMAGE%%:latest
+     COPY . /usr/src/app
+     WORKDIR /usr/src/app
+     CMD [ "sbcl", "--load", "./your-daemon-or-script.lisp" ]
+   #+end_src
+
+   You can then build and run the Docker image:
+
+   #+begin_src console
+     $ docker build -t my-sbcl-app
+     $ docker run -it --rm --name my-running-app my-sbcl-app
+   #+end_src
+
+** Run a single Common Lisp script
+
+   For many simple, single file projects, you may find it inconvenient to write
+   a complete `Dockerfile`. In such cases, you can run a Lisp script by using
+   the SBCL Docker image directly:
+
+   #+begin_src console
+     $ docker run -it --rm --name my-running-script -v "$PWD":/usr/src/app -w /usr/src/app %%IMAGE%%:latest sbcl --load ./your-daemon-or-script.lisp
+   #+end_src
+
+** Developing using SLIME
+
+   [[https://common-lisp.net/project/slime/][SLIME]] provides a convenient and fun environment for hacking on Common
+   Lisp. To develop using SLIME, first start the Swank server in a container:
+
+   #+begin_src console
+     $ docker run -it --rm --name sbcl-slime -p 127.0.0.1:4005:4005 -v /path/to/slime:/usr/src/slime -v "$PWD":/usr/src/app -w /usr/src/app %%IMAGE%%:latest sbcl --load /usr/src/slime/swank-loader.lisp --eval '(swank-loader:init)' --eval '(swank:create-server :dont-close t :interface "0.0.0.0")'
+   #+end_src
+
+   Then, in an Emacs instance with slime loaded, type:
+
+   #+begin_src emacs
+     M-x slime-connect RET RET RET
+   #+end_src
+
+
 * What's in the image?
 
   This image contains SBCL binaries built from the latest source code released
   by the SBCL devs for a variety of OSes and architectures.
 
-  The goal is to track upstream as closely as possible. Thus, patches are kept
-  to a minimum (and ideally kept for only as long as it takes for them to be
-  upstreamed).
-
   Currently, the only modification made to the SBCL source code when building
   is to remove =-march=armv5= from the =CFLAGS= on 32-bit ARM targets. This is
   done because recent gcc versions (like the ones in Alpine 3.11 and 3.12) no
   longer support this target and it can create suboptimal binaries for armv7
-  (which is the explicit target of these Docker images). If you would like to
-  build an application with SBCL that is portable to earlier ARM revisions, use
-  the =-build= images (and make sure to =rebuild-sbcl=) as the sources
-  contained in those images are pristine. This issue has been [[https://bugs.launchpad.net/sbcl/+bug/1839783][reported
-  upstream]].
+  (which is the explicit target of these Docker images). This issue has been
+  [[https://bugs.launchpad.net/sbcl/+bug/1839783][reported upstream]].
 
-** =-fancy= images
+* Image variants
 
-   The tags with a =-fancy= suffix have SBCL built by passing =--fancy= to
-   SBCL's =make.sh=. This results in an image that has additional features
-   added, such as core compression and internal xrefs.
+  This image comes in several variants, each designed for a specific use case.
 
-** =-build= images
+** =%%IMAGE%%:<version>=
 
-   While the build configuration follows upstream's default set of build
-   features, SBCL is very configurable at build time and it would be a shame to
-   not expose this somehow. Therfore, in addition to the standard images, a set
-   of "build" images (tags with the =-build= suffix) are provided.
+   This is the defacto image. If you are unsure about what your needs are, you
+   probably want to use this one. It is designed to be used both as a throw
+   away container (mount your source code and start the container to start your
+   app), as well as the base to build other images off of. The included SBCL
+   binary was built with the =--fancy= flag.
 
-   These build images have SBCL already installed in them and include the SBCL
-   source code and any packages needed to build SBCL from scratch. This allows
-   a customized SBCL to be easily built. To customize the feature set, place a
-   file at =/usr/local/src/sbcl-$SBCL_VERSION/customize-target-features.lisp=
-   or =C:\sbcl-$SBCL_VERSION\customize-target-features.lisp=. See the SBCL
-   build instructions for more details on what this file should contain. To
-   patch SBCL, place any number of patch files (ending in ".patch") in
-   =/usr/local/src/sbcl-${SBCL_VERSION}/patches/= or
-   =C:\sbcl-$SBCL_VERSION\patches\=. To build and install SBCL, execute
-   ~rebuild-sbcl~. This script will apply the patches, build, install, and
-   remove the previous copy of SBCL.
+   Some of these tags may have names like buster or stretch in them. These are
+   the suite code names for releases of Debian and indicate which release the
+   image is based on. If your image needs to install any additional packages
+   beyond what comes with the image, you'll likely want to specify one of these
+   explicitly to minimize breakage when there are new releases of Debian.
 
-   While these build images give a lot of flexibility, it results in the images
-   being much larger than the non-build images. Therefore, it is recommended
-   that you use them in [[https://docs.docker.com/develop/develop-images/multistage-build/][multi-stage builds]].
+   These images are built off the buildpack-deps image. It, by design, has a
+   large number of extremely common Debian packages.
 
-   Note that the Windows build images do not ship with the full toolchain
-   needed to build SBCL as I have not yet finished my due diligence to
-   understand all the licenses for the tools used (I'm not a Windows developer
-   and don't spend much time on that OS). Until then, the Windows builds will
-   download and install the toolchain as part of the rebuild process.
+** =%%IMAGE%%:<version>-slim=
+
+   This image does not contain the common packages contained in the default tag
+   and only contains the minimal packages needed to run SBCL. Unless you are
+   working in an environment where only this image will be deployed and you
+   have space constraints, we highly recommend using the default image of this
+   repository.
+
+** =%%IMAGE%%:<version>-alpine=
+
+   This image is based on the popular [[https://alpinelinux.org/][Alpine Linux project]], available in [[https://hub.docker.com/_/alpine][the
+   =alpine= official image]]. Alpine Linux is much smaller than most distribution
+   base images (~5MB), and thus leads to much slimmer images in general.
+
+   This variant is highly recommended when final image size being as small as
+   possible is desired. The main caveat to note is that it does use [[https://musl.libc.org/][musl libc]]
+   instead of [[https://www.etalabs.net/compare_libcs.html][glibc and friends]], so certain software might run into issues
+   depending on the depth of their libc requirements. However, most software
+   doesn't have an issue with this, so this variant is usually a very safe
+   choice. See [[https://news.ycombinator.com/item?id=10782897][this Hacker News comment thread]] for more discussion of the
+   issues that might arise and some pro/con comparisons of using Alpine-based
+   images.
+
+   To minimize image size, it's uncommon for additional related tools (such as
+   git or bash) to be included in Alpine-based images. Using this image as a
+   base, add the things you need in your own Dockerfile (see the [[https://hub.docker.com/_/alpine/][alpine image
+   description]] for examples of how to install packages if you are unfamiliar).
+
+** =%%IMAGE%%:<version>-windowsservercore=
+
+   This image is based on [[https://hub.docker.com/_/microsoft-windows-servercore][Windows Server Core
+   (=microsoft/windowsservercore=)]]. As such, it only works in places which that
+   image does, such as Windows 10 Professional/Enterprise (Anniversary Edition)
+   or Windows Server 2016.
+
+   For information about how to get Docker running on Windows, please see the
+   relevant "Quick Start" guide provided by Microsoft:
+
+   + [[https://msdn.microsoft.com/en-us/virtualization/windowscontainers/quick_start/quick_start_windows_server][Windows Server Quick Start]]
+   + [[https://msdn.microsoft.com/en-us/virtualization/windowscontainers/quick_start/quick_start_windows_10][Windows 10 Quick Start]]
 
 * License
 

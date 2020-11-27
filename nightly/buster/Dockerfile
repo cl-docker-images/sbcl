@@ -3,10 +3,10 @@
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
-FROM debian:buster
+FROM buildpack-deps:buster
 
-ENV SBCL_COMMIT 0ead38dd6f987ffd82d3f905cdd2590bc4df4fcd
-ENV SBCL_VERSION 2.0.10.121-0ead38d
+ENV SBCL_COMMIT f266a54364083e8f9601818b0d5cfbdf65e6e890
+ENV SBCL_VERSION 2.0.10.122-f266a54
 ENV SBCL_SIGNING_KEY D6839CA0A67F74D9DFB70922EBD595A9100D63CD
 
 WORKDIR /usr/local/src/
@@ -47,12 +47,10 @@ RUN set -x \
          # Remove the hardcoding of armv5 as target arch. Use the default
          # provided by the base image.
          && sed -i -e "s/CFLAGS += -marm -march=armv5/CFLAGS += -marm/" src/runtime/Config.arm-linux \
-         && sh make.sh "--xc-host=${2}" \
+         && sh make.sh "--xc-host=${2}" --fancy \
          && sh install.sh \
          && cd /usr/local/src; \
        } \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends curl gnupg ca-certificates make dirmngr bzip2 build-essential \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys ${SBCL_SIGNING_KEY} \
@@ -61,9 +59,6 @@ RUN set -x \
     && download_source "$SBCL_COMMIT" \
     && build_and_install_source "$SBCL_COMMIT" "/usr/local/src/sbcl-${SBCL_BINARY_VERSION}-$SBCL_BINARY_ARCH_CODE-linux/run-sbcl.sh" \
     && rm -rf "$GNUPGHOME" ./* \
-    && apt-get remove -y curl gnupg ca-certificates make dirmngr bzip2 build-essential \
-    && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/* \
     && sbcl --version
 
 WORKDIR /

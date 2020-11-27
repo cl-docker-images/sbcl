@@ -1,6 +1,12 @@
-FROM PLACEHOLDER
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "update.sh"
+#
+# PLEASE DO NOT EDIT IT DIRECTLY.
+#
+FROM debian:buster
 
-ENV SBCL_VERSION PLACEHOLDER
+ENV SBCL_COMMIT f266a54364083e8f9601818b0d5cfbdf65e6e890
+ENV SBCL_VERSION 2.0.10.122-f266a54
 ENV SBCL_SIGNING_KEY D6839CA0A67F74D9DFB70922EBD595A9100D63CD
 
 WORKDIR /usr/local/src/
@@ -31,34 +37,31 @@ RUN set -x \
          && rm -rf "sbcl-${1}-$SBCL_BINARY_ARCH_CODE-linux-binary.tar"; \
        } \
     && download_source() { \
-        url="https://downloads.sourceforge.net/project/sbcl/sbcl/${1}/sbcl-${1}-source.tar.bz2" \
-         && curl -fsSL "$url" > "sbcl-${1}-source.tar.bz2" \
-         && bunzip2 "sbcl-${1}-source.tar.bz2" \
-         && grep "sbcl-${1}-source.tar" "sbcl-${1}-crhodes.txt" > "${1}-sum-file.txt" \
-         && sha256sum -c "${1}-sum-file.txt" \
-         && tar xf "sbcl-${1}-source.tar"; \
+        url="https://github.com/sbcl/sbcl/archive/$1.tar.gz" \
+         && curl -fsSL "$url" > "sbcl-${1}.tar.gz" \
+         && tar xf "sbcl-${1}.tar.gz"; \
        } \
     && build_and_install_source() { \
-         cd "sbcl-${1}/" \
+         cd "sbcl-$1/" \
+         && echo "\"$SBCL_VERSION\"" > version.lisp-expr \
          # Remove the hardcoding of armv5 as target arch. Use the default
          # provided by the base image.
          && sed -i -e "s/CFLAGS += -marm -march=armv5/CFLAGS += -marm/" src/runtime/Config.arm-linux \
-         && sh make.sh "--xc-host=${2}" --fancy \
+         && sh make.sh "--xc-host=${2}" \
          && sh install.sh \
          && cd /usr/local/src; \
        } \
     && apt-get update \
-    && apt-get install -y --no-install-recommends curl gnupg ca-certificates make dirmngr bzip2 build-essential zlib1g zlib1g-dev \
+    && apt-get install -y --no-install-recommends curl gnupg ca-certificates make dirmngr bzip2 build-essential \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys ${SBCL_SIGNING_KEY} \
     && download_and_validate_hashes "$SBCL_BINARY_VERSION" \
-    && download_and_validate_hashes "$SBCL_VERSION" \
     && download_and_unpack_binary "$SBCL_BINARY_VERSION" \
-    && download_source "$SBCL_VERSION" \
-    && build_and_install_source "$SBCL_VERSION" "/usr/local/src/sbcl-${SBCL_BINARY_VERSION}-$SBCL_BINARY_ARCH_CODE-linux/run-sbcl.sh" \
+    && download_source "$SBCL_COMMIT" \
+    && build_and_install_source "$SBCL_COMMIT" "/usr/local/src/sbcl-${SBCL_BINARY_VERSION}-$SBCL_BINARY_ARCH_CODE-linux/run-sbcl.sh" \
     && rm -rf "$GNUPGHOME" ./* \
-    && apt-get remove -y curl gnupg ca-certificates make dirmngr bzip2 build-essential zlib1g-dev \
+    && apt-get remove -y curl gnupg ca-certificates make dirmngr bzip2 build-essential \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     && sbcl --version

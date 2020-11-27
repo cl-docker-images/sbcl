@@ -36,10 +36,10 @@ for version in "${versions[@]}"; do
     fi
 
     for v in \
-        buster/{,fancy,build} \
-        stretch/{,fancy,build} \
-        alpine3.12/{,fancy,build} \
-        alpine3.11/{,fancy,build} \
+        buster/{,slim} \
+        stretch/{,slim} \
+        alpine3.12/ \
+        alpine3.11/ \
         windowsservercore-{ltsc2016,1809}/ \
     ; do
         os="${v%%/*}"
@@ -50,35 +50,22 @@ for version in "${versions[@]}"; do
             continue
         fi
 
-        if [ "$version" = "nightly" ]; then
-            nightlySuffix="-nightly"
-        else
-            nightlySuffix=""
-        fi
-
         mkdir -p "$dir"
 
         case "$os" in
             buster|stretch)
                 template="apt"
-                if [ "$variant" = "build" ]; then
-                    from="daewok/sbcl:$version-$os"
-                    cp "rebuild-sbcl.apt$nightlySuffix" "$dir/rebuild-sbcl"
-                else
+                if [ "$variant" = "slim" ]; then
                     from="debian:$os"
-                    cp docker-entrypoint.sh "$dir/docker-entrypoint.sh"
+                else
+                    from="buildpack-deps:$os"
                 fi
+                cp docker-entrypoint.sh "$dir/docker-entrypoint.sh"
                 ;;
             alpine*)
                 template="apk"
                 cp docker-entrypoint.sh "$dir/docker-entrypoint.sh"
-                if [ "$variant" = "build" ]; then
-                    from="daewok/sbcl:$version-$os"
-                    cp "rebuild-sbcl.apk$nightlySuffix" "$dir/rebuild-sbcl"
-                else
-                    from="alpine:${os#alpine}"
-                    cp docker-entrypoint.sh "$dir/docker-entrypoint.sh"
-                fi
+                from="alpine:${os#alpine}"
                 ;;
             windowsservercore-*)
                 template='windowsservercore'
