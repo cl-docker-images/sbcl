@@ -31,7 +31,7 @@
   tool, and many other extensions.
   #+end_quote
 
-* How to use this iamge
+* How to use this image
 
 ** Create a =Dockerfile= in your SBCL project
 
