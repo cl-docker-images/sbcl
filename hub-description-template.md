@@ -1,42 +1,42 @@
-- [Supported Tags](#orge8fd23b)
-  - [Simple Tags](#org4d770a0)
-  - [Shared Tags](#org9cf3b84)
-- [Quick Reference](#org765a47a)
-- [What is SBCL?](#orgbe34f07)
-- [How to use this image](#org9b56958)
-  - [Create a `Dockerfile` in your SBCL project](#org4ee6ec8)
-  - [Run a single Common Lisp script](#orgde0439d)
-  - [Developing using SLIME](#org2488c13)
-- [What's in the image?](#org0878edb)
-- [Image variants](#org7e05aa8)
-  - [`%%IMAGE%%:<version>`](#org700127e)
-  - [`%%IMAGE%%:<version>-slim`](#org628e123)
-  - [`%%IMAGE%%:<version>-alpine`](#orgacfdb0e)
-  - [`%%IMAGE%%:<version>-windowsservercore`](#org60167db)
-- [License](#org0448fe1)
+- [Supported Tags](#org38a78f2)
+  - [Simple Tags](#orgf0a301a)
+  - [Shared Tags](#org3c2eab2)
+- [Quick Reference](#orgde81ade)
+- [What is SBCL?](#org4d11633)
+- [How to use this image](#org259bfc0)
+  - [Create a `Dockerfile` in your SBCL project](#org431f337)
+  - [Run a single Common Lisp script](#org71dbf3d)
+  - [Developing using SLIME](#org78f7345)
+- [What's in the image?](#orge125d24)
+- [Image variants](#orgbe8214f)
+  - [`%%IMAGE%%:<version>`](#org7de83fc)
+  - [`%%IMAGE%%:<version>-slim`](#org4425988)
+  - [`%%IMAGE%%:<version>-alpine`](#orge360b77)
+  - [`%%IMAGE%%:<version>-windowsservercore`](#org3ddc604)
+- [License](#orgdf8319a)
 
 
 
-<a id="orge8fd23b"></a>
+<a id="org38a78f2"></a>
 
 # Supported Tags
 
 
-<a id="org4d770a0"></a>
+<a id="orgf0a301a"></a>
 
 ## Simple Tags
 
 INSERT-SIMPLE-TAGS
 
 
-<a id="org9cf3b84"></a>
+<a id="org3c2eab2"></a>
 
 ## Shared Tags
 
 INSERT-SHARED-TAGS
 
 
-<a id="org765a47a"></a>
+<a id="orgde81ade"></a>
 
 # Quick Reference
 
@@ -47,7 +47,7 @@ INSERT-SHARED-TAGS
 -   **Supported platforms:** `linux/amd64`, `linux/arm64/v8`, `linux/arm/v7`, `windows/amd64`
 
 
-<a id="orgbe34f07"></a>
+<a id="org4d11633"></a>
 
 # What is SBCL?
 
@@ -56,12 +56,12 @@ From [SBCL's Home Page](http://sbcl.org):
 > Steel Bank Common Lisp (SBCL) is a high performance Common Lisp compiler. It is open source / free software, with a permissive license. In addition to the compiler and runtime system for ANSI Common Lisp, it provides an interactive environment including a debugger, a statistical profiler, a code coverage tool, and many other extensions.
 
 
-<a id="org9b56958"></a>
+<a id="org259bfc0"></a>
 
 # How to use this image
 
 
-<a id="org4ee6ec8"></a>
+<a id="org431f337"></a>
 
 ## Create a `Dockerfile` in your SBCL project
 
@@ -80,7 +80,7 @@ $ docker run -it --rm --name my-running-app my-sbcl-app
 ```
 
 
-<a id="orgde0439d"></a>
+<a id="org71dbf3d"></a>
 
 ## Run a single Common Lisp script
 
@@ -91,7 +91,7 @@ $ docker run -it --rm --name my-running-script -v "$PWD":/usr/src/app -w /usr/sr
 ```
 
 
-<a id="org2488c13"></a>
+<a id="org78f7345"></a>
 
 ## Developing using SLIME
 
@@ -108,7 +108,7 @@ M-x slime-connect RET RET RET
 ```
 
 
-<a id="org0878edb"></a>
+<a id="orge125d24"></a>
 
 # What's in the image?
 
@@ -117,32 +117,32 @@ This image contains SBCL binaries built from the latest source code released by 
 Currently, the only modification made to the SBCL source code when building is to remove `-march=armv5` from the `CFLAGS` on 32-bit ARM targets. This is done because recent gcc versions (like the ones in Alpine 3.11 and 3.12) no longer support this target and it can create suboptimal binaries for armv7 (which is the explicit target of these Docker images). This issue has been [reported upstream](https://bugs.launchpad.net/sbcl/+bug/1839783).
 
 
-<a id="org7e05aa8"></a>
+<a id="orgbe8214f"></a>
 
 # Image variants
 
 This image comes in several variants, each designed for a specific use case.
 
 
-<a id="org700127e"></a>
+<a id="org7de83fc"></a>
 
 ## `%%IMAGE%%:<version>`
 
-This is the defacto image. If you are unsure about what your needs are, you probably want to use this one. It is designed to be used both as a throw away container (mount your source code and start the container to start your app), as well as the base to build other images off of. The included SBCL binary was built with the `--fancy` flag.
+This is the defacto image. If you are unsure about what your needs are, you probably want to use this one. It is designed to be used both as a throw away container (mount your source code and start the container to start your app), as well as the base to build other images off of. The included SBCL binary was built with the `--fancy` flag. Additionally, these images contain the SBCL source code (at `/usr/local/src/sbcl`) to help facilitate interactive development and exploration (a hallmark of Common Lisp!).
 
 Some of these tags may have names like buster or stretch in them. These are the suite code names for releases of Debian and indicate which release the image is based on. If your image needs to install any additional packages beyond what comes with the image, you'll likely want to specify one of these explicitly to minimize breakage when there are new releases of Debian.
 
 These images are built off the buildpack-deps image. It, by design, has a large number of extremely common Debian packages.
 
 
-<a id="org628e123"></a>
+<a id="org4425988"></a>
 
 ## `%%IMAGE%%:<version>-slim`
 
 This image does not contain the common packages contained in the default tag and only contains the minimal packages needed to run SBCL. Unless you are working in an environment where only this image will be deployed and you have space constraints, we highly recommend using the default image of this repository.
 
 
-<a id="orgacfdb0e"></a>
+<a id="orge360b77"></a>
 
 ## `%%IMAGE%%:<version>-alpine`
 
@@ -153,7 +153,7 @@ This variant is highly recommended when final image size being as small as possi
 To minimize image size, it's uncommon for additional related tools (such as git or bash) to be included in Alpine-based images. Using this image as a base, add the things you need in your own Dockerfile (see the [alpine image description](https://hub.docker.com/_/alpine/) for examples of how to install packages if you are unfamiliar).
 
 
-<a id="org60167db"></a>
+<a id="org3ddc604"></a>
 
 ## `%%IMAGE%%:<version>-windowsservercore`
 
@@ -165,7 +165,7 @@ For information about how to get Docker running on Windows, please see the relev
 -   [Windows 10 Quick Start](https://msdn.microsoft.com/en-us/virtualization/windowscontainers/quick_start/quick_start_windows_10)
 
 
-<a id="org0448fe1"></a>
+<a id="orgdf8319a"></a>
 
 # License
 

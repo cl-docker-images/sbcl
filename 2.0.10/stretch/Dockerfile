@@ -41,15 +41,17 @@ RUN set -x \
          && bunzip2 "sbcl-${1}-source.tar.bz2" \
          && grep "sbcl-${1}-source.tar" "sbcl-${1}-crhodes.txt" > "${1}-sum-file.txt" \
          && sha256sum -c "${1}-sum-file.txt" \
-         && tar xf "sbcl-${1}-source.tar"; \
+         && tar xf "sbcl-${1}-source.tar" \
+         && mv "sbcl-$1" "sbcl"; \
        } \
     && build_and_install_source() { \
-         cd "sbcl-${1}/" \
+         cd "sbcl/" \
          # Remove the hardcoding of armv5 as target arch. Use the default
          # provided by the base image.
          && sed -i -e "s/CFLAGS += -marm -march=armv5/CFLAGS += -marm/" src/runtime/Config.arm-linux \
-         && sh make.sh "--xc-host=${2}" --fancy \
+         && sh make.sh "--xc-host=${1}" --fancy \
          && sh install.sh \
+         && sh clean.sh \
          && cd /usr/local/src; \
        } \
     && GNUPGHOME="$(mktemp -d)" \
@@ -59,8 +61,8 @@ RUN set -x \
     && download_and_validate_hashes "$SBCL_VERSION" \
     && download_and_unpack_binary "$SBCL_BINARY_VERSION" \
     && download_source "$SBCL_VERSION" \
-    && build_and_install_source "$SBCL_VERSION" "/usr/local/src/sbcl-${SBCL_BINARY_VERSION}-$SBCL_BINARY_ARCH_CODE-linux/run-sbcl.sh" \
-    && rm -rf "$GNUPGHOME" ./* \
+    && build_and_install_source "/usr/local/src/sbcl-${SBCL_BINARY_VERSION}-$SBCL_BINARY_ARCH_CODE-linux/run-sbcl.sh" \
+    && rm -rf "$GNUPGHOME" "$SBCL_BINARY_VERSION-sum-file.txt" "$SBCL_VERSION-sum-file.txt" "sbcl-$SBCL_BINARY_VERSION-crhodes."* "sbcl-$SBCL_VERSION-crhodes."*  "sbcl-$SBCL_VERSION-source.tar" "sbcl-$SBCL_BINARY_VERSION-$SBCL_BINARY_ARCH_CODE-linux" \
     && sbcl --version
 
 WORKDIR /
