@@ -110,6 +110,9 @@
    These images are built off the buildpack-deps image. It, by design, has a
    large number of extremely common Debian packages.
 
+   These images contain the Quicklisp installer, located at
+   =/usr/local/share/common-lisp/source/quicklisp/quicklisp.lisp=.
+
 ** =%%IMAGE%%:<version>-slim=
 
    This image does not contain the common packages contained in the default tag
