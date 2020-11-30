@@ -5,8 +5,8 @@
 #
 FROM buildpack-deps:buster
 
-ENV SBCL_COMMIT f266a54364083e8f9601818b0d5cfbdf65e6e890
-ENV SBCL_VERSION 2.0.10.122-f266a54
+ENV SBCL_COMMIT 3b96fc15214ffc9d1aeb2e941276cffeaae7837f
+ENV SBCL_VERSION 2.0.11.16-3b96fc1
 ENV SBCL_SIGNING_KEY D6839CA0A67F74D9DFB70922EBD595A9100D63CD
 
 WORKDIR /usr/local/src/
@@ -63,6 +63,22 @@ RUN set -x \
     && rm -rf "$GNUPGHOME" "sbcl-$SBCL_COMMIT.tar.gz" "sbcl-$SBCL_BINARY_VERSION-crhodes."* "sbcl-$SBCL_BINARY_VERSION-$SBCL_BINARY_ARCH_CODE-linux" "$SBCL_BINARY_VERSION-sum-file.txt" \
     && sbcl --version
 
+# Add the Quicklisp installer.
+WORKDIR /usr/local/share/common-lisp/source/quicklisp/
+
+ENV QUICKLISP_SIGNING_KEY D7A3489DDEFE32B7D0E7CC61307965AB028B5FF7
+
+RUN set -x \
+    && curl -fsSL "https://beta.quicklisp.org/quicklisp.lisp" > quicklisp.lisp \
+    && curl -fsSL "https://beta.quicklisp.org/quicklisp.lisp.asc" > quicklisp.lisp.asc \
+    && GNUPGHOME="$(mktemp -d)" \
+    && export GNUPGHOME \
+    && gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "${QUICKLISP_SIGNING_KEY}" \
+    && gpg --batch --verify "quicklisp.lisp.asc" "quicklisp.lisp" \
+    && rm quicklisp.lisp.asc \
+    && rm -rf "$GNUPGHOME"
+
+# Add the entrypoint
 WORKDIR /
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
