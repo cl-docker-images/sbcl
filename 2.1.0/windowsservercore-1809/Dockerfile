@@ -7,8 +7,8 @@ FROM mcr.microsoft.com/windows/servercore:1809
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
 
-ENV SBCL_VERSION 2.0.11
-ENV SBCL_SOURCE_SHA256 87d2aa53cef092119a1c8b2f3de48d209375a674c3b60e08596838013bd7971d
+ENV SBCL_VERSION 2.1.0
+ENV SBCL_SOURCE_SHA256 05ee56bd66f9ce2f4fff3716766eb53aef2a74be3bbe862a31d83a60bea8224c
 
 RUN echo 'Saving original machine PATH'; \
     $machineKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey('SYSTEM\ControlSet001\Control\Session Manager\Environment\'); \
