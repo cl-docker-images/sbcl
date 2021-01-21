@@ -3,7 +3,7 @@
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
-FROM alpine:3.11
+FROM alpine:3.13
 
 ENV SBCL_VERSION 2.1.0
 ENV SBCL_SIGNING_KEY D6839CA0A67F74D9DFB70922EBD595A9100D63CD
@@ -15,7 +15,16 @@ RUN set -x \
     && case "$(cat /etc/apk/arch)" in \
     # We use ECL to build because the version of SBCL in the edge repo doesn't
     # work for armv7 (edge has updated musl libc incompatibly).
-    armv7) SBCL_ARCH=arm; HOST_LISP="ecl"; ECL_VERSION=20.4.24; export ECL_VERSION;; \
+    armv7) \
+      SBCL_ARCH=arm; \
+      if grep "3.13" /etc/issue 2>/dev/null >/dev/null ; then \
+        HOST_LISP="sbcl"; \
+      else \
+        HOST_LISP="ecl"; \
+        ECL_VERSION=20.4.24; \
+        export ECL_VERSION; \
+      fi \
+      ;; \
     aarch64) SBCL_ARCH=arm64; HOST_LISP="sbcl";; \
     x86_64) SBCL_ARCH=x86-64; HOST_LISP="sbcl";; \
     *) echo "Unknown arch" >&2; exit 1;; \
