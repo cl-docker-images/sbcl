@@ -7,7 +7,6 @@ variables:
   CL_DOCKER_IMAGES_ARM64V8: "1"
   CL_DOCKER_IMAGES_ARM32V7: "1"
   CL_DOCKER_IMAGES_WINAMD64: "1"
-  NUM_RETRIES: "1"
 
 ##############################################################################
 # Put shared
