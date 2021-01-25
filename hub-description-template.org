@@ -16,7 +16,7 @@
   + SBCL Home Page :: [[http://sbcl.org][http://sbcl.org]]
   + Where to file Docker image related issues :: [[https://gitlab.common-lisp.net/cl-docker-images/sbcl]]
   + Where to file issues for SBCL itself :: [[https://bugs.launchpad.net/sbcl][https://bugs.launchpad.net/sbcl]]
-  + Maintained by :: [[https://github.com/daewok][Eric Timmons]]
+  + Maintained by :: [[https://common-lisp.net/project/cl-docker-images][CL Docker Images Project]]
   + Supported platforms :: =linux/amd64=, =linux/arm64/v8=, =linux/arm/v7=, =windows/amd64=
 
 * What is SBCL?
