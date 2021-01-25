@@ -111,7 +111,18 @@
    large number of extremely common Debian packages.
 
    These images contain the Quicklisp installer, located at
-   =/usr/local/share/common-lisp/source/quicklisp/quicklisp.lisp=.
+   =/usr/local/share/common-lisp/source/quicklisp/quicklisp.lisp=. Additionally,
+   there is a script at =/usr/local/bin/install-quicklisp= that will use the
+   bundled installer to install Quicklisp. You can configure the Quicklisp
+   install with the following environment variables:
+
+   + =QUICKLISP_DIST_VERSION= :: The dist version to use. Of the form
+     yyyy-mm-dd. =latest= means to install the latest version (the default).
+   + =QUICKLISP_CLIENT_VERSION= :: The client version to use. Of the form
+     yyyy-mm-dd. =latest= means to install the latest version (the default).
+   + =QUICKLISP_ADD_TO_INIT_FILE= :: If set to =true=, =(ql:add-to-init-file)=
+     is used to add code to the implementation's user init file to load
+     Quicklisp on startup. Not set by default.
 
 ** =%%IMAGE%%:<version>-slim=
 

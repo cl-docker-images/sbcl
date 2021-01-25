@@ -59,6 +59,7 @@ for version in "${versions[@]}"; do
                     from="debian:$os"
                 else
                     from="buildpack-deps:$os"
+                    cp install-quicklisp "$dir/install-quicklisp"
                 fi
                 cp docker-entrypoint.sh "$dir/docker-entrypoint.sh"
                 ;;

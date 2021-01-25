@@ -73,6 +73,9 @@ RUN set -x \
     && rm quicklisp.lisp.asc \
     && rm -rf "$GNUPGHOME"
 
+# Add the script to trivially install Quicklisp
+COPY install-quicklisp /usr/local/bin/install-quicklisp
+
 # Add the entrypoint
 WORKDIR /
 
