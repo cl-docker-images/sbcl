@@ -44,7 +44,7 @@ RUN set -x \
          # Remove the hardcoding of armv5 as target arch. Use the default
          # provided by the base image.
          && sed -i -e "s/CFLAGS += -marm -march=armv5/CFLAGS += -marm/" src/runtime/Config.arm-linux \
-         && sh make.sh "--xc-host=${1}" --fancy --with-sb-linkable-runtime \
+         && sh make.sh "--xc-host=${1}" --fancy \
          && sh install.sh \
          && sh clean.sh \
          && cd /usr/local/src; \
