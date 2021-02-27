@@ -123,6 +123,9 @@ for version in "${versions[@]}"; do
                 variantArches=
                 for arch in $parentArches; do
                     if echo "$arch" | grep -E "amd64|arm32v7|arm64v8" > /dev/null; then
+                        if [ "$arch" == "arm32v7" ] && [ "$os" == "alpine3.12" ]; then
+                            continue
+                        fi
                         variantArches+=" $arch"
                     fi
                 done
