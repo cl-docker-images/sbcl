@@ -124,6 +124,10 @@
      is used to add code to the implementation's user init file to load
      Quicklisp on startup. Not set by default.
 
+   Additionally, these images contain cl-launch to provide a uniform interface
+   to running a Lisp implementation without caring exactly which implementation
+   is being used (for instance to have uniform CI scripts).
+
 ** =%%IMAGE%%:<version>-slim=
 
    This image does not contain the common packages contained in the default tag

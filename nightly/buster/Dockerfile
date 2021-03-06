@@ -81,6 +81,14 @@ RUN set -x \
 # Add the script to trivially install Quicklisp
 COPY install-quicklisp /usr/local/bin/install-quicklisp
 
+# Install cl-launch. In the next release, move this up so that all images can
+# share it.
+# hadolint ignore=DL3008
+RUN set -x \
+    && apt-get update \
+    && apt-get install --no-install-recommends -y cl-launch \
+    && rm -rf /var/lib/apt/lists/*
+
 # Add the entrypoint
 WORKDIR /
 

@@ -1,42 +1,42 @@
-- [Supported Tags](#org8341478)
-  - [Simple Tags](#org15dde30)
-  - [Shared Tags](#org94bf650)
-- [Quick Reference](#org6a8199f)
-- [What is SBCL?](#org8882c38)
-- [How to use this image](#orge9d9616)
-  - [Create a `Dockerfile` in your SBCL project](#orge0a5328)
-  - [Run a single Common Lisp script](#org68ac15e)
-  - [Developing using SLIME](#org09fe913)
-- [What's in the image?](#org88f5537)
-- [Image variants](#orgef8241c)
-  - [`%%IMAGE%%:<version>`](#org670565e)
-  - [`%%IMAGE%%:<version>-slim`](#org216c6ff)
-  - [`%%IMAGE%%:<version>-alpine`](#orgc79805d)
-  - [`%%IMAGE%%:<version>-windowsservercore`](#orga428a77)
-- [License](#orga44fe95)
+- [Supported Tags](#orge5c30d6)
+  - [Simple Tags](#org0e5abf5)
+  - [Shared Tags](#org745721d)
+- [Quick Reference](#org319a0dc)
+- [What is SBCL?](#org952be57)
+- [How to use this image](#orga138915)
+  - [Create a `Dockerfile` in your SBCL project](#org2a58005)
+  - [Run a single Common Lisp script](#org05c79b6)
+  - [Developing using SLIME](#org3cf36f6)
+- [What's in the image?](#orgcf4d8ce)
+- [Image variants](#orgd3ba68b)
+  - [`%%IMAGE%%:<version>`](#org37a962a)
+  - [`%%IMAGE%%:<version>-slim`](#org8babebe)
+  - [`%%IMAGE%%:<version>-alpine`](#orgd2e9d8f)
+  - [`%%IMAGE%%:<version>-windowsservercore`](#org26c10a8)
+- [License](#org2ddd02f)
 
 
 
-<a id="org8341478"></a>
+<a id="orge5c30d6"></a>
 
 # Supported Tags
 
 
-<a id="org15dde30"></a>
+<a id="org0e5abf5"></a>
 
 ## Simple Tags
 
 INSERT-SIMPLE-TAGS
 
 
-<a id="org94bf650"></a>
+<a id="org745721d"></a>
 
 ## Shared Tags
 
 INSERT-SHARED-TAGS
 
 
-<a id="org6a8199f"></a>
+<a id="org319a0dc"></a>
 
 # Quick Reference
 
@@ -47,7 +47,7 @@ INSERT-SHARED-TAGS
 -   **Supported platforms:** `linux/amd64`, `linux/arm64/v8`, `linux/arm/v7`, `windows/amd64`
 
 
-<a id="org8882c38"></a>
+<a id="org952be57"></a>
 
 # What is SBCL?
 
@@ -56,12 +56,12 @@ From [SBCL's Home Page](http://sbcl.org):
 > Steel Bank Common Lisp (SBCL) is a high performance Common Lisp compiler. It is open source / free software, with a permissive license. In addition to the compiler and runtime system for ANSI Common Lisp, it provides an interactive environment including a debugger, a statistical profiler, a code coverage tool, and many other extensions.
 
 
-<a id="orge9d9616"></a>
+<a id="orga138915"></a>
 
 # How to use this image
 
 
-<a id="orge0a5328"></a>
+<a id="org2a58005"></a>
 
 ## Create a `Dockerfile` in your SBCL project
 
@@ -80,7 +80,7 @@ $ docker run -it --rm --name my-running-app my-sbcl-app
 ```
 
 
-<a id="org68ac15e"></a>
+<a id="org05c79b6"></a>
 
 ## Run a single Common Lisp script
 
@@ -91,7 +91,7 @@ $ docker run -it --rm --name my-running-script -v "$PWD":/usr/src/app -w /usr/sr
 ```
 
 
-<a id="org09fe913"></a>
+<a id="org3cf36f6"></a>
 
 ## Developing using SLIME
 
@@ -108,7 +108,7 @@ M-x slime-connect RET RET RET
 ```
 
 
-<a id="org88f5537"></a>
+<a id="orgcf4d8ce"></a>
 
 # What's in the image?
 
@@ -117,14 +117,14 @@ This image contains SBCL binaries built from the latest source code released by 
 Currently, the only modification made to the SBCL source code when building is to remove `-march=armv5` from the `CFLAGS` on 32-bit ARM targets. This is done because recent gcc versions (like the ones in Alpine 3.11 and 3.12) no longer support this target and it can create suboptimal binaries for armv7 (which is the explicit target of these Docker images). This issue has been [reported upstream](https://bugs.launchpad.net/sbcl/+bug/1839783).
 
 
-<a id="orgef8241c"></a>
+<a id="orgd3ba68b"></a>
 
 # Image variants
 
 This image comes in several variants, each designed for a specific use case.
 
 
-<a id="org670565e"></a>
+<a id="org37a962a"></a>
 
 ## `%%IMAGE%%:<version>`
 
@@ -140,15 +140,17 @@ These images contain the Quicklisp installer, located at `/usr/local/share/commo
 -   **`QUICKLISP_CLIENT_VERSION`:** The client version to use. Of the form yyyy-mm-dd. `latest` means to install the latest version (the default).
 -   **`QUICKLISP_ADD_TO_INIT_FILE`:** If set to `true`, `(ql:add-to-init-file)` is used to add code to the implementation's user init file to load Quicklisp on startup. Not set by default.
 
+Additionally, these images contain cl-launch to provide a uniform interface to running a Lisp implementation without caring exactly which implementation is being used (for instance to have uniform CI scripts).
 
-<a id="org216c6ff"></a>
+
+<a id="org8babebe"></a>
 
 ## `%%IMAGE%%:<version>-slim`
 
 This image does not contain the common packages contained in the default tag and only contains the minimal packages needed to run SBCL. Unless you are working in an environment where only this image will be deployed and you have space constraints, we highly recommend using the default image of this repository.
 
 
-<a id="orgc79805d"></a>
+<a id="orgd2e9d8f"></a>
 
 ## `%%IMAGE%%:<version>-alpine`
 
@@ -159,7 +161,7 @@ This variant is highly recommended when final image size being as small as possi
 To minimize image size, it's uncommon for additional related tools (such as git or bash) to be included in Alpine-based images. Using this image as a base, add the things you need in your own Dockerfile (see the [alpine image description](https://hub.docker.com/_/alpine/) for examples of how to install packages if you are unfamiliar).
 
 
-<a id="orga428a77"></a>
+<a id="org26c10a8"></a>
 
 ## `%%IMAGE%%:<version>-windowsservercore`
 
@@ -171,7 +173,7 @@ For information about how to get Docker running on Windows, please see the relev
 -   [Windows 10 Quick Start](https://msdn.microsoft.com/en-us/virtualization/windowscontainers/quick_start/quick_start_windows_10)
 
 
-<a id="orga44fe95"></a>
+<a id="org2ddd02f"></a>
 
 # License
 
