@@ -1,0 +1,15 @@
+.config:
+  arches:
+    amd64: "yes"
+    arm64v8: "yes"
+    arm32v7: "yes"
+    winamd64: "yes"
+  build_namespace: "daewok"
+  canonical_namespace: "clfoundation"
+  namespaces:
+    - "daewok"
+    - "clfoundation"
+  rc_versions:
+    - "2.1.5-rc"
+  versions:
+    - "2.1.4"
