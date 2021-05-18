@@ -1,3 +1,4 @@
 include:
+  - local: '/.gitlab-ci.config.yml'
   - project: 'cl-docker-images/ci-helpers'
     file: '/cl-docker-images-default-pipeline-v3.yml'
