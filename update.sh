@@ -3,6 +3,10 @@ set -Eeuo pipefail
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
+declare -A refs=(
+    [2.1.5rc]='master'
+)
+
 versions=( "$@" )
 
 generated_warning() {
@@ -17,9 +21,10 @@ EOH
 
 for version in "${versions[@]}"; do
 
-    if [ "$version" = "nightly" ]; then
+    if [[ $version == *rc ]]; then
         gitDir="$(mktemp -d)"
         git clone --shallow-since "2 months" "https://github.com/sbcl/sbcl.git" "$gitDir"
+        git -C "$gitDir" checkout -B "${refs[$version]}" "origin/${refs[$version]}"
         sbclGitSha="$(git -C "$gitDir" rev-parse HEAD)"
         (cd "$gitDir" && ./generate-version.sh)
         sbclGitVersion="$(tail -n 1 "$gitDir/version.lisp-expr" | tail -c +2 | head -c -2)"
@@ -46,8 +51,10 @@ for version in "${versions[@]}"; do
         variant="${v#*/}"
         dir="$version/$v"
 
-        if [ "$version" = "nightly" ] && [[ "$os" == "windowsservercore"* ]]; then
-            continue
+        if [[ "$version" == *rc ]]; then
+            if [[ "$os" == "windowsservercore"* ]] || [ "$variant" = slim ]; then
+                continue
+            fi
         fi
 
         mkdir -p "$dir"
@@ -78,7 +85,7 @@ for version in "${versions[@]}"; do
             template="$template-$variant"
         fi
 
-        if [ "$version" = "nightly" ]; then
+        if [[ "$version" == *rc ]]; then
             template="$template-nightly"
         fi
 
@@ -86,7 +93,7 @@ for version in "${versions[@]}"; do
 
         { generated_warning; cat "$template"; } > "$dir/Dockerfile"
 
-        if [ "$version" = "nightly" ]; then
+        if [[ "$version" == *rc ]]; then
             sed -ri \
                 -e 's,^(FROM) .*,\1 '"$from"',' \
                 -e 's/^(ENV SBCL_VERSION) .*/\1 '"$sbclGitVersion"'/' \

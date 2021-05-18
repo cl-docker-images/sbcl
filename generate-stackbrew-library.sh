@@ -10,17 +10,16 @@ defaultDebianSuite='buster'
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
-if [ "${1-unset}" = "nightly" ]; then
-    versions=( nightly )
-    aliases[nightly]="$(grep -e "^ENV SBCL_COMMIT" nightly/buster/Dockerfile | cut -d" " -f 3 | head -c 7)"
+if [ "${1-unset}" = "rc" ]; then
+    versions=( *rc/ )
+    versions=( "${versions[@]%/}" )
 elif [ "${1-unset}" = "all" ]; then
     versions=( */ )
     versions=( "${versions[@]%/}" )
-    aliases[nightly]="$(grep -e "^ENV SBCL_COMMIT" nightly/buster/Dockerfile | cut -d" " -f 3 | head -c 7)"
 else
     versions=( */ )
     versions=( "${versions[@]%/}" )
-    versions=( "${versions[@]/nightly}" )
+    versions=( "${versions[@]%%*rc}" )
 fi
 
 # sort version numbers with highest first
@@ -96,11 +95,10 @@ for version in "${versions[@]}"; do
 
         dir="$version/$v"
 
-        if [ "$version" = "nightly" ] && [[ "$os" == "windowsservercore"* ]]; then
-            continue
-        elif [ "$version" = "2.0.10" ] && [ "$os" = "stretch" ]; then
-            # AMD64 does not compile without patches
-            continue
+        if [[ "$version" == *rc ]]; then
+            if [[ "$os" == "windowsservercore"* ]] || [ "$variant" = slim ]; then
+                continue
+            fi
         fi
 
         [ -f "$dir/Dockerfile" ] || continue
