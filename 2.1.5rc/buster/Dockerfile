@@ -3,6 +3,7 @@
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
+
 FROM buildpack-deps:buster
 
 ENV SBCL_COMMIT 564a18adae631434c569ec53410976a181cfcb15
