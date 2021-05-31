@@ -7,8 +7,8 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2016
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
 
-ENV SBCL_VERSION 2.1.4
-ENV SBCL_SOURCE_SHA256 99260e2346fcd22ae5546e15baf50899dcb3b75a6c74cc7cc849378899efbd11
+ENV SBCL_VERSION 2.1.5
+ENV SBCL_SOURCE_SHA256 965807ecd65a9590d68a0ed408b544e7e49a1f6e337ebd2b25e34788bcc8a8c5
 
 RUN echo 'Saving original machine PATH'; \
     $machineKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey('SYSTEM\ControlSet001\Control\Session Manager\Environment\'); \
@@ -61,9 +61,6 @@ RUN echo 'Saving original machine PATH'; \
     sh -c 'tar -x -v -f sbcl-source.tar.bz2'; \
     rm sbcl-source.tar.bz2; \
     cd sbcl-$env:SBCL_VERSION; \
-    \
-    echo 'Patching SBCL'; \
-    Add-Content -Path .\src\runtime\Config.x86-64-win32 -Value 'LINKFLAGS += -Wl,--disable-dynamicbase,--disable-high-entropy-va,--default-image-base-low'; \
     \
     echo 'Building SBCL'; \
     $env:WIX = '/c/wix'; \

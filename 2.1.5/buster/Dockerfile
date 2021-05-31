@@ -5,8 +5,7 @@
 #
 FROM buildpack-deps:buster
 
-ENV SBCL_COMMIT 09a2f9662a744cc3b917d4b559970f97fe9ad2cc
-ENV SBCL_VERSION 2.1.4.157-09a2f96
+ENV SBCL_VERSION 2.1.5
 ENV SBCL_SIGNING_KEY D6839CA0A67F74D9DFB70922EBD595A9100D63CD
 
 WORKDIR /usr/local/src/
@@ -37,14 +36,16 @@ RUN set -x \
          && rm -rf "sbcl-${1}-$SBCL_BINARY_ARCH_CODE-linux-binary.tar"; \
        } \
     && download_source() { \
-        url="https://github.com/sbcl/sbcl/archive/$1.tar.gz" \
-         && curl -fsSL "$url" > "sbcl-${1}.tar.gz" \
-         && tar xf "sbcl-${1}.tar.gz" \
+        url="https://downloads.sourceforge.net/project/sbcl/sbcl/${1}/sbcl-${1}-source.tar.bz2" \
+         && curl -fsSL "$url" > "sbcl-${1}-source.tar.bz2" \
+         && bunzip2 "sbcl-${1}-source.tar.bz2" \
+         && grep "sbcl-${1}-source.tar" "sbcl-${1}-crhodes.txt" > "${1}-sum-file.txt" \
+         && sha256sum -c "${1}-sum-file.txt" \
+         && tar xf "sbcl-${1}-source.tar" \
          && mv "sbcl-$1" "sbcl"; \
        } \
     && build_and_install_source() { \
          cd "sbcl/" \
-         && echo "\"$SBCL_VERSION\"" > version.lisp-expr \
          # Remove the hardcoding of armv5 as target arch. Use the default
          # provided by the base image.
          && sed -i -e "s/CFLAGS += -marm -march=armv5/CFLAGS += -marm/" src/runtime/Config.arm-linux \
@@ -57,10 +58,11 @@ RUN set -x \
     && export GNUPGHOME \
     && gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys ${SBCL_SIGNING_KEY} \
     && download_and_validate_hashes "$SBCL_BINARY_VERSION" \
+    && download_and_validate_hashes "$SBCL_VERSION" \
     && download_and_unpack_binary "$SBCL_BINARY_VERSION" \
-    && download_source "$SBCL_COMMIT" \
+    && download_source "$SBCL_VERSION" \
     && build_and_install_source "/usr/local/src/sbcl-${SBCL_BINARY_VERSION}-$SBCL_BINARY_ARCH_CODE-linux/run-sbcl.sh" \
-    && rm -rf "$GNUPGHOME" "sbcl-$SBCL_COMMIT.tar.gz" "sbcl-$SBCL_BINARY_VERSION-crhodes."* "sbcl-$SBCL_BINARY_VERSION-$SBCL_BINARY_ARCH_CODE-linux" "$SBCL_BINARY_VERSION-sum-file.txt" \
+    && rm -rf "$GNUPGHOME" "$SBCL_BINARY_VERSION-sum-file.txt" "$SBCL_VERSION-sum-file.txt" "sbcl-$SBCL_BINARY_VERSION-crhodes."* "sbcl-$SBCL_VERSION-crhodes."*  "sbcl-$SBCL_VERSION-source.tar" "sbcl-$SBCL_BINARY_VERSION-$SBCL_BINARY_ARCH_CODE-linux" \
     && sbcl --version
 
 # Add the Quicklisp installer.
