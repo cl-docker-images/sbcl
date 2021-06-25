@@ -13,12 +13,12 @@ RUN set -x \
     # work for armv7 (edge has updated musl libc incompatibly).
     armv7) \
       SBCL_ARCH=arm; \
-      if grep "3.13" /etc/issue 2>/dev/null >/dev/null ; then \
-        HOST_LISP="sbcl"; \
-      else \
+      if grep "3.12" /etc/issue 2>/dev/null >/dev/null ; then \
         HOST_LISP="ecl"; \
         ECL_VERSION=20.4.24; \
         export ECL_VERSION; \
+      else \
+        HOST_LISP="sbcl"; \
       fi \
       ;; \
     aarch64) SBCL_ARCH=arm64; HOST_LISP="sbcl";; \
