@@ -61,7 +61,16 @@ getArches() {
             | xargs bashbrew cat --format '[{{ .RepoName }}:{{ .TagName }}]="{{ join " " .TagEntry.Architectures }}"'
     ) )"
 }
-getArches 'sbcl'
+# getArches 'sbcl'
+
+declare -g -A parentRepoToArches=(
+    [alpine:3.13]="amd64 arm32v6 arm32v7 arm64v8 i386 ppc64le s390x"
+    [alpine:3.14]="amd64 arm32v6 arm32v7 arm64v8 i386 ppc64le s390x"
+    [buildpack-deps:buster]="amd64 arm32v6 arm32v7 arm64v8 i386 ppc64le s390x"
+    [buildpack-deps:stretch]="amd64 arm32v6 arm32v7 arm64v8 i386 ppc64le s390x"
+    [debian:buster]="amd64 arm32v6 arm32v7 arm64v8 i386 ppc64le s390x"
+    [debian:stretch]="amd64 arm32v6 arm32v7 arm64v8 i386 ppc64le s390x"
+)
 
 cat <<-EOH
 # this file is generated via https://github.com/cl-docker-images/sbcl/blob/$(fileCommit "$self")/$self
