@@ -1,0 +1,18 @@
+#!/bin/sh
+
+if [ -z "$QUICKLISP_DIST_VERSION" ] || [ "$QUICKLISP_DIST_VERSION" = "latest" ]; then
+    QUICKLISP_DIST_VERSION=nil
+else
+    QUICKLISP_DIST_VERSION="\"quicklisp/$QUICKLISP_DIST_VERSION\""
+fi
+
+if [ -z "$QUICKLISP_CLIENT_VERSION" ] || [ "$QUICKLISP_CLIENT_VERSION" = "latest" ]; then
+    QUICKLISP_CLIENT_VERSION=nil
+else
+    QUICKLISP_CLIENT_VERSION="\"$QUICKLISP_CLIENT_VERSION\""
+fi
+
+sbcl --non-interactive \
+     --load /usr/local/share/common-lisp/source/quicklisp/quicklisp.lisp \
+     --eval "(quicklisp-quickstart:install :dist-version $QUICKLISP_DIST_VERSION :client-version $QUICKLISP_CLIENT_VERSION)" \
+     --eval "(when (equalp \"$QUICKLISP_ADD_TO_INIT_FILE\" \"true\") (ql-util:without-prompting (ql:add-to-init-file)))"
