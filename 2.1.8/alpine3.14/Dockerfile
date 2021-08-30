@@ -5,7 +5,7 @@
 #
 FROM alpine:3.14
 
-ENV SBCL_VERSION 2.1.7
+ENV SBCL_VERSION 2.1.8
 ENV SBCL_SIGNING_KEY D6839CA0A67F74D9DFB70922EBD595A9100D63CD
 
 WORKDIR /usr/local/src/
@@ -31,7 +31,7 @@ RUN set -x \
     esac \
     && export SBCL_ARCH \
     && import_key() { \
-         gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$1"; \
+         gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$1"; \
        } \
     && download_and_validate_hashes() { \
          curl -fsSL "https://downloads.sourceforge.net/project/sbcl/sbcl/${1}/sbcl-${1}-crhodes.asc" > "sbcl-${1}-crhodes.asc" \

@@ -5,7 +5,7 @@
 #
 FROM buildpack-deps:buster
 
-ENV SBCL_VERSION 2.1.7
+ENV SBCL_VERSION 2.1.8
 ENV SBCL_SIGNING_KEY D6839CA0A67F74D9DFB70922EBD595A9100D63CD
 
 WORKDIR /usr/local/src/
@@ -56,7 +56,7 @@ RUN set -x \
        } \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
-    && gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys ${SBCL_SIGNING_KEY} \
+    && gpg --batch --keyserver keyserver.ubuntu.com --recv-keys ${SBCL_SIGNING_KEY} \
     && download_and_validate_hashes "$SBCL_BINARY_VERSION" \
     && download_and_validate_hashes "$SBCL_VERSION" \
     && download_and_unpack_binary "$SBCL_BINARY_VERSION" \
@@ -75,7 +75,7 @@ RUN set -x \
     && curl -fsSL "https://beta.quicklisp.org/quicklisp.lisp.asc" > quicklisp.lisp.asc \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
-    && gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "${QUICKLISP_SIGNING_KEY}" \
+    && gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "${QUICKLISP_SIGNING_KEY}" \
     && gpg --batch --verify "quicklisp.lisp.asc" "quicklisp.lisp" \
     && rm quicklisp.lisp.asc \
     && rm -rf "$GNUPGHOME"

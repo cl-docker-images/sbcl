@@ -2,10 +2,10 @@
 set -Eeuo pipefail
 
 declare -A aliases=(
-    [2.1.7]='latest'
+    [2.1.8]='latest'
 )
 
-defaultDebianSuite='buster'
+defaultDebianSuite='bullseye'
 
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
@@ -66,10 +66,10 @@ getArches() {
 declare -g -A parentRepoToArches=(
     [alpine:3.13]="amd64 arm32v6 arm32v7 arm64v8 i386 ppc64le s390x"
     [alpine:3.14]="amd64 arm32v6 arm32v7 arm64v8 i386 ppc64le s390x"
+    [buildpack-deps:bullseye]="amd64 arm32v6 arm32v7 arm64v8 i386 ppc64le s390x"
     [buildpack-deps:buster]="amd64 arm32v6 arm32v7 arm64v8 i386 ppc64le s390x"
-    [buildpack-deps:stretch]="amd64 arm32v6 arm32v7 arm64v8 i386 ppc64le s390x"
+    [debian:bullseye]="amd64 arm32v6 arm32v7 arm64v8 i386 ppc64le s390x"
     [debian:buster]="amd64 arm32v6 arm32v7 arm64v8 i386 ppc64le s390x"
-    [debian:stretch]="amd64 arm32v6 arm32v7 arm64v8 i386 ppc64le s390x"
 )
 
 cat <<-EOH
@@ -88,8 +88,8 @@ join() {
 for version in "${versions[@]}"; do
 
     for v in \
+        bullseye/{,slim} \
         buster/{,slim} \
-        stretch/{,slim} \
         alpine3.14/ \
         alpine3.13/ \
         windowsservercore-{1809,ltsc2016}/ \

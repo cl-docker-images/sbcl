@@ -26,7 +26,7 @@ RUN set -x \
     esac \
     && export SBCL_ARCH \
     && import_key() { \
-         gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$1"; \
+         gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$1"; \
        } \
     && download_and_validate_hashes() { \
          curl -fsSL "https://downloads.sourceforge.net/project/sbcl/sbcl/${1}/sbcl-${1}-crhodes.asc" > "sbcl-${1}-crhodes.asc" \

@@ -130,7 +130,7 @@ This image comes in several variants, each designed for a specific use case.
 
 This is the defacto image. If you are unsure about what your needs are, you probably want to use this one. It is designed to be used both as a throw away container (mount your source code and start the container to start your app), as well as the base to build other images off of. The included SBCL binary was built with the `--fancy` flag. Additionally, these images contain the SBCL source code (at `/usr/local/src/sbcl`) to help facilitate interactive development and exploration (a hallmark of Common Lisp!).
 
-Some of these tags may have names like buster or stretch in them. These are the suite code names for releases of Debian and indicate which release the image is based on. If your image needs to install any additional packages beyond what comes with the image, you'll likely want to specify one of these explicitly to minimize breakage when there are new releases of Debian.
+Some of these tags may have names like bullseye or buster in them. These are the suite code names for releases of Debian and indicate which release the image is based on. If your image needs to install any additional packages beyond what comes with the image, you'll likely want to specify one of these explicitly to minimize breakage when there are new releases of Debian.
 
 These images are built off the buildpack-deps image. It, by design, has a large number of extremely common Debian packages.
 

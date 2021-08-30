@@ -2,4 +2,4 @@
 
 set -e
 
-grep -e "^ENV SBCL_COMMIT" nightly/buster/Dockerfile | cut -d" " -f 3
+grep -e "^ENV SBCL_COMMIT" nightly/bullseye/Dockerfile | cut -d" " -f 3

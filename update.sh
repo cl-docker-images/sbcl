@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 declare -A refs=(
-    [2.1.8-rc]='master'
+    [2.1.9-rc]='master'
 )
 
 versions=( "$@" )
@@ -41,8 +41,8 @@ for version in "${versions[@]}"; do
     fi
 
     for v in \
+        bullseye/{,slim} \
         buster/{,slim} \
-        stretch/{,slim} \
         alpine3.14/ \
         alpine3.13/ \
         windowsservercore-{ltsc2016,1809}/ \
@@ -60,7 +60,7 @@ for version in "${versions[@]}"; do
         mkdir -p "$dir"
 
         case "$os" in
-            buster|stretch)
+            bullseye|buster)
                 template="apt"
                 if [ "$variant" = "slim" ]; then
                     from="debian:$os"
