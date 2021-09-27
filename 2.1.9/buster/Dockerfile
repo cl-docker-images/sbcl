@@ -5,7 +5,7 @@
 #
 FROM buildpack-deps:buster
 
-ENV SBCL_VERSION 2.1.8
+ENV SBCL_VERSION 2.1.9
 ENV SBCL_SIGNING_KEY D6839CA0A67F74D9DFB70922EBD595A9100D63CD
 
 WORKDIR /usr/local/src/
@@ -83,12 +83,12 @@ RUN set -x \
 # Add the script to trivially install Quicklisp
 COPY install-quicklisp /usr/local/bin/install-quicklisp
 
-# Install cl-launch. In the next release, move this up so that all images can
-# share it.
+# Install cl-launch and rlwrap. In the next release, move this up so that all
+# images can share it.
 # hadolint ignore=DL3008
 RUN set -x \
     && apt-get update \
-    && apt-get install --no-install-recommends -y cl-launch \
+    && apt-get install --no-install-recommends -y cl-launch rlwrap \
     && rm -rf /var/lib/apt/lists/*
 
 # Add the entrypoint

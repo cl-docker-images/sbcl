@@ -3,12 +3,12 @@
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
-FROM mcr.microsoft.com/windows/servercore:ltsc2016
+FROM mcr.microsoft.com/windows/servercore:1809
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
 
-ENV SBCL_VERSION 2.1.8
-ENV SBCL_SOURCE_SHA256 a3ea7bafcca051073b3769c1ee79d26c3c47cb4eb2f548b07ace38df14e25546
+ENV SBCL_VERSION 2.1.9
+ENV SBCL_SOURCE_SHA256 9e746ff12c4f78d2deabd95e48169b552f9472808cf8b8fc801d84df3e962fa1
 
 RUN echo 'Saving original machine PATH'; \
     $machineKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey('SYSTEM\ControlSet001\Control\Session Manager\Environment\'); \

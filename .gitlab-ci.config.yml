@@ -10,10 +10,10 @@
     - "daewok"
     - "clfoundation"
   rc_versions:
-    - 2.1.9-rc
+    - 2.1.10-rc
   rc_changes:
-    - 2.1.9-rc/**/*
+    - 2.1.10-rc/**/*
   versions:
-    - "2.1.8"
+    - "2.1.9"
   release_changes:
-    - 2.1.8/**/*
+    - 2.1.9/**/*
