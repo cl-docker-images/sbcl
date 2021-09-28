@@ -163,6 +163,11 @@
    image does, such as Windows 10 Professional/Enterprise (Anniversary Edition)
    or Windows Server 2016.
 
+   This image contains msys2 along with some common packages used for building
+   foreign code. The goal is to have foreign packages installed to make it
+   equivalent to default Debian images. If there's something missing, please
+   open an issue!
+
    For information about how to get Docker running on Windows, please see the
    relevant "Quick Start" guide provided by Microsoft:
 
