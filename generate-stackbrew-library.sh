@@ -92,7 +92,7 @@ for version in "${versions[@]}"; do
         buster/{,slim} \
         alpine3.14/ \
         alpine3.13/ \
-        windowsservercore-{1809,ltsc2016}/ \
+        windowsservercore-{1809,ltsc2019}/ \
     ; do
         os="${v%%/*}"
         variant="${v#*/}"
