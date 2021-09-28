@@ -27,7 +27,8 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     If (Test-Path 'C:\$Recycle.Bin') { Remove-Item -Force -Recurse -Path 'C:\$Recycle.Bin'; };
 
 # Install common tools. Eventually make this equivalent to buildpack-deps.
-RUN function msys() { C:\msys64\usr\bin\bash.exe @('-lc') + @Args; } \
+RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
+    function msys() { C:\msys64\usr\bin\bash.exe @('-lc') + @Args; } \
     $env:CHERE_INVOKING = 'yes'; \
     $env:MSYSTEM = 'MINGW64'; \
     msys 'pacman -S --noconfirm --needed mingw-w64-x86_64-gcc make diffutils tar unzip mingw-w64-x86_64-zlib git' \
@@ -49,7 +50,8 @@ RUN function msys() { C:\msys64\usr\bin\bash.exe @('-lc') + @Args; } \
 ENV SBCL_VERSION 2.1.9
 ENV SBCL_SOURCE_SHA256 9e746ff12c4f78d2deabd95e48169b552f9472808cf8b8fc801d84df3e962fa1
 
-RUN function msys() { C:\msys64\usr\bin\bash.exe @('-lc') + @Args; } \
+RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
+    function msys() { C:\msys64\usr\bin\bash.exe @('-lc') + @Args; } \
     $env:CHERE_INVOKING = 'yes'; \
     $env:MSYSTEM = 'MINGW64'; \
     $env:MSYS2_PATH_TYPE = 'inherit'; \
