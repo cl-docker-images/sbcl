@@ -47,8 +47,8 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     echo 'Clearing Recycle Bin (see https://github.com/docker/for-win/issues/8910)'; \
     If (Test-Path 'C:\$Recycle.Bin') { Remove-Item -Force -Recurse -Path 'C:\$Recycle.Bin'; };
 
-ENV SBCL_VERSION 2.1.9
-ENV SBCL_SOURCE_SHA256 9e746ff12c4f78d2deabd95e48169b552f9472808cf8b8fc801d84df3e962fa1
+ENV SBCL_VERSION 2.1.10
+ENV SBCL_SOURCE_SHA256 eb183f0f59a5cb2cbed762ec062bc34b9b6214b65402660784ef54838884b138
 
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
     function msys() { C:\msys64\usr\bin\bash.exe @('-lc') + @Args; } \
