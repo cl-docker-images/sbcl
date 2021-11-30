@@ -3,7 +3,7 @@
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
-FROM mcr.microsoft.com/windows/servercore:1809
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
@@ -47,8 +47,8 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     echo 'Clearing Recycle Bin (see https://github.com/docker/for-win/issues/8910)'; \
     If (Test-Path 'C:\$Recycle.Bin') { Remove-Item -Force -Recurse -Path 'C:\$Recycle.Bin'; };
 
-ENV SBCL_VERSION 2.1.10
-ENV SBCL_SOURCE_SHA256 eb183f0f59a5cb2cbed762ec062bc34b9b6214b65402660784ef54838884b138
+ENV SBCL_VERSION 2.1.11
+ENV SBCL_SOURCE_SHA256 bfc1481de7fdbdfaeef2ab0f0e8e84efd343433dea8d21cfbea8b0146cbdfefd
 
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
     function msys() { C:\msys64\usr\bin\bash.exe @('-lc') + @Args; } \

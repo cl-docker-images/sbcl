@@ -43,8 +43,8 @@ for version in "${versions[@]}"; do
     for v in \
         bullseye/{,slim} \
         buster/{,slim} \
+        alpine3.15/ \
         alpine3.14/ \
-        alpine3.13/ \
         windowsservercore-{ltsc2019,1809}/ \
     ; do
         os="${v%%/*}"
