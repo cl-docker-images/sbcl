@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 declare -A refs=(
-    [2.2.2-rc]='master'
+    [2.2.3-rc]='master'
 )
 
 versions=( "$@" )
