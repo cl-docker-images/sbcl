@@ -43,8 +43,11 @@ RUN set -x \
          # Remove the hardcoding of armv5 as target arch. Use the default
          # provided by the base image.
          && sed -i -e "s/CFLAGS += -marm -march=armv5/CFLAGS += -marm/" src/runtime/Config.arm-linux \
+         # Old versions of SBCL choke. <https://sourceforge.net/p/sbcl/mailman/message/37640913/>
+         && echo "(setf *debugger-hook* (lambda (c h) (declare (ignore h)) (let ((restart (find-restart 'continue c))) (when restart (invoke-restart restart)))))" > build-debugger-hook.lisp \
          && sh make.sh "--xc-host=${2}" \
          && sh install.sh \
+         && rm build-debugger-hook.lisp \
          && cd /usr/local/src; \
        } \
     && apt-get update \
@@ -56,7 +59,7 @@ RUN set -x \
     && download_and_validate_hashes "$SBCL_VERSION" \
     && download_and_unpack_binary "$SBCL_BINARY_VERSION" \
     && download_source "$SBCL_VERSION" \
-    && build_and_install_source "$SBCL_VERSION" "/usr/local/src/sbcl-${SBCL_BINARY_VERSION}-$SBCL_BINARY_ARCH_CODE-linux/run-sbcl.sh" \
+    && build_and_install_source "$SBCL_VERSION" "/usr/local/src/sbcl-${SBCL_BINARY_VERSION}-$SBCL_BINARY_ARCH_CODE-linux/run-sbcl.sh --load build-debugger-hook.lisp" \
     && rm -rf "$GNUPGHOME" ./* \
     && apt-get remove -y curl gnupg ca-certificates make dirmngr bzip2 build-essential \
     && apt-get autoremove -y \

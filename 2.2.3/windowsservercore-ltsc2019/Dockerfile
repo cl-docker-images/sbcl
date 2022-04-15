@@ -3,7 +3,7 @@
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
-FROM mcr.microsoft.com/windows/servercore:1809
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
@@ -47,8 +47,8 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     echo 'Clearing Recycle Bin (see https://github.com/docker/for-win/issues/8910)'; \
     If (Test-Path 'C:\$Recycle.Bin') { Remove-Item -Force -Recurse -Path 'C:\$Recycle.Bin'; };
 
-ENV SBCL_VERSION 2.2.2
-ENV SBCL_SOURCE_SHA256 8790dbbe97711dce14bb823125ce5b185b0073cf2f3cbf37bdd1ad380e7950f6
+ENV SBCL_VERSION 2.2.3
+ENV SBCL_SOURCE_SHA256 de7f49e1f7750fd2cd89111ef70641cc5471355f621b737392ac68aa95f37f9f
 
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
     function msys() { C:\msys64\usr\bin\bash.exe @('-lc') + @Args; } \
@@ -80,7 +80,9 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     \
     echo 'Building SBCL'; \
     $env:WIX = '/c/wix'; \
-    msys './make.sh --with-sb-linkable-runtime'; \
+    msys 'echo "(setf *debugger-hook* (lambda (c h) (declare (ignore h)) (let ((restart (find-restart `'continue c))) (when restart (invoke-restart restart)))))" > build-debugger-hook.lisp'; \
+    msys './make.sh --xc-host="sbcl --load build-debugger-hook.lisp" --with-sb-linkable-runtime'; \
+    msys 'rm build-debugger-hook.lisp'; \
     msys './make-windows-installer.sh'; \
     cd ..; \
     \
