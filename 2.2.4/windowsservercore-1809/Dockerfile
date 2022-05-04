@@ -80,9 +80,7 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     \
     echo 'Building SBCL'; \
     $env:WIX = '/c/wix'; \
-    msys 'echo "(setf *debugger-hook* (lambda (c h) (declare (ignore h)) (let ((restart (find-restart `'continue c))) (when restart (invoke-restart restart)))))" > build-debugger-hook.lisp'; \
-    msys './make.sh --xc-host="sbcl --load build-debugger-hook.lisp" --with-sb-linkable-runtime'; \
-    msys 'rm build-debugger-hook.lisp'; \
+    msys './make.sh --with-sb-linkable-runtime'; \
     msys './make-windows-installer.sh'; \
     cd ..; \
     \
