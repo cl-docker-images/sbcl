@@ -56,7 +56,7 @@ RUN set -x \
          && cd /usr/local/src; \
        } \
     && apt-get update \
-    && apt-get install -y --no-install-recommends curl gnupg ca-certificates make dirmngr bzip2 build-essential \
+    && apt-get install -y --no-install-recommends curl gnupg ca-certificates make dirmngr bzip2 build-essential libzstd-dev \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && gpg --batch --keyserver keyserver.ubuntu.com --recv-keys ${SBCL_SIGNING_KEY} \
@@ -66,7 +66,7 @@ RUN set -x \
     && download_source "$SBCL_VERSION" \
     && build_and_install_source "$SBCL_VERSION" "/usr/local/src/sbcl-${SBCL_BINARY_VERSION}-$SBCL_BINARY_ARCH_CODE-linux/run-sbcl.sh --load build-debugger-hook.lisp" \
     && rm -rf "$GNUPGHOME" ./* \
-    && apt-get remove -y curl gnupg ca-certificates make dirmngr bzip2 build-essential \
+    && apt-get remove -y curl gnupg ca-certificates make dirmngr bzip2 build-essential libzstd-dev \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     && sbcl --version

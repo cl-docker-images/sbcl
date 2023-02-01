@@ -19,6 +19,9 @@ RUN set -x \
     amd64) SBCL_ARCH=x86-64; SBCL_BINARY_ARCH_CODE=x86-64; SBCL_BINARY_VERSION=1.5.5;; \
     *) echo "Unknown arch" >&2; exit 1;; \
     esac \
+    && apt-get update \
+    && apt-get install --no-install-recommends -y libzstd-dev \
+    && rm -rf /var/lib/apt/lists/* \
     && export SBCL_ARCH \
     && export SBCL_BINARY_ARCH_CODE \
     && export SBCL_BINARY_VERSION \
