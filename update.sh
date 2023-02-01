@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 declare -A refs=(
-    [2.2.5-rc]='master'
+    [2.3.2-rc]='master'
 )
 
 versions=( "$@" )
@@ -43,8 +43,8 @@ for version in "${versions[@]}"; do
     for v in \
         bullseye/{,slim} \
         buster/{,slim} \
-        alpine3.15/ \
-        alpine3.14/ \
+        alpine3.17/ \
+        alpine3.16/ \
         windowsservercore-{ltsc2019,1809}/ \
     ; do
         os="${v%%/*}"
