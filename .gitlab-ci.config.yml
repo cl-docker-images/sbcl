@@ -3,7 +3,7 @@
     amd64: "yes"
     arm64v8: "yes"
     arm32v7: "yes"
-    winamd64: "yes"
+    winamd64: "no"
   build_namespace: "daewok"
   canonical_namespace: "clfoundation"
   namespaces:
